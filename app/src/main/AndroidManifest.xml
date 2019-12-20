@@ -1,14 +1,27 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.linklab.inertia.surveymyhealth">
+<!-- This is the manifest file for the application. This file is needed and changes to this file can drastically affect the
+        performance of the application. For your information to insert a comment in a manifest file you can press the
+        "CTRL" + "SHIFT" + "/" keys and start typing your comment -->
 
+<!-- Defines the package name of the application that is used in compiling -->
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.linklab.inertia.besic">
+
+    <!-- Defines what features are need by the application to run  -->
     <uses-feature android:name="android.hardware.type.watch" />
+
+    <!-- Defines the application itself including services and application file information -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/app_name_abbreviated"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.DeviceDefault">
-
+        android:theme="@android:style/Theme.DeviceDefault"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="true" >
+        </meta-data>
     </application>
-
 </manifest>

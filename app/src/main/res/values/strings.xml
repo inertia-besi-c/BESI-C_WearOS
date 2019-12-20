@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">SurveyMyHealth</string>
+    <string name="app_name_full">Behavioral and Environmental Sensing and Intervention</string>     <!-- Full name of the application -->
+    <string name="app_name_abbreviated">BESI-C</string>     <!-- This is the abbreviated format of the application name -->
 </resources>
