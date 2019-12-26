@@ -34,8 +34,8 @@ public class WatchFace extends CanvasWatchFaceService
         private TextPaint batteryPaint, timePaint, datePaint, startPaint;     // Sets the paint instance for the battery level text.
         private String batteryLevel, currentTime, currentDate, startMessage;        // Sets up string variables.
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas.
-        private int batteryLevelPositionX, batteryLevelPositionY,        // Sets up integer variables.
-                currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,        // Sets up integer variables.
+        private int batteryLevelPositionX, batteryLevelPositionY,
+                currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
                 startX, startY;       // Sets up integer variables.
 
         /**
@@ -116,23 +116,6 @@ public class WatchFace extends CanvasWatchFaceService
         }
 
         /**
-         * Resets button variables so text can be drawn using the same resources
-         */
-        private void reconfigureButtons()
-        {
-            this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
-
-            if (isScreenOn())       // Checks if the screen is on
-            {
-                this.startPaint.setColor(Color.WHITE);      // Sets the color
-            }
-            else
-            {
-                this.startPaint.setColor(Color.BLACK);      // Sets the color
-            }
-        }
-
-        /**
          * This method sets up the Date and Time information needed such as screen location, text, and paint.
          */
         private void setUpDateAndTime()
@@ -162,16 +145,6 @@ public class WatchFace extends CanvasWatchFaceService
         }
 
         /**
-         * This method initializes the required values for variables needed in the onDraw method.
-         */
-        private void setUpDefaultValues()
-        {
-            this.currentDate = this.systemInformation.getDateForUI();        // Sets up the date from the specific method.
-            this.currentTime = this.systemInformation.getTimeForUI();        // Sets up the time from the specific method.
-            this.batteryLevel = this.getBatteryLevelString();      // Sets up the battery level by calling the specified method.
-        }
-
-        /**
          * This method initializes the required colors for variables needed in the onDraw method.
          */
         private void setUpDefaultColors()
@@ -193,6 +166,33 @@ public class WatchFace extends CanvasWatchFaceService
             {
                 this.batteryPaint.setColor(Color.RED);        // Sets the color of the battery level.
             }
+        }
+
+        /**
+         * Resets button variables so text can be drawn using the same resources
+         */
+        private void reconfigureButtons()
+        {
+            this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
+
+            if (isScreenOn())       // Checks if the screen is on
+            {
+                this.startPaint.setColor(Color.WHITE);      // Sets the color
+            }
+            else
+            {
+                this.startPaint.setColor(Color.BLACK);      // Sets the color
+            }
+        }
+
+        /**
+         * This method initializes the required values for variables needed in the onDraw method.
+         */
+        private void setUpDefaultValues()
+        {
+            this.currentDate = this.systemInformation.getDateForUI();        // Sets up the date from the specific method.
+            this.currentTime = this.systemInformation.getTimeForUI();        // Sets up the time from the specific method.
+            this.batteryLevel = this.getBatteryLevelString();      // Sets up the battery level by calling the specified method.
         }
 
         /**
