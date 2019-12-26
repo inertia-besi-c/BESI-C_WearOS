@@ -89,19 +89,9 @@ public class WatchFace extends CanvasWatchFaceService
             canvas.drawRect(this.startX, startY, (getResources().getDisplayMetrics().widthPixels / 2)+(getResources().getDisplayMetrics().widthPixels / 15),    // Draws the specified rectangle
                     this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15, this.startPaint);       // Continued from previous line
             this.reconfigureButtons();      // Calls the method
-            canvas.drawText(this.startMessage, this.startX+20, startY + (startY/3) + 10, this.startPaint);      // Calls the canvas to draw the message information
+            canvas.drawText(this.startMessage, this.startX+20, startY + (startY/3) + 12, this.startPaint);      // Calls the canvas to draw the message information
 
             onTimeTick();       // Calls the specified method
-        }
-
-        /**
-         * Overridden method updates the time every minute
-         */
-        @Override
-        public void onTimeTick()
-        {
-            super.onTimeTick();     // Calls to superclass
-            invalidate();       // Redraws the screen
         }
 
         /**
@@ -111,7 +101,7 @@ public class WatchFace extends CanvasWatchFaceService
         {
             this.startMessage = getResources().getString(R.string.start_string);        // Sets the string of the button
             this.startX = 0;        // Sets the starting x location
-            this.startY = this.currentTimePositionY+(this.currentTimeTextBounds.height()/3);        // Sets the starting y location
+            this.startY = this.currentTimePositionY+(this.currentTimeTextBounds.height()/3)+10;        // Sets the starting y location
 
             this.startPaint.setTextSize(40);        // Initializes button size
             this.startPaint.getFontMetrics(this.startBackground);       // Sets background
@@ -131,15 +121,15 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private void reconfigureButtons()
         {
+            this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
+
             if (isScreenOn())       // Checks if the screen is on
             {
                 this.startPaint.setColor(Color.WHITE);      // Sets the color
-                this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
             }
             else
             {
                 this.startPaint.setColor(Color.BLACK);      // Sets the color
-                this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
             }
         }
 
@@ -154,11 +144,11 @@ public class WatchFace extends CanvasWatchFaceService
             this.timePaint.setTextSize(Float.valueOf(getResources().getString(R.string.ui_time_size)));     // Sets the size of the UI element
             this.datePaint.setTextSize(Float.valueOf(getResources().getString(R.string.ui_date_size)));     // Sets the size of the UI element
 
-            this.currentTimePositionX = Math.abs((getResources().getDisplayMetrics().widthPixels / 2) - (this.currentTimeTextBounds.width()/2));        // Sets te x location of the time.
+            this.currentTimePositionX = Math.abs((getResources().getDisplayMetrics().widthPixels / 2) - (this.currentTimeTextBounds.width()/2) - 5);        // Sets te x location of the time.
             this.currentDatePositionX = Math.abs((getResources().getDisplayMetrics().widthPixels / 2) - (this.currentDateTextBounds.width()/2));        // Sets te x location of the date.
 
-            this.currentTimePositionY = Math.abs(getResources().getDisplayMetrics().heightPixels / 2);     // Sets the y location of the time.
-            this.currentDatePositionY = Math.abs((getResources().getDisplayMetrics().heightPixels / 2) - ((this.currentDateTextBounds.height()*2) + 20));     // Sets the y location of the date.
+            this.currentTimePositionY = Math.abs((getResources().getDisplayMetrics().heightPixels / 2) - 15);     // Sets the y location of the time.
+            this.currentDatePositionY = Math.abs((getResources().getDisplayMetrics().heightPixels / 2) - ((this.currentDateTextBounds.height()*2) + 20) - 15);     // Sets the y location of the date.
         }
 
         /**
@@ -169,7 +159,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.batteryPaint.getTextBounds(this.batteryLevel, 0, this.batteryLevel.length(), this.batteryLevelTextBounds);       // Paints the battery information
             this.batteryPaint.setTextSize(Float.valueOf(getResources().getString(R.string.ui_battery_size)));     // Sets the size of the UI element
             this.batteryLevelPositionX = Math.abs((getResources().getDisplayMetrics().widthPixels / 2) - (this.batteryLevelTextBounds.width()/2));      // Sets the x location of the battery level
-            this.batteryLevelPositionY = Math.abs(getResources().getDisplayMetrics().heightPixels) - (this.batteryLevelTextBounds.height()/2 + 15);     // Sets the y location of the battery level
+            this.batteryLevelPositionY = Math.abs(getResources().getDisplayMetrics().heightPixels) - (this.batteryLevelTextBounds.height()/2 + 10);     // Sets the y location of the battery level
         }
 
         /**
@@ -192,23 +182,28 @@ public class WatchFace extends CanvasWatchFaceService
                 this.datePaint.setColor(Color.WHITE);       // Sets the color of the date on the UI
                 this.timePaint.setColor(Color.WHITE);       // Sets the color of the time on the UI.
                 this.batteryPaint.setColor(Color.GREEN);        // Sets the color of the battery level.
-
-                if (this.getBatteryLevelInteger() <= 30)        // Checks te battery level
-                {
-                    this.batteryPaint.setColor(Color.RED);        // Sets the color of the battery level.
-                }
             }
             else        // If the screen is in ambient mode
             {
                 this.datePaint.setColor(Color.DKGRAY);       // Sets the color of the date on the UI
                 this.timePaint.setColor(Color.LTGRAY);       // Sets the color of the time on the UI.
                 this.batteryPaint.setColor(Color.DKGRAY);        // Sets the color of the battery level.
-
-                if (this.getBatteryLevelInteger() <= 30)        // Checks te battery level
-                {
-                    this.batteryPaint.setColor(Color.RED);        // Sets the color of the battery level.
-                }
             }
+
+            if (this.getBatteryLevelInteger() <= 30)        // Checks te battery level
+            {
+                this.batteryPaint.setColor(Color.RED);        // Sets the color of the battery level.
+            }
+        }
+
+        /**
+         * Overridden method updates the time every minute
+         */
+        @Override
+        public void onTimeTick()
+        {
+            super.onTimeTick();     // Calls to superclass
+            invalidate();       // Redraws the screen
         }
 
         /**

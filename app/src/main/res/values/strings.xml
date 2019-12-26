@@ -11,7 +11,7 @@
     <string name="watchface_name">BESI-C</string>  <!--This is the string that is shown as the watchface name-->
 
     <!--User Interface Size Information-->
-    <string name="ui_time_size">88</string>     <!--Size of the time-->
+    <string name="ui_time_size">85</string>     <!--Size of the time-->
     <string name="ui_date_size">38</string>     <!--Size of the date-->
     <string name="ui_battery_size">25</string>      <!--Size of the battery text-->
     <string name="ui_start_button_size">65</string>     <!--Size of the start button-->
