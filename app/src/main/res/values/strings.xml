@@ -8,7 +8,7 @@
     <string name="start_string">START</string>  <!--This is the string that is shown on the green button-->
 
     <!--Name of Unique Device Screens-->
-    <string name="watchface_name">START</string>  <!--This is the string that is shown as the watchface name-->
+    <string name="watchface_name">BESI-C</string>  <!--This is the string that is shown as the watchface name-->
 
     <!--User Interface Size Information-->
     <string name="ui_time_size">88</string>     <!--Size of the time-->

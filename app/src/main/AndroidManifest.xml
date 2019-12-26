@@ -21,6 +21,7 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
@@ -50,11 +51,8 @@
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
-
     </application>
 </manifest>
