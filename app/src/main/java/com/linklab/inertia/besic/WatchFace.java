@@ -78,7 +78,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.setUpDefaultColors();      // Sets up the colors on the UI.
             this.setUpDateAndTime();       // Sets up the time on the UI.
             this.setUpBatteryLevel();      // Sets up the battery values on the UI.
-            this.setUpButtons();
+            this.setUpButtons();        // Sets up the buttons on the UI.
             this.clearCanvas(canvas);       // Clears the screen so new values can be drawn.
 
             canvas.drawText(this.currentDate, this.currentDatePositionX, this.currentDatePositionY, this.datePaint);       // Calls the canvas to draw the date information
