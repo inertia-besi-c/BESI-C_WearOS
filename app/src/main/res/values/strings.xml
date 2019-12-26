@@ -1,4 +1,15 @@
 <resources>
+    <!--General Application Naming and Information-->
     <string name="app_name_full">Behavioral and Environmental Sensing and Intervention</string>     <!-- Full name of the application -->
     <string name="app_name_abbreviated">BESI-C</string>     <!-- This is the abbreviated format of the application name -->
+
+    <!--User Interface Naming Information-->
+    <string name="battery_level_string">Battery:</string>   <!--This is the battery information shown in front of the battery information-->
+    <string name="start_string">START</string>  <!--This is the string that is shown on the green button-->
+
+    <!--User Interface Size Information-->
+    <string name="ui_time_size">88</string>     <!--Size of the time-->
+    <string name="ui_date_size">38</string>     <!--Size of the date-->
+    <string name="ui_battery_size">25</string>      <!--Size of the battery text-->
+    <string name="ui_start_button_size">65</string>     <!--Size of the start button-->
 </resources>

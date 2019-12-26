@@ -9,19 +9,52 @@
     package="com.linklab.inertia.besic">
 
     <!-- Defines what features are need by the application to run  -->
+    <uses-permission android:name="com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA" />
     <uses-feature android:name="android.hardware.type.watch" />
+    <uses-feature android:name="android.software.type.watch" />
 
     <!-- Defines the application itself including services and application file information -->
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/besic_logo_round"
         android:label="@string/app_name_abbreviated"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
         <meta-data
             android:name="com.google.android.wearable.standalone"
-            android:value="true" >
-        </meta-data>
+            android:value="true" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <uses-library
+            android:name="com.google.android.wearable"
+            android:required="true" />
+
+        <service
+            android:name=".WatchFace"
+            android:label="@string/watchface_name"
+            android:permission="android.permission.BIND_WALLPAPER">
+
+            <meta-data
+                android:name="android.service.wallpaper"
+                android:resource="@xml/watch_face" />
+            <meta-data
+                android:name="com.google.android.wearable.watchface.preview"
+                android:resource="@drawable/besi" />
+            <meta-data
+                android:name="com.google.android.wearable.watchface.preview_circular"
+                android:resource="@drawable/besi" />
+
+            <intent-filter>
+                <action android:name="android.service.wallpaper.WallpaperService" />
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
+            </intent-filter>
+        </service>
+
     </application>
 </manifest>
