@@ -7,6 +7,9 @@
     <string name="battery_level_string">Battery:</string>   <!--This is the battery information shown in front of the battery information-->
     <string name="start_string">START</string>  <!--This is the string that is shown on the green button-->
 
+    <!--Name of Unique Device Screens-->
+    <string name="watchface_name">START</string>  <!--This is the string that is shown as the watchface name-->
+
     <!--User Interface Size Information-->
     <string name="ui_time_size">88</string>     <!--Size of the time-->
     <string name="ui_date_size">38</string>     <!--Size of the date-->
