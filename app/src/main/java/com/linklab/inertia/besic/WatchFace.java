@@ -3,7 +3,6 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.graphics.*;
 import android.text.*;
@@ -22,7 +21,7 @@ public class WatchFace extends CanvasWatchFaceService
     @Override
     public Engine onCreateEngine()
     {
-        return new BESIWatchFace();        // Calls the method stated.
+        return new BESIWatchFace();        // Calls the manually created private engine in the class.
     }
 
     /**
