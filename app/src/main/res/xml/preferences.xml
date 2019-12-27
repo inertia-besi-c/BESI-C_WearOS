@@ -3,11 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:key="main"
-        android:title="Device Settings">
+        android:title="General">
 
         <PreferenceScreen
             android:key="device"
-            android:title="Device Information Settings">
+            android:title="Device Information">
 
             <ListPreference
                 android:key="user_info"
@@ -44,5 +44,49 @@
             </EditTextPreference>
         </PreferenceScreen>
 
+        <PreferenceScreen
+            android:key="Battery"
+            android:title="Battery">
+        </PreferenceScreen>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="main"
+        android:title="Surveys">
+
+        <PreferenceScreen
+            android:key="pain"
+            android:title="Pain Survey">
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="followup"
+            android:title="Followup Survey">
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="endofday"
+            android:title="End of Day Survey">
+        </PreferenceScreen>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="main"
+        android:title="Sensors">
+
+        <PreferenceScreen
+            android:key="heartrate"
+            android:title="Heart Rate">
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="accelerometer"
+            android:title="Accelerometer">
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="estimote"
+            android:title="Estimote">
+        </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>
