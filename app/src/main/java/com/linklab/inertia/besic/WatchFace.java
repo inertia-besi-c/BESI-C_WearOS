@@ -3,10 +3,12 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-import android.support.wearable.watchface.CanvasWatchFaceService;
+import android.support.wearable.watchface.*;
 import android.graphics.*;
 import android.text.*;
+import android.util.Log;
 import android.view.*;
+import android.widget.Toast;
 
 /**
  * On Android Wear Watch Face is implemented as a service. This is being used by the application to save resources by giving them to the android system to configure.
@@ -47,6 +49,8 @@ public class WatchFace extends CanvasWatchFaceService
         public void onCreate(SurfaceHolder holder)
         {
             super.onCreate(holder);     // Calls a creation instance
+
+            this.setWatchFaceStyle(new WatchFaceStyle.Builder(WatchFace.this).setAcceptsTapEvents(true).build());        // Sets the watchface to accept user tap event inputs.
 
             this.systemInformation = new SystemInformation();       // Binds the variable to the calls in the class
 
@@ -89,8 +93,28 @@ public class WatchFace extends CanvasWatchFaceService
                     this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15, this.startPaint);       // Continued from previous line
             this.reconfigureButtons();      // Calls the method
             canvas.drawText(this.startMessage, this.startX+20, startY + (startY/3) + 12, this.startPaint);      // Calls the canvas to draw the message information
+        }
 
-            onTimeTick();       // Calls the specified method
+        @Override
+        public void onTapCommand(@TapType int tapType, int x, int y, long eventTime)
+        {
+            int startButtonXEnd = (getResources().getDisplayMetrics().widthPixels / 2)+(getResources().getDisplayMetrics().widthPixels / 15);
+            int startButtonYEnd = this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15;
+
+            switch (tapType)
+            {
+                case WatchFaceService.TAP_TYPE_TOUCH:
+                    if (x >= startX && x <= startButtonXEnd && y >= startY && y <= startButtonYEnd)
+                    {
+                        Toast.makeText(getApplicationContext(),
+                                "Start Tapped!",
+                                Toast.LENGTH_LONG)
+                                .show();
+                    }
+
+                case WatchFaceService.TAP_TYPE_TOUCH_CANCEL:
+                    break;
+            }
         }
 
         /**
