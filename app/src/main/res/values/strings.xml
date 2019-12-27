@@ -1,3 +1,6 @@
+<!--
+    This file stores application specific items that is not expected to be changed. These values are hardcoded values needed for thr app to function properly.
+-->
 <resources>
     <!--General Application Naming and Information-->
     <string name="app_name_full">Behavioral and Environmental Sensing and Intervention</string>     <!-- Full name of the application -->
