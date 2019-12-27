@@ -47,6 +47,96 @@
         <PreferenceScreen
             android:key="Battery"
             android:title="Battery">
+
+            <PreferenceCategory
+                android:key="Battery General"
+                android:title="Low Battery Settings">
+
+                <EditTextPreference
+                    android:dialogTitle="Battery Alert"
+                    android:dialogMessage="Battery Percentage at which to activate Low Power Mode?"
+                    android:inputType="number"
+                    android:key="low_battery_alert"
+                    android:title="Battery Alert Level"
+                    android:summary="15">
+                </EditTextPreference>
+
+                <EditTextPreference
+                    android:dialogTitle="Battery Buzz"
+                    android:dialogMessage="How long should the alert buzz be (seconds)?"
+                    android:inputType="number"
+                    android:key="low_battery_buzz"
+                    android:title="Battery Buzz"
+                    android:summary="2">
+                </EditTextPreference>
+
+                <EditTextPreference
+                    android:dialogTitle="Battery Reminder Buzz"
+                    android:dialogMessage="Buzz time (seconds) for low battery reminder?"
+                    android:inputType="number"
+                    android:key="battery_remind"
+                    android:title="Battery Reminder"
+                    android:summary="600">
+                </EditTextPreference>
+            </PreferenceCategory>
+
+            <PreferenceCategory
+                android:key="Low Battery Start Time"
+                android:title="Low Battery Disable">
+
+                <ListPreference
+                    android:key="battery_hour_alert_start"
+                    android:title="Low Battery Start Hour"
+                    android:entries="@array/hourList"
+                    android:entryValues="@array/hourList"
+                    android:summary="12 AM">
+                </ListPreference>
+
+                <ListPreference
+                    android:key="battery_minute_alert_start"
+                    android:title="Low Battery Start Minute"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:summary="0 Minutes">
+                </ListPreference>
+
+                <ListPreference
+                    android:key="battery_second_alert_start"
+                    android:title="Low Battery Start Second"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:summary="0 Seconds">
+                </ListPreference>
+            </PreferenceCategory>
+
+            <PreferenceCategory
+                android:key="Low Battery End Time"
+                android:title="Low Battery Re-enable">
+
+                <ListPreference
+                    android:key="battery_hour_alert_end"
+                    android:title="Low Battery End Hour"
+                    android:entries="@array/hourList"
+                    android:entryValues="@array/hourList"
+                    android:summary="8 AM">
+                </ListPreference>
+
+                <ListPreference
+                    android:key="battery_minute_alert_end"
+                    android:title="Low Battery End Minute"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:summary="0 Minutes">
+                </ListPreference>
+
+                <ListPreference
+                    android:key="battery_second_alert_end"
+                    android:title="Low Battery End Second"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:summary="0 Seconds">
+                </ListPreference>
+            </PreferenceCategory>
         </PreferenceScreen>
 
         <PreferenceScreen
@@ -64,20 +154,20 @@
 
             <EditTextPreference
                 android:dialogTitle="Starting Buzz"
-                android:dialogMessage="Buzz time (milliseconds) for starting activities?"
+                android:dialogMessage="Buzz time (seconds) for starting activities?"
                 android:inputType="number"
                 android:key="activity_start"
                 android:title="Starting Activity"
-                android:summary="1000">
+                android:summary="1">
             </EditTextPreference>
 
             <EditTextPreference
                 android:dialogTitle="Reminder Buzz"
-                android:dialogMessage="Buzz time (milliseconds) for activity reminder?"
+                android:dialogMessage="Buzz time (seconds) for activity reminder?"
                 android:inputType="number"
                 android:key="activity_remind"
                 android:title="Reminding Activity"
-                android:summary="1000">
+                android:summary="1">
             </EditTextPreference>
         </PreferenceScreen>
     </PreferenceCategory>
@@ -110,7 +200,7 @@
 
             <EditTextPreference
                 android:dialogTitle="Pain Delay"
-                android:dialogMessage="Pain EMA Reminder Timer Delay (milliseconds)?"
+                android:dialogMessage="Pain EMA Reminder Timer Delay (seconds)?"
                 android:inputType="number"
                 android:key="pain_remind"
                 android:title="Delay Timer"
@@ -124,11 +214,11 @@
 
             <EditTextPreference
                 android:dialogTitle="Followup Time Delay"
-                android:dialogMessage="Followup EMA trigger time from Pain EMA Question (minutes)?"
+                android:dialogMessage="Followup EMA trigger time from Pain EMA Question (seconds)?"
                 android:inputType="number"
                 android:key="followup_trigger"
                 android:title="Followup Trigger"
-                android:summary="30">
+                android:summary="1800">
             </EditTextPreference>
 
             <EditTextPreference
@@ -151,7 +241,7 @@
 
             <EditTextPreference
                 android:dialogTitle="Followup Delay"
-                android:dialogMessage="Followup EMA Reminder Timer Delay (milliseconds)?"
+                android:dialogMessage="Followup EMA Reminder Timer Delay (seconds)?"
                 android:inputType="number"
                 android:key="followup_remind"
                 android:title="Delay Timer"
@@ -162,6 +252,8 @@
         <PreferenceScreen
             android:key="endofday"
             android:title="End of Day Survey">
+
+
         </PreferenceScreen>
     </PreferenceCategory>
 
