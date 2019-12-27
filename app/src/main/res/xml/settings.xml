@@ -1,14 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    This file is the UI setting for the settings screen for the application. The values initialized
+    here are the default values, but can be changed to reflect a new value. The updated values will
+    be shared to the shared preferences section which is used to alter the application accordingly.
+-->
+
+<!-- A settings screen is initialized -->
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- This section makes a new category for general settings for the application -->
     <PreferenceCategory
         android:key="main"
         android:title="General">
 
+        <!-- A settings screen is initialized -->
         <PreferenceScreen
             android:key="device"
             android:title="Device Information">
 
+            <!-- A list is made for the user information -->
             <ListPreference
                 android:key="user_info"
                 android:title="User"
@@ -17,6 +28,7 @@
                 android:summary="Demonstration">
             </ListPreference>
 
+            <!-- A list is made for the device information -->
             <ListPreference
                 android:key="device_info"
                 android:title="Device Identification"
@@ -25,6 +37,7 @@
                 android:summary="Demonstration">
             </ListPreference>
 
+            <!-- A text input is made for the directory information -->
             <EditTextPreference
                 android:dialogTitle="Directory"
                 android:dialogMessage="Directory name for saving data?"
@@ -34,6 +47,7 @@
                 android:summary="BESI-C">
             </EditTextPreference>
 
+            <!-- A text input is taken for the deployment identification-->
             <EditTextPreference
                 android:dialogTitle="Deployment Identification"
                 android:dialogMessage="Deployment Identification assigned?"
@@ -44,14 +58,17 @@
             </EditTextPreference>
         </PreferenceScreen>
 
+        <!-- A new screen is made for the battery setting of the device -->
         <PreferenceScreen
             android:key="Battery"
             android:title="Battery">
 
+            <!-- A settings Category is initialized -->
             <PreferenceCategory
                 android:key="Battery General"
                 android:title="Low Battery Settings">
 
+                <!-- A text input is initialized for low battery parameters -->
                 <EditTextPreference
                     android:dialogTitle="Battery Alert"
                     android:dialogMessage="Battery Percentage at which to activate Low Power Mode?"
@@ -61,6 +78,7 @@
                     android:summary="15">
                 </EditTextPreference>
 
+                <!-- A text input parameter is initialized for buzz duration -->
                 <EditTextPreference
                     android:dialogTitle="Battery Buzz"
                     android:dialogMessage="How long should the alert buzz be (seconds)?"
@@ -70,6 +88,7 @@
                     android:summary="2">
                 </EditTextPreference>
 
+                <!-- A text input parameter is initialized for reminder buzz parameters-->
                 <EditTextPreference
                     android:dialogTitle="Battery Reminder Buzz"
                     android:dialogMessage="Buzz time (seconds) for low battery reminder?"
@@ -80,10 +99,12 @@
                 </EditTextPreference>
             </PreferenceCategory>
 
+            <!-- A new category is made for disabling notification of low battery -->
             <PreferenceCategory
                 android:key="Low Battery Start Time"
                 android:title="Low Battery Disable">
 
+                <!-- A preference list is made for the hour time -->
                 <ListPreference
                     android:key="battery_hour_alert_start"
                     android:title="Low Battery Start Hour"
@@ -92,6 +113,7 @@
                     android:summary="12 AM">
                 </ListPreference>
 
+                <!-- A preference list is made for the minute time -->
                 <ListPreference
                     android:key="battery_minute_alert_start"
                     android:title="Low Battery Start Minute"
@@ -100,6 +122,7 @@
                     android:summary="0 Minutes">
                 </ListPreference>
 
+                <!-- A preference list is made for the seconds time -->
                 <ListPreference
                     android:key="battery_second_alert_start"
                     android:title="Low Battery Start Second"
@@ -109,10 +132,12 @@
                 </ListPreference>
             </PreferenceCategory>
 
+            <!-- A new category is made for re-enabling the low battery alert -->
             <PreferenceCategory
                 android:key="Low Battery End Time"
                 android:title="Low Battery Re-enable">
 
+                <!-- A preference list is made for the hour time -->
                 <ListPreference
                     android:key="battery_hour_alert_end"
                     android:title="Low Battery End Hour"
@@ -121,6 +146,7 @@
                     android:summary="8 AM">
                 </ListPreference>
 
+                <!-- A preference list is made for the minute time -->
                 <ListPreference
                     android:key="battery_minute_alert_end"
                     android:title="Low Battery End Minute"
@@ -129,6 +155,7 @@
                     android:summary="0 Minutes">
                 </ListPreference>
 
+                <!-- A preference list is made for the seconds time -->
                 <ListPreference
                     android:key="battery_second_alert_end"
                     android:title="Low Battery End Second"
@@ -139,10 +166,12 @@
             </PreferenceCategory>
         </PreferenceScreen>
 
+        <!-- A new preference screen is made for the alerts section-->
         <PreferenceScreen
             android:key="notifications"
             android:title="Alerts">
 
+            <!-- A text input is initialized for the haptic feedback information -->
             <EditTextPreference
                 android:dialogTitle="Haptic Feedback"
                 android:dialogMessage="Haptic Feedback Level? Please try to keep it to less than 30"
@@ -152,6 +181,7 @@
                 android:summary="20">
             </EditTextPreference>
 
+            <!-- A text input is initialized for the buzz associated with the start of an activity -->
             <EditTextPreference
                 android:dialogTitle="Starting Buzz"
                 android:dialogMessage="Buzz time (seconds) for starting activities?"
@@ -161,6 +191,7 @@
                 android:summary="1">
             </EditTextPreference>
 
+            <!-- A text input is initialized for the buzz associated with a reminder to complete an activity -->
             <EditTextPreference
                 android:dialogTitle="Reminder Buzz"
                 android:dialogMessage="Buzz time (seconds) for activity reminder?"
@@ -172,14 +203,17 @@
         </PreferenceScreen>
     </PreferenceCategory>
 
+    <!-- A new category is made for survey settings -->
     <PreferenceCategory
         android:key="main"
         android:title="Surveys">
 
+        <!-- A screen is initialized for the pain survey information -->
         <PreferenceScreen
             android:key="pain"
             android:title="Pain Survey">
 
+            <!-- A text input is initialized for the reminder interval -->
             <EditTextPreference
                 android:dialogTitle="Pain Interval"
                 android:dialogMessage="Pain EMA Reminder Interval Time (seconds)?"
@@ -189,6 +223,7 @@
                 android:summary="300">
             </EditTextPreference>
 
+            <!-- A text input is initialized for the number of reminders needed -->
             <EditTextPreference
                 android:dialogTitle="Pain Reminder"
                 android:dialogMessage="Pain EMA Number of Reminders?"
@@ -198,6 +233,7 @@
                 android:summary="2">
             </EditTextPreference>
 
+            <!-- A text input is initialized for the delay associated with starting the reminders -->
             <EditTextPreference
                 android:dialogTitle="Pain Delay"
                 android:dialogMessage="Pain EMA Reminder Timer Delay (seconds)?"
@@ -208,10 +244,12 @@
             </EditTextPreference>
         </PreferenceScreen>
 
+        <!--A new settings screen is initialized for the followup EMA -->
         <PreferenceScreen
             android:key="followup"
             android:title="Followup Survey">
 
+            <!-- A text input is taken for the delay associated with starting the activity -->
             <EditTextPreference
                 android:dialogTitle="Followup Time Delay"
                 android:dialogMessage="Followup EMA trigger time from Pain EMA Question (seconds)?"
@@ -221,6 +259,7 @@
                 android:summary="1800">
             </EditTextPreference>
 
+            <!-- A text input is initialized for the reminder interval -->
             <EditTextPreference
                 android:dialogTitle="Followup Interval"
                 android:dialogMessage="Followup EMA Reminder Interval Time (seconds)?"
@@ -230,6 +269,7 @@
                 android:summary="300">
             </EditTextPreference>
 
+            <!-- A text input is initialized for the number of reminders needed -->
             <EditTextPreference
                 android:dialogTitle="Followup Reminder"
                 android:dialogMessage="Followup EMA Number of Reminders?"
@@ -239,6 +279,7 @@
                 android:summary="3">
             </EditTextPreference>
 
+            <!-- A text input is initialized for the delay associated with starting the reminders -->
             <EditTextPreference
                 android:dialogTitle="Followup Delay"
                 android:dialogMessage="Followup EMA Reminder Timer Delay (seconds)?"
@@ -249,28 +290,32 @@
             </EditTextPreference>
         </PreferenceScreen>
 
+        <!-- A new settings screen is created for the end of day settings -->
         <PreferenceScreen
             android:key="endofday"
             android:title="End of Day Survey">
 
-
         </PreferenceScreen>
     </PreferenceCategory>
 
+    <!-- A new category is set for the sensor information -->
     <PreferenceCategory
         android:key="main"
         android:title="Sensors">
 
+        <!-- A new screen is created for the heart rate information -->
         <PreferenceScreen
             android:key="heartrate"
             android:title="Heart Rate">
         </PreferenceScreen>
 
+        <!-- A new setting is created for the accelerometer information -->
         <PreferenceScreen
             android:key="accelerometer"
             android:title="Accelerometer">
         </PreferenceScreen>
 
+        <!-- A new setting is created for the estimote information -->
         <PreferenceScreen
             android:key="estimote"
             android:title="Estimote">

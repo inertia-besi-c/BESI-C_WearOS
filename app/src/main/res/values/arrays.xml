@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
      This is a resource file for list values put into the settings screen. These values will be compiled and installed at runtime and will not be changeable on the watch,
-     however, the options shown here can be used to change values in the shared preferences where it will then be reflected in the application
+     however, the options shown here can be used to change values in the shared settings where it will then be reflected in the application
 -->
 <resources>
     <!-- Possible users for the device. This is the items that are seen on the device -->

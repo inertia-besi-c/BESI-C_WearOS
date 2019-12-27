@@ -12,7 +12,7 @@
 
     <!--Name of Unique Device Screens-->
     <string name="watchface_name">BESI-C</string>  <!--This is the string that is shown as the watchface name-->
-    <string name="preference_name">Preferences</string>  <!--This is the string that is shown as the preferences name-->
+    <string name="preference_name">Preferences</string>  <!--This is the string that is shown as the settings name-->
 
     <!--User Interface Size Information-->
     <string name="ui_time_size">85</string>     <!--Size of the time-->
