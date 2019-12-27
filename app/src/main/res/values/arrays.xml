@@ -10,4 +10,19 @@
         <item>CG</item>
         <item>DEMO</item>
     </string-array>
+
+    <string-array name="deviceList">
+        <item>Patient 1</item>
+        <item>Patient 2</item>
+        <item>Caregiver 1</item>
+        <item>Caregiver 2</item>
+        <item>Demonstration</item>
+    </string-array>
+    <string-array name="deviceListValue">
+        <item>PT1</item>
+        <item>PT2</item>
+        <item>CG1</item>
+        <item>CG2</item>
+        <item>DEMO</item>
+    </string-array>
 </resources>

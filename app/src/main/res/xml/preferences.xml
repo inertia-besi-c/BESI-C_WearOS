@@ -3,24 +3,46 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
         android:key="main"
-        android:title="General Settings">
+        android:title="Device Settings">
 
-        <EditTextPreference
-            android:dialogTitle="Directory"
-            android:dialogMessage="Directory name for saving data?"
-            android:inputType="textCapCharacters"
-            android:key="directory_key"
-            android:title="Directory"
-            android:summary="BESI-C">
-        </EditTextPreference>
+        <PreferenceScreen
+            android:key="device"
+            android:title="Device Information Settings">
 
-<!--        <DropDownPreference-->
-<!--            android:dependency="user"-->
-<!--            android:key="user_info"-->
-<!--            android:title="User"-->
-<!--            android:summary="Who will be using this device?"-->
-<!--            android:entries="@array/userList"-->
-<!--            android:entryValues="@array/userListValue">-->
-<!--        </DropDownPreference>-->
+            <ListPreference
+                android:key="user_info"
+                android:title="User"
+                android:entries="@array/userList"
+                android:entryValues="@array/userListValue"
+                android:summary="Demonstration">
+            </ListPreference>
+
+            <ListPreference
+                android:key="device_info"
+                android:title="Device Identification"
+                android:entries="@array/deviceList"
+                android:entryValues="@array/deviceListValue"
+                android:summary="Demonstration">
+            </ListPreference>
+
+            <EditTextPreference
+                android:dialogTitle="Directory"
+                android:dialogMessage="Directory name for saving data?"
+                android:inputType="textCapCharacters"
+                android:key="directory_key"
+                android:title="Directory"
+                android:summary="BESI-C">
+            </EditTextPreference>
+
+            <EditTextPreference
+                android:dialogTitle="Deployment Identification"
+                android:dialogMessage="Deployment Identification assigned?"
+                android:inputType="textCapCharacters"
+                android:key="deployment_key"
+                android:title="Deployment Identification"
+                android:summary="P0D0">
+            </EditTextPreference>
+        </PreferenceScreen>
+
     </PreferenceCategory>
 </PreferenceScreen>

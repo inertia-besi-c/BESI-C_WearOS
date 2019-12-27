@@ -1,9 +1,11 @@
 package com.linklab.inertia.besic;
 
+import android.annotation.SuppressLint;
 import android.os.*;
 import android.preference.*;
 import androidx.annotation.*;
 
+@SuppressLint("ExportedPreferenceActivity")
 public class Settings extends PreferenceActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
