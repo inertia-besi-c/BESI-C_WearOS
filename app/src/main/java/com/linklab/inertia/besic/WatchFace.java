@@ -3,10 +3,12 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-import android.support.wearable.watchface.CanvasWatchFaceService;
+import android.support.wearable.watchface.*;
 import android.graphics.*;
 import android.text.*;
+import android.util.Log;
 import android.view.*;
+import android.widget.Toast;
 
 /**
  * On Android Wear Watch Face is implemented as a service. This is being used by the application to save resources by giving them to the android system to configure.
@@ -34,8 +36,8 @@ public class WatchFace extends CanvasWatchFaceService
         private TextPaint batteryPaint, timePaint, datePaint, startPaint;     // Sets the paint instance for the battery level text.
         private String batteryLevel, currentTime, currentDate, startMessage;        // Sets up string variables.
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas.
-        private int batteryLevelPositionX, batteryLevelPositionY,        // Sets up integer variables.
-                currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,        // Sets up integer variables.
+        private int batteryLevelPositionX, batteryLevelPositionY,
+                currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
                 startX, startY;       // Sets up integer variables.
 
         /**
@@ -47,6 +49,8 @@ public class WatchFace extends CanvasWatchFaceService
         public void onCreate(SurfaceHolder holder)
         {
             super.onCreate(holder);     // Calls a creation instance
+
+            this.setWatchFaceStyle(new WatchFaceStyle.Builder(WatchFace.this).setAcceptsTapEvents(true).build());        // Sets the watchface to accept user tap event inputs.
 
             this.systemInformation = new SystemInformation();       // Binds the variable to the calls in the class
 
@@ -78,7 +82,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.setUpDefaultColors();      // Sets up the colors on the UI.
             this.setUpDateAndTime();       // Sets up the time on the UI.
             this.setUpBatteryLevel();      // Sets up the battery values on the UI.
-            this.setUpButtons();
+            this.setUpButtons();        // Sets up the buttons on the UI.
             this.clearCanvas(canvas);       // Clears the screen so new values can be drawn.
 
             canvas.drawText(this.currentDate, this.currentDatePositionX, this.currentDatePositionY, this.datePaint);       // Calls the canvas to draw the date information
@@ -89,8 +93,33 @@ public class WatchFace extends CanvasWatchFaceService
                     this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15, this.startPaint);       // Continued from previous line
             this.reconfigureButtons();      // Calls the method
             canvas.drawText(this.startMessage, this.startX+20, startY + (startY/3) + 12, this.startPaint);      // Calls the canvas to draw the message information
+        }
 
-            onTimeTick();       // Calls the specified method
+        /**
+         * Waits for the screen to be tapped by the user. Then does case analysis to determine the appropriate action needed.
+         * @param tapType is the type of tap performed on the screen
+         * @param x is the x location on the screen where the tap was performed
+         * @param y is the y location on the screen where the tap was performed
+         * @param eventTime is how long the type of tap was performed for
+         */
+        @Override
+        public void onTapCommand(@TapType int tapType, int x, int y, long eventTime)
+        {
+            int startButtonXEnd = (getResources().getDisplayMetrics().widthPixels / 2)+(getResources().getDisplayMetrics().widthPixels / 15);       // The end of the start button x location
+            int startButtonYEnd = this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15;       // The end of the start button y location
+
+            switch (tapType)        // Switch case for the tap type
+            {
+                case WatchFaceService.TAP_TYPE_TOUCH:       // Checks if the tap type was a touch
+                    if (x >= startX && x <= startButtonXEnd && y >= startY && y <= startButtonYEnd)     // Determines if this was around the start button
+                    {
+                        // Implement call to Pain EMA HERE
+                        Toast.makeText(getApplicationContext(), "Start Tapped!", Toast.LENGTH_LONG).show();
+                    }
+
+                case WatchFaceService.TAP_TYPE_TOUCH_CANCEL:        // Checks if the user dismissed the touch
+                    break;      // Breaks the tap action
+            }
         }
 
         /**
@@ -112,23 +141,6 @@ public class WatchFace extends CanvasWatchFaceService
             else        // If screen is off
             {
                 this.startPaint.setColor(Color.DKGRAY);     // Sets color to this level
-            }
-        }
-
-        /**
-         * Resets button variables so text can be drawn using the same resources
-         */
-        private void reconfigureButtons()
-        {
-            this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
-
-            if (isScreenOn())       // Checks if the screen is on
-            {
-                this.startPaint.setColor(Color.WHITE);      // Sets the color
-            }
-            else
-            {
-                this.startPaint.setColor(Color.BLACK);      // Sets the color
             }
         }
 
@@ -162,16 +174,6 @@ public class WatchFace extends CanvasWatchFaceService
         }
 
         /**
-         * This method initializes the required values for variables needed in the onDraw method.
-         */
-        private void setUpDefaultValues()
-        {
-            this.currentDate = this.systemInformation.getDateForUI();        // Sets up the date from the specific method.
-            this.currentTime = this.systemInformation.getTimeForUI();        // Sets up the time from the specific method.
-            this.batteryLevel = this.getBatteryLevelString();      // Sets up the battery level by calling the specified method.
-        }
-
-        /**
          * This method initializes the required colors for variables needed in the onDraw method.
          */
         private void setUpDefaultColors()
@@ -193,6 +195,33 @@ public class WatchFace extends CanvasWatchFaceService
             {
                 this.batteryPaint.setColor(Color.RED);        // Sets the color of the battery level.
             }
+        }
+
+        /**
+         * Resets button variables so text can be drawn using the same resources
+         */
+        private void reconfigureButtons()
+        {
+            this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
+
+            if (isScreenOn())       // Checks if the screen is on
+            {
+                this.startPaint.setColor(Color.WHITE);      // Sets the color
+            }
+            else
+            {
+                this.startPaint.setColor(Color.BLACK);      // Sets the color
+            }
+        }
+
+        /**
+         * This method initializes the required values for variables needed in the onDraw method.
+         */
+        private void setUpDefaultValues()
+        {
+            this.currentDate = this.systemInformation.getDateForUI();        // Sets up the date from the specific method.
+            this.currentTime = this.systemInformation.getTimeForUI();        // Sets up the time from the specific method.
+            this.batteryLevel = this.getBatteryLevelString();      // Sets up the battery level by calling the specified method.
         }
 
         /**
