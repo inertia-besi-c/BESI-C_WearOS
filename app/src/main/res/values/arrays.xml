@@ -3,12 +3,14 @@
     <string-array name="userList">
         <item>Patient</item>
         <item>Caregiver</item>
-        <item>Demonstration</item>
+        <item>Demonstration Patient</item>
+        <item>Demonstration Caregiver</item>
     </string-array>
     <string-array name="userListValue">
         <item>PT</item>
         <item>CG</item>
-        <item>DEMO</item>
+        <item>PT-DEMO</item>
+        <item>CG-DEMO</item>
     </string-array>
 
     <string-array name="deviceList">
@@ -16,13 +18,15 @@
         <item>Patient 2</item>
         <item>Caregiver 1</item>
         <item>Caregiver 2</item>
-        <item>Demonstration</item>
+        <item>Patient Demonstration</item>
+        <item>Caregiver Demonstration</item>
     </string-array>
     <string-array name="deviceListValue">
         <item>PT1</item>
         <item>PT2</item>
         <item>CG1</item>
         <item>CG2</item>
-        <item>DEMO</item>
+        <item>PT-DEMO</item>
+        <item>CG-DEMO</item>
     </string-array>
 </resources>

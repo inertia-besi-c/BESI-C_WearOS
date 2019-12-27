@@ -6,18 +6,22 @@ import android.preference.*;
 import androidx.annotation.*;
 
 @SuppressLint("ExportedPreferenceActivity")
-public class Settings extends PreferenceActivity {
+public class Settings extends PreferenceActivity
+{
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         getFragmentManager().beginTransaction().replace(android.R.id.content,
                 new MainSettingFragment()).commit();
     }
 
-    public static class MainSettingFragment extends PreferenceFragment {
+    public static class MainSettingFragment extends PreferenceFragment
+    {
         @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
+        public void onCreate(@Nullable Bundle savedInstanceState)
+        {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
         }

@@ -48,6 +48,38 @@
             android:key="Battery"
             android:title="Battery">
         </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="notifications"
+            android:title="Alerts">
+
+            <EditTextPreference
+                android:dialogTitle="Haptic Feedback"
+                android:dialogMessage="Haptic Feedback Level? Please try to keep it to less than 30"
+                android:inputType="number"
+                android:key="haptic_level"
+                android:title="Haptic Level"
+                android:summary="20">
+            </EditTextPreference>
+
+            <EditTextPreference
+                android:dialogTitle="Starting Buzz"
+                android:dialogMessage="Buzz time (milliseconds) for starting activities?"
+                android:inputType="number"
+                android:key="activity_start"
+                android:title="Starting Activity"
+                android:summary="1000">
+            </EditTextPreference>
+
+            <EditTextPreference
+                android:dialogTitle="Reminder Buzz"
+                android:dialogMessage="Buzz time (milliseconds) for activity reminder?"
+                android:inputType="number"
+                android:key="activity_remind"
+                android:title="Reminding Activity"
+                android:summary="1000">
+            </EditTextPreference>
+        </PreferenceScreen>
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -57,11 +89,74 @@
         <PreferenceScreen
             android:key="pain"
             android:title="Pain Survey">
+
+            <EditTextPreference
+                android:dialogTitle="Pain Interval"
+                android:dialogMessage="Pain EMA Reminder Interval Time (seconds)?"
+                android:inputType="number"
+                android:key="pain_remind_interval"
+                android:title="Interval Reminder"
+                android:summary="300">
+            </EditTextPreference>
+
+            <EditTextPreference
+                android:dialogTitle="Pain Reminder"
+                android:dialogMessage="Pain EMA Number of Reminders?"
+                android:inputType="number"
+                android:key="pain_remind_max"
+                android:title="Maximum Reminders"
+                android:summary="2">
+            </EditTextPreference>
+
+            <EditTextPreference
+                android:dialogTitle="Pain Delay"
+                android:dialogMessage="Pain EMA Reminder Timer Delay (milliseconds)?"
+                android:inputType="number"
+                android:key="pain_remind"
+                android:title="Delay Timer"
+                android:summary="0">
+            </EditTextPreference>
         </PreferenceScreen>
 
         <PreferenceScreen
             android:key="followup"
             android:title="Followup Survey">
+
+            <EditTextPreference
+                android:dialogTitle="Followup Time Delay"
+                android:dialogMessage="Followup EMA trigger time from Pain EMA Question (minutes)?"
+                android:inputType="number"
+                android:key="followup_trigger"
+                android:title="Followup Trigger"
+                android:summary="30">
+            </EditTextPreference>
+
+            <EditTextPreference
+                android:dialogTitle="Followup Interval"
+                android:dialogMessage="Followup EMA Reminder Interval Time (seconds)?"
+                android:inputType="number"
+                android:key="followup_remind_interval"
+                android:title="Interval Reminder"
+                android:summary="300">
+            </EditTextPreference>
+
+            <EditTextPreference
+                android:dialogTitle="Followup Reminder"
+                android:dialogMessage="Followup EMA Number of Reminders?"
+                android:inputType="number"
+                android:key="followup_remind_max"
+                android:title="Maximum Reminders"
+                android:summary="3">
+            </EditTextPreference>
+
+            <EditTextPreference
+                android:dialogTitle="Followup Delay"
+                android:dialogMessage="Followup EMA Reminder Timer Delay (milliseconds)?"
+                android:inputType="number"
+                android:key="followup_remind"
+                android:title="Delay Timer"
+                android:summary="0">
+            </EditTextPreference>
         </PreferenceScreen>
 
         <PreferenceScreen
