@@ -1,3 +1,6 @@
+<!--
+    This file stores application specific items that is not expected to be changed. These values are hardcoded values needed for thr app to function properly.
+-->
 <resources>
     <!--General Application Naming and Information-->
     <string name="app_name_full">Behavioral and Environmental Sensing and Intervention</string>     <!-- Full name of the application -->
@@ -9,6 +12,7 @@
 
     <!--Name of Unique Device Screens-->
     <string name="watchface_name">BESI-C</string>  <!--This is the string that is shown as the watchface name-->
+    <string name="preference_name">Preferences</string>  <!--This is the string that is shown as the settings name-->
 
     <!--User Interface Size Information-->
     <string name="ui_time_size">85</string>     <!--Size of the time-->

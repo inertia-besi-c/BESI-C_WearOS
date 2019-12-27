@@ -3,12 +3,12 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+import android.content.Intent;
 import android.support.wearable.watchface.*;
 import android.graphics.*;
 import android.text.*;
-import android.util.Log;
 import android.view.*;
-import android.widget.Toast;
+import android.widget.*;
 
 /**
  * On Android Wear Watch Face is implemented as a service. This is being used by the application to save resources by giving them to the android system to configure.
@@ -83,6 +83,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.setUpDateAndTime();       // Sets up the time on the UI.
             this.setUpBatteryLevel();      // Sets up the battery values on the UI.
             this.setUpButtons();        // Sets up the buttons on the UI.
+
             this.clearCanvas(canvas);       // Clears the screen so new values can be drawn.
 
             canvas.drawText(this.currentDate, this.currentDatePositionX, this.currentDatePositionY, this.datePaint);       // Calls the canvas to draw the date information
@@ -114,6 +115,7 @@ public class WatchFace extends CanvasWatchFaceService
                     if (x >= startX && x <= startButtonXEnd && y >= startY && y <= startButtonYEnd)     // Determines if this was around the start button
                     {
                         // Implement call to Pain EMA HERE
+                        startActivity(new Intent(WatchFace.this, Settings.class));
                         Toast.makeText(getApplicationContext(), "Start Tapped!", Toast.LENGTH_LONG).show();
                     }
 
@@ -191,7 +193,7 @@ public class WatchFace extends CanvasWatchFaceService
                 this.batteryPaint.setColor(Color.DKGRAY);        // Sets the color of the battery level.
             }
 
-            if (this.getBatteryLevelInteger() <= 30)        // Checks te battery level
+            if (this.getBatteryLevelInteger() <= 30)        // Checks the battery level
             {
                 this.batteryPaint.setColor(Color.RED);        // Sets the color of the battery level.
             }

@@ -10,9 +10,9 @@ import java.util.*;
 
 class SystemInformation
 {
-    private DateFormat timeFormat, dateFormat;
-    private Date current;
-    private int level, scale, batteryPercent;
+    private DateFormat timeFormat, dateFormat;      // Private date format variables
+    private Date current;       // Private date variables
+    private int level, scale, batteryPercent;       // private integer variables
 
     /**
      * Constructor for the class. Initializes the variables
