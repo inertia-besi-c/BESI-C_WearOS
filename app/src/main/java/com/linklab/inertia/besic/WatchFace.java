@@ -95,25 +95,30 @@ public class WatchFace extends CanvasWatchFaceService
             canvas.drawText(this.startMessage, this.startX+20, startY + (startY/3) + 12, this.startPaint);      // Calls the canvas to draw the message information
         }
 
+        /**
+         * Waits for the screen to be tapped by the user. Then does case analysis to determine the appropriate action needed.
+         * @param tapType is the type of tap performed on the screen
+         * @param x is the x location on the screen where the tap was performed
+         * @param y is the y location on the screen where the tap was performed
+         * @param eventTime is how long the type of tap was performed for
+         */
         @Override
         public void onTapCommand(@TapType int tapType, int x, int y, long eventTime)
         {
-            int startButtonXEnd = (getResources().getDisplayMetrics().widthPixels / 2)+(getResources().getDisplayMetrics().widthPixels / 15);
-            int startButtonYEnd = this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15;
+            int startButtonXEnd = (getResources().getDisplayMetrics().widthPixels / 2)+(getResources().getDisplayMetrics().widthPixels / 15);       // The end of the start button x location
+            int startButtonYEnd = this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15;       // The end of the start button y location
 
-            switch (tapType)
+            switch (tapType)        // Switch case for the tap type
             {
-                case WatchFaceService.TAP_TYPE_TOUCH:
-                    if (x >= startX && x <= startButtonXEnd && y >= startY && y <= startButtonYEnd)
+                case WatchFaceService.TAP_TYPE_TOUCH:       // Checks if the tap type was a touch
+                    if (x >= startX && x <= startButtonXEnd && y >= startY && y <= startButtonYEnd)     // Determines if this was around the start button
                     {
-                        Toast.makeText(getApplicationContext(),
-                                "Start Tapped!",
-                                Toast.LENGTH_LONG)
-                                .show();
+                        // Implement call to Pain EMA HERE
+                        Toast.makeText(getApplicationContext(), "Start Tapped!", Toast.LENGTH_LONG).show();
                     }
 
-                case WatchFaceService.TAP_TYPE_TOUCH_CANCEL:
-                    break;
+                case WatchFaceService.TAP_TYPE_TOUCH_CANCEL:        // Checks if the user dismissed the touch
+                    break;      // Breaks the tap action
             }
         }
 
