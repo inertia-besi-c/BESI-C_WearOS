@@ -110,7 +110,7 @@
                     android:title="Low Battery Start Hour"
                     android:entries="@array/hourList"
                     android:entryValues="@array/hourList"
-                    android:summary="12 AM">
+                    android:summary="00 Hours">
                 </ListPreference>
 
                 <!-- A preference list is made for the minute time -->
@@ -119,7 +119,7 @@
                     android:title="Low Battery Start Minute"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
-                    android:summary="0 Minutes">
+                    android:summary="00 Minutes">
                 </ListPreference>
 
                 <!-- A preference list is made for the seconds time -->
@@ -128,14 +128,15 @@
                     android:title="Low Battery Start Second"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
-                    android:summary="0 Seconds">
+                    android:summary="00 Seconds">
                 </ListPreference>
             </PreferenceCategory>
 
             <!-- A new category is made for re-enabling the low battery alert -->
             <PreferenceCategory
                 android:key="Low Battery End Time"
-                android:title="Low Battery Re-enable">
+                android:title="Low Battery Re-enable"
+                android:summary="Make sure the end time if on the hour is 1 second less than the desired time!!!">
 
                 <!-- A preference list is made for the hour time -->
                 <ListPreference
@@ -143,7 +144,7 @@
                     android:title="Low Battery End Hour"
                     android:entries="@array/hourList"
                     android:entryValues="@array/hourList"
-                    android:summary="8 AM">
+                    android:summary="08 Hours">
                 </ListPreference>
 
                 <!-- A preference list is made for the minute time -->
@@ -152,7 +153,7 @@
                     android:title="Low Battery End Minute"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
-                    android:summary="0 Minutes">
+                    android:summary="00 Minutes">
                 </ListPreference>
 
                 <!-- A preference list is made for the seconds time -->
@@ -161,7 +162,7 @@
                     android:title="Low Battery End Second"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
-                    android:summary="0 Seconds">
+                    android:summary="00 Seconds">
                 </ListPreference>
             </PreferenceCategory>
         </PreferenceScreen>
@@ -178,7 +179,7 @@
                 android:inputType="number"
                 android:key="haptic_level"
                 android:title="Haptic Level"
-                android:summary="20">
+                android:summary="20 milliseconds">
             </EditTextPreference>
 
             <!-- A text input is initialized for the buzz associated with the start of an activity -->
@@ -188,7 +189,7 @@
                 android:inputType="number"
                 android:key="activity_start"
                 android:title="Starting Activity"
-                android:summary="1">
+                android:summary="1 Second">
             </EditTextPreference>
 
             <!-- A text input is initialized for the buzz associated with a reminder to complete an activity -->
@@ -198,7 +199,7 @@
                 android:inputType="number"
                 android:key="activity_remind"
                 android:title="Reminding Activity"
-                android:summary="1">
+                android:summary="1 Second">
             </EditTextPreference>
         </PreferenceScreen>
     </PreferenceCategory>
@@ -211,7 +212,7 @@
         <!-- A screen is initialized for the pain survey information -->
         <PreferenceScreen
             android:key="pain"
-            android:title="Pain Survey">
+            android:title="Pain">
 
             <!-- A text input is initialized for the reminder interval -->
             <EditTextPreference
@@ -247,7 +248,7 @@
         <!--A new settings screen is initialized for the followup EMA -->
         <PreferenceScreen
             android:key="followup"
-            android:title="Followup Survey">
+            android:title="Followup">
 
             <!-- A text input is taken for the delay associated with starting the activity -->
             <EditTextPreference
@@ -293,8 +294,144 @@
         <!-- A new settings screen is created for the end of day settings -->
         <PreferenceScreen
             android:key="endofday"
-            android:title="End of Day Survey">
+            android:title="End of Day">
+            <!-- A category is made for the general settings associated with the end of day ema -->
+            <PreferenceCategory
+                android:key="endofday_main"
+                android:title="End of Day General">
 
+                <!-- A text input is initialized for the reminder interval -->
+                <EditTextPreference
+                    android:dialogTitle="End of Day Interval"
+                    android:dialogMessage="End of Day EMA Reminder Interval Time (seconds)?"
+                    android:inputType="number"
+                    android:key="eod_remind_interval"
+                    android:title="Interval Reminder"
+                    android:summary="300">
+                </EditTextPreference>
+
+                <!-- A text input is initialized for the number of reminders needed -->
+                <EditTextPreference
+                    android:dialogTitle="End of Day Reminder"
+                    android:dialogMessage="End of Day EMA Number of Reminders?"
+                    android:inputType="number"
+                    android:key="eod_remind_max"
+                    android:title="Maximum Reminders"
+                    android:summary="2">
+                </EditTextPreference>
+
+                <!-- A text input is initialized for the delay associated with starting the reminders -->
+                <EditTextPreference
+                    android:dialogTitle="End of Day Delay"
+                    android:dialogMessage="End of Day EMA Reminder Timer Delay (seconds)?"
+                    android:inputType="number"
+                    android:key="eod_remind"
+                    android:title="Delay Timer"
+                    android:summary="0">
+                </EditTextPreference>
+            </PreferenceCategory>
+
+            <!-- A category is made for items associated with the automatic start time -->
+            <PreferenceCategory
+                android:key="endofday_automatic_start_time"
+                android:title="End of Day General"
+                android:summary="Make sure the time is exact down to the second!">
+
+            <!-- A preference list is made for the hour time -->
+                <ListPreference
+                    android:key="eod_automatic_start_hour"
+                    android:title="End of Day Automatic Start Hour"
+                    android:entries="@array/hourList"
+                    android:entryValues="@array/hourList"
+                    android:summary="21 Hours">
+                </ListPreference>
+
+                <!-- A preference list is made for the minute time -->
+                <ListPreference
+                    android:key="eod_automatic_start_minute"
+                    android:title="End of Day Automatic Start Minute"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:summary="30 Minutes">
+                </ListPreference>
+
+                <!-- A preference list is made for the seconds time -->
+                <ListPreference
+                    android:key="eod_automatic_start_second"
+                    android:title="End of Day Automatic Start Second"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:summary="00 Seconds">
+                </ListPreference>
+            </PreferenceCategory>
+
+            <!-- A category is made for items associated with the manual start time -->
+            <PreferenceCategory
+                android:key="endofday_manual_start_time"
+                android:title="End of Day General"
+                android:summary="Make sure the time is exact down to the second!">
+
+            <!-- A preference list is made for the hour time -->
+                <ListPreference
+                    android:key="eod_manual_start_hour"
+                    android:title="End of Day Manual Start Hour"
+                    android:entries="@array/hourList"
+                    android:entryValues="@array/hourList"
+                    android:summary="17 Hours">
+                </ListPreference>
+
+                <!-- A preference list is made for the minute time -->
+                <ListPreference
+                    android:key="eod_manual_start_minute"
+                    android:title="End of Day Manual Start Minute"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:summary="00 Minutes">
+                </ListPreference>
+
+                <!-- A preference list is made for the seconds time -->
+                <ListPreference
+                    android:key="eod_manual_start_second"
+                    android:title="End of Day Manual Start Second"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:summary="00 Seconds">
+                </ListPreference>
+            </PreferenceCategory>
+
+            <!-- A category is made for items associated with the manual end time -->
+            <PreferenceCategory
+                android:key="endofday_manual_end_time"
+                android:title="End of Day General"
+                android:summary="Make sure the end time if on the hour is 1 second less than the desired time!">
+
+            <!-- A preference list is made for the hour time -->
+                <ListPreference
+                    android:key="eod_manual_end_hour"
+                    android:title="End of Day Manual Start Hour"
+                    android:entries="@array/hourList"
+                    android:entryValues="@array/hourList"
+                    android:summary="23 Hours">
+                </ListPreference>
+
+                <!-- A preference list is made for the minute time -->
+                <ListPreference
+                    android:key="eod_manual_end_minute"
+                    android:title="End of Day Manual Start Minute"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:summary="59 Minutes">
+                </ListPreference>
+
+                <!-- A preference list is made for the seconds time -->
+                <ListPreference
+                    android:key="eod_manual_end_second"
+                    android:title="End of Day Manual Start Second"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:summary="59 Seconds">
+                </ListPreference>
+            </PreferenceCategory>
         </PreferenceScreen>
     </PreferenceCategory>
 
@@ -307,18 +444,78 @@
         <PreferenceScreen
             android:key="heartrate"
             android:title="Heart Rate">
+
+            <!-- A text input is taken for the duration associated with running the sensor -->
+            <EditTextPreference
+                android:dialogTitle="Heart Rate Duration"
+                android:dialogMessage="How long should the Heart Rate Sensor run for (seconds)?"
+                android:inputType="number"
+                android:key="heartrate_duration"
+                android:title="Heart Rate Duration"
+                android:summary="30">
+            </EditTextPreference>
+
+            <!-- A text input is initialized for the waiting interval -->
+            <EditTextPreference
+                android:dialogTitle="Heart Rate Interval"
+                android:dialogMessage="How often should a Heart Rate Measurement be taken (seconds)?"
+                android:inputType="number"
+                android:key="heartrate_interval"
+                android:title="Heart Rate Interval"
+                android:summary="300">
+            </EditTextPreference>
         </PreferenceScreen>
 
         <!-- A new setting is created for the accelerometer information -->
         <PreferenceScreen
             android:key="accelerometer"
             android:title="Accelerometer">
+
+            <!-- A text input is initialized for the maximum data count -->
+            <EditTextPreference
+                android:dialogTitle="Maximum Data Count"
+                android:dialogMessage="Maximum amount of data needed to be compiled before writing?"
+                android:inputType="number"
+                android:key="accelerometer_data_limit"
+                android:title="Writing Limit"
+                android:summary="400">
+            </EditTextPreference>
         </PreferenceScreen>
 
         <!-- A new setting is created for the estimote information -->
         <PreferenceScreen
             android:key="estimote"
             android:title="Estimote">
+
+            <!-- A text input is taken for the duration associated with running the sensor -->
+            <EditTextPreference
+                android:dialogTitle="Estimote Duration"
+                android:dialogMessage="How long should the Estimote Sensor run for (seconds)?"
+                android:inputType="number"
+                android:key="estimote_duration"
+                android:title="Estimote Duration"
+                android:summary="15">
+            </EditTextPreference>
+
+            <!-- A text input is initialized for the waiting interval -->
+            <EditTextPreference
+                android:dialogTitle="Estimote Interval"
+                android:dialogMessage="How often should a Estimote Measurement be taken (seconds)?"
+                android:inputType="number"
+                android:key="estimote_interval"
+                android:title="Estimote Interval"
+                android:summary="90">
+            </EditTextPreference>
+
+            <!-- A text input is initialized for the number of reminders needed -->
+            <EditTextPreference
+                android:dialogTitle="Estimote Activity"
+                android:dialogMessage="Maximum Number of Cycles to enabling SleepMode?"
+                android:inputType="number"
+                android:key="estimote_maximum_activity"
+                android:title="Maximum Cycles"
+                android:summary="5">
+            </EditTextPreference>
         </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>
