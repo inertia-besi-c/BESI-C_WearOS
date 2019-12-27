@@ -1,122 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+     This is a resource file for list values put into the settings screen. These values will be compiled and installed at runtime and will not be changeable on the watch,
+     however, the options shown here can be used to change values in the shared preferences where it will then be reflected in the application
+-->
 <resources>
-    <string-array name="userList">
-        <item>Patient</item>
-        <item>Caregiver</item>
-        <item>Demonstration Patient</item>
-        <item>Demonstration Caregiver</item>
-    </string-array>
-    <string-array name="userListValue">
-        <item>PT</item>
-        <item>CG</item>
-        <item>PT-DEMO</item>
-        <item>CG-DEMO</item>
-    </string-array>
+    <!-- Possible users for the device. This is the items that are seen on the device -->
+    <string-array name="userList">              <!-- Defines a list for the users -->
+        <item>Patient</item>        <!-- The patient user option -->
+        <item>Caregiver</item>      <!-- The caregiver user option -->
+        <item>Demonstration Patient</item>      <!-- The demo patient user option -->
+        <item>Demonstration Caregiver</item>         <!-- The demo caregiver user option -->
+    </string-array>     <!--Ends the list-->
 
-    <string-array name="deviceList">
-        <item>Patient 1</item>
-        <item>Patient 2</item>
-        <item>Caregiver 1</item>
-        <item>Caregiver 2</item>
-        <item>Patient Demonstration</item>
-        <item>Caregiver Demonstration</item>
-    </string-array>
-    <string-array name="deviceListValue">
-        <item>PT1</item>
-        <item>PT2</item>
-        <item>CG1</item>
-        <item>CG2</item>
-        <item>PT-DEMO</item>
-        <item>CG-DEMO</item>
-    </string-array>
+    <!-- The actual values associated with the items clicked above. These must be in order with the screen list-->
+    <string-array name="userListValue">     <!--Defines a list for the actual values -->
+        <item>PT</item>     <!-- The patient value-->
+        <item>CG</item>     <!-- The caregiver value -->
+        <item>PT-DEMO</item>        <!-- The demo patient value -->
+        <item>CG-DEMO</item>        <!-- The demo caregiver value -->
+    </string-array>     <!--Ends the list-->
 
-    <string-array name="hourList">
-        <item>00</item>
-        <item>01</item>
-        <item>02</item>
-        <item>03</item>
-        <item>04</item>
-        <item>05</item>
-        <item>06</item>
-        <item>07</item>
-        <item>08</item>
-        <item>09</item>
-        <item>10</item>
-        <item>11</item>
-        <item>12</item>
-        <item>13</item>
-        <item>14</item>
-        <item>15</item>
-        <item>16</item>
-        <item>17</item>
-        <item>18</item>
-        <item>19</item>
-        <item>20</item>
-        <item>21</item>
-        <item>22</item>
-        <item>23</item>
-    </string-array>
+    <!-- Defines UI items for device recognition -->
+    <string-array name="deviceList">        <!-- Defines a list for the user to click -->
+        <item>Patient 1</item>      <!-- Shows the first patient watch -->
+        <item>Patient 2</item>      <!-- Shows the second patient watch -->
+        <item>Caregiver 1</item>      <!-- Shows the first caregiver watch -->
+        <item>Caregiver 2</item>      <!-- Shows the second caregiver watch -->
+        <item>Patient Demonstration</item>      <!-- Shows as a patient demo watch -->
+        <item>Caregiver Demonstration</item>        <!-- Shows as a caregiver demo watch -->
+    </string-array>     <!--Ends the list-->
 
-    <string-array name="minutesecondList">
-        <item>00</item>
-        <item>01</item>
-        <item>02</item>
-        <item>03</item>
-        <item>04</item>
-        <item>05</item>
-        <item>06</item>
-        <item>07</item>
-        <item>08</item>
-        <item>09</item>
-        <item>10</item>
-        <item>11</item>
-        <item>12</item>
-        <item>13</item>
-        <item>14</item>
-        <item>15</item>
-        <item>16</item>
-        <item>17</item>
-        <item>18</item>
-        <item>19</item>
-        <item>20</item>
-        <item>21</item>
-        <item>22</item>
-        <item>23</item>
-        <item>24</item>
-        <item>25</item>
-        <item>26</item>
-        <item>27</item>
-        <item>28</item>
-        <item>29</item>
-        <item>30</item>
-        <item>31</item>
-        <item>32</item>
-        <item>33</item>
-        <item>34</item>
-        <item>35</item>
-        <item>36</item>
-        <item>37</item>
-        <item>38</item>
-        <item>39</item>
-        <item>40</item>
-        <item>41</item>
-        <item>42</item>
-        <item>43</item>
-        <item>44</item>
-        <item>45</item>
-        <item>46</item>
-        <item>47</item>
-        <item>48</item>
-        <item>49</item>
-        <item>50</item>
-        <item>51</item>
-        <item>52</item>
-        <item>53</item>
-        <item>54</item>
-        <item>55</item>
-        <item>56</item>
-        <item>57</item>
-        <item>58</item>
-        <item>59</item>
-    </string-array>
+    <string-array name="deviceListValue">        <!-- Defines a list for the user to click -->
+        <item>PT1</item>        <!--The value associated with the respective list option-->
+        <item>PT2</item>        <!--The value associated with the respective list option-->
+        <item>CG1</item>        <!--The value associated with the respective list option-->
+        <item>CG2</item>        <!--The value associated with the respective list option-->
+        <item>PT-DEMO</item>        <!--The value associated with the respective list option-->
+        <item>CG-DEMO</item>        <!--The value associated with the respective list option-->
+    </string-array>     <!--Ends the list-->
+
+    <string-array name="hourList">        <!-- Defines a list for the user to click -->
+        <item>00</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>01</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>02</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>03</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>04</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>05</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>06</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>07</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>08</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>09</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>10</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>11</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>12</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>13</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>14</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>15</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>16</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>17</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>18</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>19</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>20</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>21</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>22</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>23</item>     <!--Clickable item on screen and doubles as actual value-->
+    </string-array>     <!--Ends the list-->
+
+    <string-array name="minutesecondList">        <!-- Defines a list for the user to click -->
+        <item>00</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>01</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>02</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>03</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>04</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>05</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>06</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>07</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>08</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>09</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>10</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>11</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>12</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>13</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>14</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>15</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>16</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>17</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>18</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>19</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>20</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>21</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>22</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>23</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>24</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>25</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>26</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>27</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>28</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>29</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>30</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>31</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>32</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>33</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>34</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>35</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>36</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>37</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>38</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>39</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>40</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>41</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>42</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>43</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>44</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>45</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>46</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>47</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>48</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>49</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>50</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>51</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>52</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>53</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>54</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>55</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>56</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>57</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>58</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>59</item>     <!--Clickable item on screen and doubles as actual value-->
+    </string-array>     <!--Ends the list-->
 </resources>
