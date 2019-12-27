@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="userList">
+        <item>Patient</item>
+        <item>Caregiver</item>
+        <item>Demonstration</item>
+    </string-array>
+    <string-array name="userListValue">
+        <item>PT</item>
+        <item>CG</item>
+        <item>DEMO</item>
+    </string-array>
+</resources>

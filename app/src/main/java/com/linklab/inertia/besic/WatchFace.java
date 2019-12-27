@@ -3,12 +3,12 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+import android.content.Intent;
 import android.support.wearable.watchface.*;
 import android.graphics.*;
 import android.text.*;
-import android.util.Log;
 import android.view.*;
-import android.widget.Toast;
+import android.widget.*;
 
 /**
  * On Android Wear Watch Face is implemented as a service. This is being used by the application to save resources by giving them to the android system to configure.
@@ -114,6 +114,7 @@ public class WatchFace extends CanvasWatchFaceService
                     if (x >= startX && x <= startButtonXEnd && y >= startY && y <= startButtonYEnd)     // Determines if this was around the start button
                     {
                         // Implement call to Pain EMA HERE
+                        startActivity(new Intent(WatchFace.this, Settings.class));
                         Toast.makeText(getApplicationContext(), "Start Tapped!", Toast.LENGTH_LONG).show();
                     }
 
