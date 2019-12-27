@@ -83,6 +83,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.setUpDateAndTime();       // Sets up the time on the UI.
             this.setUpBatteryLevel();      // Sets up the battery values on the UI.
             this.setUpButtons();        // Sets up the buttons on the UI.
+
             this.clearCanvas(canvas);       // Clears the screen so new values can be drawn.
 
             canvas.drawText(this.currentDate, this.currentDatePositionX, this.currentDatePositionY, this.datePaint);       // Calls the canvas to draw the date information
@@ -192,7 +193,7 @@ public class WatchFace extends CanvasWatchFaceService
                 this.batteryPaint.setColor(Color.DKGRAY);        // Sets the color of the battery level.
             }
 
-            if (this.getBatteryLevelInteger() <= 30)        // Checks te battery level
+            if (this.getBatteryLevelInteger() <= 30)        // Checks the battery level
             {
                 this.batteryPaint.setColor(Color.RED);        // Sets the color of the battery level.
             }
