@@ -40,16 +40,16 @@
     </string-array>     <!--Ends the list-->
 
     <string-array name="hourList">        <!-- Defines a list for the user to click -->
-        <item>00</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>01</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>02</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>03</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>04</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>05</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>06</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>07</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>08</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>09</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>0</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>1</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>2</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>3</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>4</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>5</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>6</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>7</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>8</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>9</item>     <!--Clickable item on screen and doubles as actual value-->
         <item>10</item>     <!--Clickable item on screen and doubles as actual value-->
         <item>11</item>     <!--Clickable item on screen and doubles as actual value-->
         <item>12</item>     <!--Clickable item on screen and doubles as actual value-->
@@ -67,16 +67,16 @@
     </string-array>     <!--Ends the list-->
 
     <string-array name="minutesecondList">        <!-- Defines a list for the user to click -->
-        <item>00</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>01</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>02</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>03</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>04</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>05</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>06</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>07</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>08</item>     <!--Clickable item on screen and doubles as actual value-->
-        <item>09</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>0</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>1</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>2</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>3</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>4</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>5</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>6</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>7</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>8</item>     <!--Clickable item on screen and doubles as actual value-->
+        <item>9</item>     <!--Clickable item on screen and doubles as actual value-->
         <item>10</item>     <!--Clickable item on screen and doubles as actual value-->
         <item>11</item>     <!--Clickable item on screen and doubles as actual value-->
         <item>12</item>     <!--Clickable item on screen and doubles as actual value-->

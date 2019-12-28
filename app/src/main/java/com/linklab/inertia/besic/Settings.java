@@ -42,6 +42,7 @@ public class Settings extends PreferenceActivity
         public void onCreate(@Nullable Bundle savedInstanceState)
         {
             super.onCreate(savedInstanceState);     // Call to the superclass
+            
             this.addPreferencesFromResource(R.xml.settings);     // Creates the preference resource from the specified xml file
 
             setUpSummaryValue(findPreference("user_info"));
