@@ -8,8 +8,8 @@
     <string-array name="userList">              <!-- Defines a list for the users -->
         <item>Patient</item>        <!-- The patient user option -->
         <item>Caregiver</item>      <!-- The caregiver user option -->
-        <item>Demonstration Patient</item>      <!-- The demo patient user option -->
-        <item>Demonstration Caregiver</item>         <!-- The demo caregiver user option -->
+        <item>Patient Demonstration</item>      <!-- Shows as a patient demo watch -->
+        <item>Caregiver Demonstration</item>        <!-- Shows as a caregiver demo watch -->
     </string-array>     <!--Ends the list-->
 
     <!-- The actual values associated with the items clicked above. These must be in order with the screen list-->

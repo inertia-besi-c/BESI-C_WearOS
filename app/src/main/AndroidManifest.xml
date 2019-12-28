@@ -19,6 +19,7 @@
         android:icon="@mipmap/besic_logo_round"
         android:label="@string/app_name_abbreviated"
         android:supportsRtl="true"
+        android:launchMode="singleInstance"
         android:theme="@android:style/Theme.DeviceDefault"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
