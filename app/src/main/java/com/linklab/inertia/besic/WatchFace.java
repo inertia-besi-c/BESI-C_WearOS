@@ -40,6 +40,7 @@ public class WatchFace extends CanvasWatchFaceService
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage;        // Sets up string variables
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas
+        private boolean drawEODEMA;      // Sets up all the boolean to be run on the system
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
                 startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel, count;       // Sets up integer variables.
@@ -73,6 +74,8 @@ public class WatchFace extends CanvasWatchFaceService
             this.currentTimeTextBounds = new Rect();        // Makes a text rectangle
             this.currentDateTextBounds = new Rect();        // Makes a text rectangle
 
+            this.drawEODEMA = false;     // Initializes the boolean as a false value
+
             this.setUpDefaultValues();      // Calls the method
             this.setUpDefaultColors();      // Calls the method
         }
@@ -105,7 +108,7 @@ public class WatchFace extends CanvasWatchFaceService
                     this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15, this.sleepEODEMAPaint);       // Continued from previous line
             this.reconfigureButtons();      // Calls the method
             canvas.drawText(this.startMessage, this.startX+20, this.startY + (this.startY/3) + 12, this.startPaint);      // Calls the canvas to draw the message information
-            canvas.drawText(this.sleepEODEMAMessage, this.sleepEODEMAX+10, this.sleepEODEMAY+(this.sleepEODEMAY/3)+8, this.sleepEODEMAPaint);        // Calls the canvas to draw the message
+            canvas.drawText(this.sleepEODEMAMessage, this.sleepEODEMAX+8, this.sleepEODEMAY+(this.sleepEODEMAY/3)+8, this.sleepEODEMAPaint);        // Calls the canvas to draw the message
         }
 
         /**
@@ -119,12 +122,14 @@ public class WatchFace extends CanvasWatchFaceService
         public void onTapCommand(@TapType int tapType, int x, int y, long eventTime)
         {
             int startButtonXEnd = (getResources().getDisplayMetrics().widthPixels / 2)+(getResources().getDisplayMetrics().widthPixels / 15);       // The end of the start button x location
-            int startButtonYEnd = this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15;       // The end of the start button y location
+            int sleepEODEMAXEnd = getResources().getDisplayMetrics().widthPixels;
+
+            int buttonsYEnd = this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15;       // The end of the start button y location
 
             switch (tapType)        // Switch case for the tap type
             {
                 case WatchFaceService.TAP_TYPE_TOUCH:       // Checks if the tap type was a touch
-                    if (x >= startX && x <= startButtonXEnd && y >= startY && y <= startButtonYEnd)     // Determines if this was around the start button
+                    if (x >= startX && x < startButtonXEnd && y >= startY && y <= buttonsYEnd)     // Determines if this was around the start button
                     {
                         if (count==0)       // If this is the first time we are opening the app
                         {
@@ -140,6 +145,22 @@ public class WatchFace extends CanvasWatchFaceService
                         }
                     }
 
+                    if (x > startButtonXEnd && x < sleepEODEMAXEnd && y >= sleepEODEMAY && y <= buttonsYEnd)
+                    {
+                        if (drawEODEMA)
+                        {
+                            this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
+                            // This is where an intent to launch the end of day ema would be made
+                            Toast.makeText(getApplicationContext(), "EODEMA not Implemented!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
+                        }
+                        else
+                        {
+                            this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
+                            setSleepMode(!getSleepMode());     // Sets the sleepMode level to be altered
+                            invalidate();       // Immediately updates the screen
+                        }
+                    }
+
                 case WatchFaceService.TAP_TYPE_TOUCH_CANCEL:        // Checks if the user dismissed the touch
                     break;      // Breaks the tap action
             }
@@ -150,9 +171,6 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private void setUpButtons()
         {
-            this.startMessage = getResources().getString(R.string.start_string);        // Sets the string of the button
-            this.sleepEODEMAMessage = getResources().getString(R.string.sleep_string);      // Sets the string of the button
-
             this.startX = 0;        // Sets the starting x location
             this.sleepEODEMAX = (getResources().getDisplayMetrics().widthPixels / 2)+(getResources().getDisplayMetrics().widthPixels / 15);     // Sets the starting x location
 
@@ -165,8 +183,21 @@ public class WatchFace extends CanvasWatchFaceService
             this.startPaint.getFontMetrics(this.startBackground);       // Sets background
             this.sleepEODEMAPaint.getFontMetrics(this.sleepEODEMABackground);       // Sets background
 
-            drawStartButton();
-            drawSleepButton();
+            this.startMessage = getResources().getString(R.string.start_string);        // Sets the string of the button
+
+            drawStartButton();      // Calls the method
+            decideSleepEODEMAButton();      // Calls the method
+
+            if (drawEODEMA)     // If it is time to draw the end of day EMA
+            {
+                this.sleepEODEMAMessage = getResources().getString(R.string.eodema_string);      // Sets the string of the button
+                drawEODEMAButton();      // Calls the method
+            }
+            else        // If not, draw the sleep automatically
+            {
+                this.sleepEODEMAMessage = getResources().getString(R.string.sleep_string);      // Sets the string of the button
+                drawSleepButton();      // Calls the method
+            }
         }
 
         /**
@@ -201,6 +232,7 @@ public class WatchFace extends CanvasWatchFaceService
         /**
          * This method initializes the required colors for variables needed in the onDraw method.
          */
+        @SuppressWarnings("ALL")        // Suppresses the warnings for this method
         private void setUpDefaultColors()
         {
             if (isScreenOn())      // Checks if the system is in Ambient mode
@@ -220,7 +252,7 @@ public class WatchFace extends CanvasWatchFaceService
                 this.sleepEODEMAPaint.setColor(Color.DKGRAY);      // Sets color of the button to this level
             }
 
-            if (this.getBatteryLevelInteger() <= 30)        // Checks the battery level
+            if (this.getBatteryLevelInteger() <= Integer.valueOf(this.sharedPreferences.getString("low_battery_alert", "")))        // Checks the battery level
             {
                 this.batteryPaint.setColor(Color.RED);        // Sets the color of the battery level.
             }
@@ -232,7 +264,15 @@ public class WatchFace extends CanvasWatchFaceService
         private void reconfigureButtons()
         {
             this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
-            this.sleepEODEMAPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_sleep_button_size)));    // Sets the text size
+
+            if (drawEODEMA)     // If it is time to draw the end of day ema button
+            {
+                this.sleepEODEMAPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_survey_button_size)));    // Sets the text size
+            }
+            else        // If not, draw the sleep button attribute automatically.
+            {
+                this.sleepEODEMAPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_sleep_button_size)));    // Sets the text size
+            }
 
             if (isScreenOn())       // Checks if the screen is on
             {
@@ -246,21 +286,58 @@ public class WatchFace extends CanvasWatchFaceService
             }
         }
 
+        /**
+         * This method checks with the system information and decides if the sleep button or the daily ema button should be displayed.
+         */
+        @SuppressWarnings("ALL")        // Suppresses the warnings for this method
+        private void decideSleepEODEMAButton()
+        {
+            int startHour = Integer.valueOf(this.sharedPreferences.getString("eod_manual_start_hour", ""));     // Gets the start hour from preferences
+            int startMinute = Integer.valueOf(this.sharedPreferences.getString("eod_manual_start_minute", ""));     // Gets the start minute from preferences
+            int startSecond = Integer.valueOf(this.sharedPreferences.getString("eod_manual_start_second", ""));     // Gets the start second from preferences
+
+            int endHour = Integer.parseInt(this.sharedPreferences.getString("eod_manual_end_hour", ""));         // Gets the end hour from preferences
+            int endMinute = Integer.valueOf(this.sharedPreferences.getString("eod_manual_end_minute", ""));     // Gets the end minute from preferences
+            int endSecond = Integer.valueOf(this.sharedPreferences.getString("eod_manual_end_second", ""));     // Gets the end second from preferences
+
+            drawEODEMA = systemInformation.isTimeBetweenTimes(systemInformation.getTimeMilitary(), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
+        }
+
+        /**
+         * Draws the sleep button based on the system conditions
+         */
         private void drawSleepButton()
         {
-            if (!getSleepMode())
+            if (isScreenOn())       // Checks if the screen is on on the device
             {
-                this.sleepEODEMAPaint.setColor(Color.BLUE);      // Sets color to this level
+                if (getSleepMode())     // Checks if sleep mode on the system is not enabled
+                {
+                    this.sleepEODEMAPaint.setColor(Color.GRAY);      // Sets color to this level
+                }
+                else        // if sleep mode is enabled
+                {
+                    this.sleepEODEMAPaint.setColor(Color.BLUE);      // Sets color to this level
+                }
             }
-            else
+            else        // If the screen is off on the device
             {
-                this.sleepEODEMAPaint.setColor(Color.GRAY);      // Sets color to this level
+                this.sleepEODEMAPaint.setColor(Color.DKGRAY);      // Sets color to this level
             }
         }
 
+        /**
+         * Draws the end of day ema button based on the system attributes
+         */
         private void drawEODEMAButton()
         {
-            // Draws the daily survey button
+            if (isScreenOn())       // Checks if the screen is on on the device
+            {
+                this.sleepEODEMAPaint.setColor(Color.RED);      // Sets color to this level
+            }
+            else        // If not, sets the following
+            {
+                this.sleepEODEMAPaint.setColor(Color.DKGRAY);      // Sets color to this level
+            }
         }
 
         /**
@@ -298,6 +375,14 @@ public class WatchFace extends CanvasWatchFaceService
         {
             super.onTimeTick();     // Calls to superclass
             invalidate();       // Redraws the screen
+        }
+
+        /**
+         * This method changes the sleepMode level of the system
+         */
+        private void setSleepMode(boolean bool)
+        {
+            this.systemInformation.setSleepMode(bool);        // Calls to the information class for the sleepMode level to be changed
         }
 
         /**

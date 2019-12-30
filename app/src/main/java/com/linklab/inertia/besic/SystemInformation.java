@@ -49,6 +49,17 @@ class SystemInformation
     }
 
     /**
+     * Gets the current time in military format
+     * @return a string of the current time in military format
+     */
+    String getTimeMilitary()
+    {
+        this.setCurrent(new Date());      // The current date and timer is set.
+        this.setDateFormat(new SimpleDateFormat("HH:mm:ss", Locale.getDefault()));      // The time format military wise is called in US format.
+        return this.getDateFormat().format(getCurrent());       // The current time in military format is returned
+    }
+
+    /**
      * This get the battery level from the system
      * @param context gets the application context needed
      * @return an integer value of the battery level
@@ -64,6 +75,17 @@ class SystemInformation
         return this.getBatteryPercent();      // This is the battery level as a string
     }
 
+    /**
+     * This method checks if the current time parameter (in military format) is between two given time limits.
+     * @param currentTime is the current time in military format
+     * @param startHour the starting hour of the beginning time
+     * @param endHour the ending hour of the time needed to be checked against
+     * @param startMinute the starting minute of the beginning time
+     * @param endMinute the ending minute of the checked time
+     * @param startSecond the starting second of the time
+     * @param endSecond the ending second of the time to be checked against
+     * @return a boolean true if the system time is between the two given times, otherwise false.
+     */
     boolean isTimeBetweenTimes(String currentTime, int startHour, int endHour, int startMinute, int endMinute, int startSecond, int endSecond)     // Checks if the current time is between two times
     {
         String hourString = currentTime.split(":")[0];     // It set the first string to the hour

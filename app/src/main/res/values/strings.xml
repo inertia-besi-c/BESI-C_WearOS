@@ -22,5 +22,5 @@
     <string name="ui_battery_size">25</string>      <!--Size of the battery text-->
     <string name="ui_start_button_size">65</string>     <!--Size of the start button-->
     <string name="ui_sleep_button_size">50</string>     <!--Size of the sleep button-->
-    <string name="ui_survey_button_size">50</string>     <!--Size of the survey button-->
+    <string name="ui_survey_button_size">40</string>     <!--Size of the survey button-->
 </resources>
