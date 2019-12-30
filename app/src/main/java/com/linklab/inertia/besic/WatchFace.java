@@ -3,7 +3,11 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.wearable.watchface.*;
 import android.graphics.*;
 import android.text.*;
@@ -31,14 +35,16 @@ public class WatchFace extends CanvasWatchFaceService
      */
     private class BESIWatchFace extends CanvasWatchFaceService.Engine
     {
-        private SystemInformation systemInformation;        // Gets a context to te system information class.
-        private Paint.FontMetrics startBackground;
-        private TextPaint batteryPaint, timePaint, datePaint, startPaint;     // Sets the paint instance for the battery level text.
-        private String batteryLevel, currentTime, currentDate, startMessage;        // Sets up string variables.
-        private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas.
+        private SharedPreferences sharedPreferences;        // Gets a context to the system shared preferences object
+        private Vibrator vibrator;      // This is the variable that access the vibrator in the device
+        private SystemInformation systemInformation;        // Gets a context to the system information class
+        private Paint.FontMetrics startBackground;      // Sets a variable to the start background
+        private TextPaint batteryPaint, timePaint, datePaint, startPaint;     // Sets the paint instance for the battery level text
+        private String batteryLevel, currentTime, currentDate, startMessage;        // Sets up string variables
+        private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
-                startX, startY, count;       // Sets up integer variables.
+                startX, startY, hapticLevel, count;       // Sets up integer variables.
 
         /**
          * This method is called when the service of the watch face is called for the first time.
@@ -51,7 +57,9 @@ public class WatchFace extends CanvasWatchFaceService
             super.onCreate(holder);     // Calls a creation instance
 
             this.setWatchFaceStyle(new WatchFaceStyle.Builder(WatchFace.this).setAcceptsTapEvents(true).build());        // Sets the watchface to accept user tap event inputs.
+            this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
+            this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
             this.systemInformation = new SystemInformation();       // Binds the variable to the calls in the class
 
             this.startBackground = new Paint.FontMetrics();     // Sets the background of the button
@@ -116,12 +124,14 @@ public class WatchFace extends CanvasWatchFaceService
                     {
                         if (count==0)       // If this is the first time we are opening the app
                         {
+                            this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
                             startActivity(new Intent(WatchFace.this, Settings.class));      // Open the settings for them to be set
-                            count++;        // Increment the count variable
+                            this.count++;        // Increment the count variable
                         }
                         else    // If not, we have launched the app before.
                         {
-                            // This is where the pain EMA would be started. 
+                            this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
+                            // This is where the pain EMA would be started.
                             Toast.makeText(getApplicationContext(), "Settings already set!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
                         }
                     }
@@ -231,6 +241,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.currentDate = this.systemInformation.getDateForUI();        // Sets up the date from the specific method.
             this.currentTime = this.systemInformation.getTimeForUI();        // Sets up the time from the specific method.
             this.batteryLevel = this.getBatteryLevelString();      // Sets up the battery level by calling the specified method.
+            this.hapticLevel = Integer.valueOf(this.sharedPreferences.getString("haptic_level", ""));
         }
 
         /**
