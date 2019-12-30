@@ -9,6 +9,8 @@
     <!--User Interface Naming Information-->
     <string name="battery_level_string">Battery:</string>   <!--This is the battery information shown in front of the battery information-->
     <string name="start_string">START</string>  <!--This is the string that is shown on the green button-->
+    <string name="sleep_string">SLEEP</string>  <!--This is the string that is shown on the blue button-->
+    <string name="eodema_string">SURVEY</string>  <!--This is the string that is shown on the red button-->
 
     <!--Name of Unique Device Screens-->
     <string name="watchface_name">BESI-C</string>  <!--This is the string that is shown as the watchface name-->
@@ -19,4 +21,6 @@
     <string name="ui_date_size">38</string>     <!--Size of the date-->
     <string name="ui_battery_size">25</string>      <!--Size of the battery text-->
     <string name="ui_start_button_size">65</string>     <!--Size of the start button-->
+    <string name="ui_sleep_button_size">50</string>     <!--Size of the sleep button-->
+    <string name="ui_survey_button_size">40</string>     <!--Size of the survey button-->
 </resources>
