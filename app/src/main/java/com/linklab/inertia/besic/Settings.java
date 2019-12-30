@@ -123,7 +123,7 @@ public class Settings extends PreferenceActivity
             {
                 preference.setSummary(stringValue);     // Sets the summary of the item to be the new value
             }
-            return true;
+            return true;        // Returns true
         }
     };
 }

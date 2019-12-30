@@ -4,6 +4,8 @@ package com.linklab.inertia.besic;
  * Imports needed by the system to function appropriately
  */
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.wearable.watchface.*;
 import android.graphics.*;
 import android.text.*;
@@ -242,7 +244,10 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private String getBatteryLevelString()
         {
-            return getResources().getString(R.string.battery_level_string) + " " + getBatteryLevelInteger() + "%";      // Sets up the string shown on the canvas for battery level.
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            String info = sharedPreferences.getString("user_info", "");
+            return "User:" + " " + info;
+//            return getResources().getString(R.string.battery_level_string) + " " + getBatteryLevelInteger() + "%";      // Sets up the string shown on the canvas for battery level.
         }
 
         /**
