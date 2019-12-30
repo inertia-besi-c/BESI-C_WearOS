@@ -57,7 +57,7 @@ public class WatchFace extends CanvasWatchFaceService
             super.onCreate(holder);     // Calls a creation instance
 
             this.setWatchFaceStyle(new WatchFaceStyle.Builder(WatchFace.this).setAcceptsTapEvents(true).build());        // Sets the watchface to accept user tap event inputs.
-            this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Get instance of Vibrator from current Context
 
             this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
             this.systemInformation = new SystemInformation();       // Binds the variable to the calls in the class
@@ -236,6 +236,7 @@ public class WatchFace extends CanvasWatchFaceService
         /**
          * This method initializes the required values for variables needed in the onDraw method.
          */
+        @SuppressWarnings("ALL")        // Suppresses the warnings for this method
         private void setUpDefaultValues()
         {
             this.currentDate = this.systemInformation.getDateForUI();        // Sets up the date from the specific method.
