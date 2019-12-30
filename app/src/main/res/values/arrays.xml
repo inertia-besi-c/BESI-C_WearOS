@@ -8,34 +8,30 @@
     <string-array name="userList">              <!-- Defines a list for the users -->
         <item>Patient</item>        <!-- The patient user option -->
         <item>Caregiver</item>      <!-- The caregiver user option -->
-        <item>Patient Demonstration</item>      <!-- Shows as a patient demo watch -->
-        <item>Caregiver Demonstration</item>        <!-- Shows as a caregiver demo watch -->
     </string-array>     <!--Ends the list-->
 
     <!-- The actual values associated with the items clicked above. These must be in order with the screen list-->
     <string-array name="userListValue">     <!--Defines a list for the actual values -->
         <item>PT</item>     <!-- The patient value-->
         <item>CG</item>     <!-- The caregiver value -->
-        <item>PT-DEMO</item>        <!-- The demo patient value -->
-        <item>CG-DEMO</item>        <!-- The demo caregiver value -->
     </string-array>     <!--Ends the list-->
 
     <!-- Defines UI items for device recognition -->
     <string-array name="deviceList">        <!-- Defines a list for the user to click -->
         <item>Patient 1</item>      <!-- Shows the first patient watch -->
         <item>Patient 2</item>      <!-- Shows the second patient watch -->
+        <item>Patient Demonstration</item>      <!-- Shows as a patient demo watch -->
         <item>Caregiver 1</item>      <!-- Shows the first caregiver watch -->
         <item>Caregiver 2</item>      <!-- Shows the second caregiver watch -->
-        <item>Patient Demonstration</item>      <!-- Shows as a patient demo watch -->
         <item>Caregiver Demonstration</item>        <!-- Shows as a caregiver demo watch -->
     </string-array>     <!--Ends the list-->
 
     <string-array name="deviceListValue">        <!-- Defines a list for the user to click -->
         <item>PT1</item>        <!--The value associated with the respective list option-->
         <item>PT2</item>        <!--The value associated with the respective list option-->
+        <item>PT-DEMO</item>        <!--The value associated with the respective list option-->
         <item>CG1</item>        <!--The value associated with the respective list option-->
         <item>CG2</item>        <!--The value associated with the respective list option-->
-        <item>PT-DEMO</item>        <!--The value associated with the respective list option-->
         <item>CG-DEMO</item>        <!--The value associated with the respective list option-->
     </string-array>     <!--Ends the list-->
 

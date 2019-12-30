@@ -4,8 +4,6 @@ package com.linklab.inertia.besic;
  * Imports needed by the system to function appropriately
  */
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.wearable.watchface.*;
 import android.graphics.*;
 import android.text.*;
@@ -40,7 +38,7 @@ public class WatchFace extends CanvasWatchFaceService
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas.
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
-                startX, startY;       // Sets up integer variables.
+                startX, startY, count;       // Sets up integer variables.
 
         /**
          * This method is called when the service of the watch face is called for the first time.
@@ -116,9 +114,16 @@ public class WatchFace extends CanvasWatchFaceService
                 case WatchFaceService.TAP_TYPE_TOUCH:       // Checks if the tap type was a touch
                     if (x >= startX && x <= startButtonXEnd && y >= startY && y <= startButtonYEnd)     // Determines if this was around the start button
                     {
-                        // Implement call to Pain EMA HERE
-                        startActivity(new Intent(WatchFace.this, Settings.class));
-                        Toast.makeText(getApplicationContext(), "Start Tapped!", Toast.LENGTH_LONG).show();
+                        if (count==0)       // If this is the first time we are opening the app
+                        {
+                            startActivity(new Intent(WatchFace.this, Settings.class));      // Open the settings for them to be set
+                            count++;        // Increment the count variable
+                        }
+                        else    // If not, we have launched the app before.
+                        {
+                            // This is where the pain EMA would be started. 
+                            Toast.makeText(getApplicationContext(), "Settings already set!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
+                        }
                     }
 
                 case WatchFaceService.TAP_TYPE_TOUCH_CANCEL:        // Checks if the user dismissed the touch
@@ -244,10 +249,7 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private String getBatteryLevelString()
         {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            String info = sharedPreferences.getString("user_info", "");
-            return "User:" + " " + info;
-//            return getResources().getString(R.string.battery_level_string) + " " + getBatteryLevelInteger() + "%";      // Sets up the string shown on the canvas for battery level.
+            return getResources().getString(R.string.battery_level_string) + " " + getBatteryLevelInteger() + "%";      // Sets up the string shown on the canvas for battery level.
         }
 
         /**
