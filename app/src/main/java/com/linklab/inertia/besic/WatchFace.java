@@ -3,12 +3,16 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.wearable.watchface.*;
 import android.graphics.*;
 import android.text.*;
-import android.util.Log;
 import android.view.*;
-import android.widget.Toast;
+import android.widget.*;
 
 /**
  * On Android Wear Watch Face is implemented as a service. This is being used by the application to save resources by giving them to the android system to configure.
@@ -31,14 +35,16 @@ public class WatchFace extends CanvasWatchFaceService
      */
     private class BESIWatchFace extends CanvasWatchFaceService.Engine
     {
-        private SystemInformation systemInformation;        // Gets a context to te system information class.
-        private Paint.FontMetrics startBackground;
-        private TextPaint batteryPaint, timePaint, datePaint, startPaint;     // Sets the paint instance for the battery level text.
-        private String batteryLevel, currentTime, currentDate, startMessage;        // Sets up string variables.
-        private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas.
+        private SharedPreferences sharedPreferences;        // Gets a context to the system shared preferences object
+        private Vibrator vibrator;      // This is the variable that access the vibrator in the device
+        private SystemInformation systemInformation;        // Gets a context to the system information class
+        private Paint.FontMetrics startBackground;      // Sets a variable to the start background
+        private TextPaint batteryPaint, timePaint, datePaint, startPaint;     // Sets the paint instance for the battery level text
+        private String batteryLevel, currentTime, currentDate, startMessage;        // Sets up string variables
+        private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
-                startX, startY;       // Sets up integer variables.
+                startX, startY, hapticLevel, count;       // Sets up integer variables.
 
         /**
          * This method is called when the service of the watch face is called for the first time.
@@ -51,7 +57,9 @@ public class WatchFace extends CanvasWatchFaceService
             super.onCreate(holder);     // Calls a creation instance
 
             this.setWatchFaceStyle(new WatchFaceStyle.Builder(WatchFace.this).setAcceptsTapEvents(true).build());        // Sets the watchface to accept user tap event inputs.
+            this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Get instance of Vibrator from current Context
 
+            this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
             this.systemInformation = new SystemInformation();       // Binds the variable to the calls in the class
 
             this.startBackground = new Paint.FontMetrics();     // Sets the background of the button
@@ -83,6 +91,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.setUpDateAndTime();       // Sets up the time on the UI.
             this.setUpBatteryLevel();      // Sets up the battery values on the UI.
             this.setUpButtons();        // Sets up the buttons on the UI.
+
             this.clearCanvas(canvas);       // Clears the screen so new values can be drawn.
 
             canvas.drawText(this.currentDate, this.currentDatePositionX, this.currentDatePositionY, this.datePaint);       // Calls the canvas to draw the date information
@@ -113,8 +122,18 @@ public class WatchFace extends CanvasWatchFaceService
                 case WatchFaceService.TAP_TYPE_TOUCH:       // Checks if the tap type was a touch
                     if (x >= startX && x <= startButtonXEnd && y >= startY && y <= startButtonYEnd)     // Determines if this was around the start button
                     {
-                        // Implement call to Pain EMA HERE
-                        Toast.makeText(getApplicationContext(), "Start Tapped!", Toast.LENGTH_LONG).show();
+                        if (count==0)       // If this is the first time we are opening the app
+                        {
+                            this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
+                            startActivity(new Intent(WatchFace.this, Settings.class));      // Open the settings for them to be set
+                            this.count++;        // Increment the count variable
+                        }
+                        else    // If not, we have launched the app before.
+                        {
+                            this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
+                            // This is where the pain EMA would be started.
+                            Toast.makeText(getApplicationContext(), "Settings already set!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
+                        }
                     }
 
                 case WatchFaceService.TAP_TYPE_TOUCH_CANCEL:        // Checks if the user dismissed the touch
@@ -191,7 +210,7 @@ public class WatchFace extends CanvasWatchFaceService
                 this.batteryPaint.setColor(Color.DKGRAY);        // Sets the color of the battery level.
             }
 
-            if (this.getBatteryLevelInteger() <= 30)        // Checks te battery level
+            if (this.getBatteryLevelInteger() <= 30)        // Checks the battery level
             {
                 this.batteryPaint.setColor(Color.RED);        // Sets the color of the battery level.
             }
@@ -217,11 +236,13 @@ public class WatchFace extends CanvasWatchFaceService
         /**
          * This method initializes the required values for variables needed in the onDraw method.
          */
+        @SuppressWarnings("ALL")        // Suppresses the warnings for this method
         private void setUpDefaultValues()
         {
             this.currentDate = this.systemInformation.getDateForUI();        // Sets up the date from the specific method.
             this.currentTime = this.systemInformation.getTimeForUI();        // Sets up the time from the specific method.
             this.batteryLevel = this.getBatteryLevelString();      // Sets up the battery level by calling the specified method.
+            this.hapticLevel = Integer.valueOf(this.sharedPreferences.getString("haptic_level", ""));
         }
 
         /**
