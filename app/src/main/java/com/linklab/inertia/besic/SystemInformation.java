@@ -12,6 +12,7 @@ class SystemInformation
 {
     private DateFormat timeFormat, dateFormat;      // Private date format variables
     private Date current;       // Private date variables
+    private boolean sleepMode;      // Private boolean variable for the sleep level of the application
     private int level, scale, batteryPercent;       // private integer variables
 
     /**
@@ -22,6 +23,7 @@ class SystemInformation
         this.level = 0;     // Sets the level
         this.scale = 0;     // Sets the scale
         this.batteryPercent = 0;        // Sets the battery percentage
+        this.sleepMode = false;     // Sets the initial sleepMode of the system
     }
 
     /**
@@ -60,6 +62,41 @@ class SystemInformation
         this.setBatteryPercent((getLevel()*100)/getScale());     // Sets the battery level to a percentage of what it needs to be.
 
         return this.getBatteryPercent();      // This is the battery level as a string
+    }
+
+    boolean isTimeBetweenTimes(String currentTime, int startHour, int endHour, int startMinute, int endMinute, int startSecond, int endSecond)     // Checks if the current time is between two times
+    {
+        String hourString = currentTime.split(":")[0];     // It set the first string to the hour
+        String minuteString = currentTime.split(":")[1];       // It sets the second string to the minutes
+        String secondString = currentTime.split(":")[2];       // It sets the third string to the seconds
+
+        int hour = Integer.parseInt(hourString);        // Makes the string an integer for the hour
+        int minute = Integer.parseInt(minuteString);        // Makes the string an integer for the minute
+        int second = Integer.parseInt(secondString);        // Makes the string an integer for the seconds
+
+        if ((hour >= startHour) && (hour < endHour))    // If the time of the system is between the given time limits
+        {
+            return true;        // Return true
+        }
+        else        // If it fails the first check
+        {
+            if (hour == endHour)        // Check if the hour is the current hour
+            {
+                if ((minute >= startMinute) && (minute < endMinute))      // Check the minute, and if it is less than the end minute time
+                {
+                    return true;        // Return true
+                }
+                else        // If it fails the first check
+                {
+                    if (minute == endMinute)        // Check if the minute is the current minute
+                    {
+                        return (second >= startSecond) && (second < endSecond);
+                    }
+                    return false;       // If not return false
+                }
+            }
+            return false;       // If not return false
+        }
     }
 
     /**
@@ -117,6 +154,15 @@ class SystemInformation
     }
 
     /**
+     * Sets the sleepMode of the system
+     * @param sleepMode is the level needed to be changed to
+     */
+    void setSleepMode(boolean sleepMode)
+    {
+        this.sleepMode = sleepMode;        // Sets the variable appropriately
+    }
+
+    /**
      * Gets the level
      * @return the level variable value
      */
@@ -168,5 +214,14 @@ class SystemInformation
     private Date getCurrent()
     {
         return this.current;      // Returns the variable
+    }
+
+    /**
+     * Creates a global access to the sleepMode variable
+     * @return the value associated with the sleepMode
+     */
+    boolean getSleepMode()
+    {
+        return this.sleepMode;      // Returns the value associated with the variable
     }
 }

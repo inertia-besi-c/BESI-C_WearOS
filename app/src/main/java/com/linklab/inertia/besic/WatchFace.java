@@ -3,11 +3,9 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Vibrator;
-import android.preference.PreferenceManager;
+import android.content.*;
+import android.os.*;
+import android.preference.*;
 import android.support.wearable.watchface.*;
 import android.graphics.*;
 import android.text.*;
@@ -38,13 +36,13 @@ public class WatchFace extends CanvasWatchFaceService
         private SharedPreferences sharedPreferences;        // Gets a context to the system shared preferences object
         private Vibrator vibrator;      // This is the variable that access the vibrator in the device
         private SystemInformation systemInformation;        // Gets a context to the system information class
-        private Paint.FontMetrics startBackground;      // Sets a variable to the start background
-        private TextPaint batteryPaint, timePaint, datePaint, startPaint;     // Sets the paint instance for the battery level text
-        private String batteryLevel, currentTime, currentDate, startMessage;        // Sets up string variables
+        private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
+        private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
+        private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage;        // Sets up string variables
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
-                startX, startY, hapticLevel, count;       // Sets up integer variables.
+                startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel, count;       // Sets up integer variables.
 
         /**
          * This method is called when the service of the watch face is called for the first time.
@@ -63,10 +61,13 @@ public class WatchFace extends CanvasWatchFaceService
             this.systemInformation = new SystemInformation();       // Binds the variable to the calls in the class
 
             this.startBackground = new Paint.FontMetrics();     // Sets the background of the button
+            this.sleepEODEMABackground = new Paint.FontMetrics();       // Sets the background of the sleep/EODEMA button
+
             this.batteryPaint = new TextPaint();        // Makes a text paint
             this.timePaint = new TextPaint();        // Makes a text paint
             this.datePaint = new TextPaint();        // Makes a text paint
             this.startPaint = new TextPaint();        // Makes a text paint
+            this.sleepEODEMAPaint = new TextPaint();        // Makes a text paint
 
             this.batteryLevelTextBounds = new Rect();        // Makes a text rectangle
             this.currentTimeTextBounds = new Rect();        // Makes a text rectangle
@@ -98,10 +99,13 @@ public class WatchFace extends CanvasWatchFaceService
             canvas.drawText(this.currentTime, this.currentTimePositionX, this.currentTimePositionY, this.timePaint);       // Calls the canvas to draw the time information
             canvas.drawText(this.batteryLevel, this.batteryLevelPositionX, this.batteryLevelPositionY, this.batteryPaint);      // Calls the canvas to draw the battery information.
 
-            canvas.drawRect(this.startX, startY, (getResources().getDisplayMetrics().widthPixels / 2)+(getResources().getDisplayMetrics().widthPixels / 15),    // Draws the specified rectangle
+            canvas.drawRect(this.startX, this.startY, this.sleepEODEMAX,    // Draws the specified rectangle
                     this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15, this.startPaint);       // Continued from previous line
+            canvas.drawRect(this.sleepEODEMAX, this.sleepEODEMAY, getResources().getDisplayMetrics().widthPixels,       // Draws the specified rectangle
+                    this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15, this.sleepEODEMAPaint);       // Continued from previous line
             this.reconfigureButtons();      // Calls the method
-            canvas.drawText(this.startMessage, this.startX+20, startY + (startY/3) + 12, this.startPaint);      // Calls the canvas to draw the message information
+            canvas.drawText(this.startMessage, this.startX+20, this.startY + (this.startY/3) + 12, this.startPaint);      // Calls the canvas to draw the message information
+            canvas.drawText(this.sleepEODEMAMessage, this.sleepEODEMAX+10, this.sleepEODEMAY+(this.sleepEODEMAY/3)+8, this.sleepEODEMAPaint);        // Calls the canvas to draw the message
         }
 
         /**
@@ -147,20 +151,22 @@ public class WatchFace extends CanvasWatchFaceService
         private void setUpButtons()
         {
             this.startMessage = getResources().getString(R.string.start_string);        // Sets the string of the button
+            this.sleepEODEMAMessage = getResources().getString(R.string.sleep_string);      // Sets the string of the button
+
             this.startX = 0;        // Sets the starting x location
+            this.sleepEODEMAX = (getResources().getDisplayMetrics().widthPixels / 2)+(getResources().getDisplayMetrics().widthPixels / 15);     // Sets the starting x location
+
             this.startY = this.currentTimePositionY+(this.currentTimeTextBounds.height()/3)+10;        // Sets the starting y location
+            this.sleepEODEMAY = this.currentTimePositionY+(this.currentTimeTextBounds.height()/3)+10;     // Sets the starting y location
 
-            this.startPaint.setTextSize(40);        // Initializes button size
+            this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));        // Initializes button size
+            this.sleepEODEMAPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_sleep_button_size)));        // Sets the sleep button text size
+
             this.startPaint.getFontMetrics(this.startBackground);       // Sets background
+            this.sleepEODEMAPaint.getFontMetrics(this.sleepEODEMABackground);       // Sets background
 
-            if (isScreenOn())       // If the screen is on
-            {
-                this.startPaint.setColor(Color.GREEN);      // Sets color to this level
-            }
-            else        // If screen is off
-            {
-                this.startPaint.setColor(Color.DKGRAY);     // Sets color to this level
-            }
+            drawStartButton();
+            drawSleepButton();
         }
 
         /**
@@ -202,12 +208,16 @@ public class WatchFace extends CanvasWatchFaceService
                 this.datePaint.setColor(Color.WHITE);       // Sets the color of the date on the UI
                 this.timePaint.setColor(Color.WHITE);       // Sets the color of the time on the UI.
                 this.batteryPaint.setColor(Color.GREEN);        // Sets the color of the battery level.
+                this.startPaint.setColor(Color.GREEN);      // Sets color of the start button to this level
+                this.sleepEODEMAPaint.setColor(Color.BLUE);      // Sets color of the button to this level
             }
             else        // If the screen is in ambient mode
             {
                 this.datePaint.setColor(Color.DKGRAY);       // Sets the color of the date on the UI
                 this.timePaint.setColor(Color.LTGRAY);       // Sets the color of the time on the UI.
                 this.batteryPaint.setColor(Color.DKGRAY);        // Sets the color of the battery level.
+                this.startPaint.setColor(Color.DKGRAY);      // Sets color of the start button to this level
+                this.sleepEODEMAPaint.setColor(Color.DKGRAY);      // Sets color of the button to this level
             }
 
             if (this.getBatteryLevelInteger() <= 30)        // Checks the battery level
@@ -222,14 +232,49 @@ public class WatchFace extends CanvasWatchFaceService
         private void reconfigureButtons()
         {
             this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
+            this.sleepEODEMAPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_sleep_button_size)));    // Sets the text size
 
             if (isScreenOn())       // Checks if the screen is on
             {
                 this.startPaint.setColor(Color.WHITE);      // Sets the color
+                this.sleepEODEMAPaint.setColor(Color.WHITE);        // Sets the color
             }
             else
             {
                 this.startPaint.setColor(Color.BLACK);      // Sets the color
+                this.sleepEODEMAPaint.setColor(Color.BLACK);        // Sets the color
+            }
+        }
+
+        private void drawSleepButton()
+        {
+            if (!getSleepMode())
+            {
+                this.sleepEODEMAPaint.setColor(Color.BLUE);      // Sets color to this level
+            }
+            else
+            {
+                this.sleepEODEMAPaint.setColor(Color.GRAY);      // Sets color to this level
+            }
+        }
+
+        private void drawEODEMAButton()
+        {
+            // Draws the daily survey button
+        }
+
+        /**
+         * Draws the start button onto the screen.
+         */
+        private void drawStartButton()
+        {
+            if (isScreenOn())       // If the screen is on
+            {
+                this.startPaint.setColor(Color.GREEN);      // Sets color to this level
+            }
+            else        // If screen is off
+            {
+                this.startPaint.setColor(Color.DKGRAY);     // Sets color to this level
             }
         }
 
@@ -271,6 +316,15 @@ public class WatchFace extends CanvasWatchFaceService
         private int getBatteryLevelInteger()
         {
             return this.systemInformation.getBatteryLevel(getApplicationContext());     // Gets the battery level as an integer from the helper class
+        }
+
+        /**
+         * This method provides the sleepMode of the system
+         * @return a boolean checking if sleepMode is enabled
+         */
+        private boolean getSleepMode()
+        {
+            return systemInformation.getSleepMode();        // Calls to the information class for the sleepMode level
         }
 
         /**
