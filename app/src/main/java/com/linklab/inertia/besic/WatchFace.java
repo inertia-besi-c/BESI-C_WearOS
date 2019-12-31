@@ -147,7 +147,7 @@ public class WatchFace extends CanvasWatchFaceService
 
                     if (x > startButtonXEnd && x < sleepEODEMAXEnd && y >= sleepEODEMAY && y <= buttonsYEnd)
                     {
-                        if (drawEODEMA)
+                        if (drawEODEMA)     // Checks if the daily ema button needs is available
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
                             // This is where an intent to launch the end of day ema would be made
