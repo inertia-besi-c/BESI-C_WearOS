@@ -41,11 +41,15 @@ public class DataLogger extends PreferenceActivity
     }
 
     /**
-     * Method opens a link to a main directory folder specified in the sdcard of the device and logs the
+     * Method opens a link to a main directory folder specified in the sdcard of the device and saves the
      * the contents of a data stream into the given filename. If any of the file or folders do not exist,
      * one is created and logged into.
+     * @param saveType is the argument passed into the method to determine what type of method to save the
+     *                 data. An argument with "log" would append the data to the file without erasing the
+     *                 contents. An argument with "write" would erase the content of the file and add the
+     *                 new contents to the file.
      */
-    public void logData()
+    public void saveData(String saveType)
     {
         if (isExternalStorageWritable())        // Checks if the external storage is writable
         {
@@ -62,7 +66,16 @@ public class DataLogger extends PreferenceActivity
                 this.dataFile.createNewFile();      // Creates a new file at the specified path name
                 this.outputFIle = new FileOutputStream(this.dataFile, true);        // Creates a new file to be read out into the device
                 this.outputWriter = new OutputStreamWriter(this.outputFIle);        // Assigns the output file to be written by the output writer
-                this.outputWriter.append(this.Content);        // Appends the content to be logged into the file
+
+                if (saveType.toLowerCase().equals("log"))       // Checks if the data is supposed to be in log mode
+                    this.outputWriter.append(this.Content);        // Appends the content to be saved into the file without erasing it
+
+                else if (saveType.toLowerCase().equals("write"))     // Checks if the data is supposed to be in write mode
+                    this.outputWriter.write(this.Content);      // Writes the content to be saved into the file after erasing it.
+
+                else
+                    Toast.makeText(getApplicationContext(), "Error: Invalid Save Argument", Toast.LENGTH_LONG).show();     // Shows a toast
+
                 this.outputWriter.close();      // Closes the output writer
                 this.outputFIle.close();        // Closes the file that is output into the device
             }
