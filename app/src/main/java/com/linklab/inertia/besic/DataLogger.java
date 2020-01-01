@@ -1,19 +1,26 @@
 package com.linklab.inertia.besic;
 
-import android.annotation.*;
+/*
+ * Imports needed by the system to function appropriately
+ */
 import android.content.*;
 import android.preference.*;
 import android.widget.*;
-
 import java.io.*;
 
+/**
+ * This class is made to enable the logging and reading of data from the saved location on the external storage
+ * of the device. There is a log mode, write mode, and read mode implementation for the file readers.
+ */
 public class DataLogger extends PreferenceActivity
 {
-    private String FileName, Content, Subdirectory, DeviceID, mainDirectoryPath, Directory, externalStorageState;        // Variable names for the file characters and contents.
+    private String FileName, Content, Subdirectory, DeviceID, mainDirectoryPath, Directory, externalStorageState, lineItems;        // Variable names for the file characters and contents.
     private SharedPreferences sharedPreferences;        // Gets the shared preference from the system.
     FileOutputStream outputFIle;        // File to be put out into the device
     File mainDirectory, dataFile;     // Sets up the file of the system
     OutputStreamWriter outputWriter;        // Link to the writer of the device
+    StringBuilder fileContent;      // A string builder variable storing data
+    BufferedReader bufferedReader;      // A buffer reader to read from the file
 
     /**
      * Constructor for when the class is called
@@ -79,19 +86,60 @@ public class DataLogger extends PreferenceActivity
                 this.outputWriter.close();      // Closes the output writer
                 this.outputFIle.close();        // Closes the file that is output into the device
             }
-            catch (IOException e)
+            catch (IOException e)       // If a file error happens
             {
                 Toast.makeText(getApplicationContext(), "Error Making File", Toast.LENGTH_LONG).show();     // Shows a toast
             }
-            catch (Exception e)
+            catch (Exception e)     // If any other error happens
             {
                 Toast.makeText(getApplicationContext(), "Unknown Error", Toast.LENGTH_LONG).show();     // Shows a toast
             }
         }
         else
         {
-            Toast.makeText(getApplicationContext(), "Please Check External Storage", Toast.LENGTH_LONG).show();     // Shows a toast
+            Toast.makeText(getApplicationContext(), "Cannot Write to sdcard", Toast.LENGTH_LONG).show();     // Shows a toast
         }
+    }
+
+    /**
+     * This method reads the content from a file specified with a path.
+     * @return the string format of what the file contains.
+     */
+    public String readData()
+    {
+        if (isExternalStorageReadable())        // Checks if the external storage can be read from
+        {
+            this.fileContent = new StringBuilder();     // Creates a new string builder variable to store all the data
+            try
+            {
+                this.dataFile = new File(this.mainDirectoryPath+"/"+this.Subdirectory+"/"+this.FileName);       // Specifies a path to the file
+                this.bufferedReader = new BufferedReader(new FileReader(this.dataFile));        // Opens a reader for the file
+
+                while((this.lineItems = this.bufferedReader.readLine()) != null)        // Checks if there is still a line to read from and it's not null
+                {
+                    this.fileContent.append(this.lineItems);        // Appends the value to the string builder
+                    this.fileContent.append("\n");      // Appends a next line character.
+                }
+
+                this.bufferedReader.close();       // Closes the reader
+            }
+            catch (IOException e)       // If a file error happens
+            {
+                Toast.makeText(getApplicationContext(), "Cannot Find File", Toast.LENGTH_LONG).show();     // Shows a toast
+            }
+            catch (Exception e)     // If any other error happens
+            {
+                Toast.makeText(getApplicationContext(), "Unknown Error", Toast.LENGTH_LONG).show();     // Shows a toast
+            }
+
+            return this.fileContent.toString();     // Returns the file contents a string
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(), "Cannot Read from sdcard", Toast.LENGTH_LONG).show();     // Shows a toast
+        }
+
+        return "Cannot Read from sdcard";       // Returns a false cannot read from sdcard error message
     }
 
     /**
