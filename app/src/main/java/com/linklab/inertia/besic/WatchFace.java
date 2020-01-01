@@ -35,6 +35,7 @@ public class WatchFace extends CanvasWatchFaceService
     {
         private SharedPreferences sharedPreferences;        // Gets a context to the system shared preferences object
         private Vibrator vibrator;      // This is the variable that access the vibrator in the device
+        private DataLogger dataLogger;
         private SystemInformation systemInformation;        // Gets a context to the system information class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
@@ -140,6 +141,9 @@ public class WatchFace extends CanvasWatchFaceService
                         else    // If not, we have launched the app before.
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
+
+                            this.dataLogger = new DataLogger("TestSubdirectory", "TestFile", "Test Content of File, Pain Button");
+                            this.dataLogger.saveData("log");
                             // This is where the pain EMA would be started.
                             Toast.makeText(getApplicationContext(), "Settings already set!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
                         }

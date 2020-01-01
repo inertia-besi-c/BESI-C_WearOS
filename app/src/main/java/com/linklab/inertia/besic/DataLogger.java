@@ -23,18 +23,6 @@ public class DataLogger extends PreferenceActivity
     BufferedReader bufferedReader;      // A buffer reader to read from the file
 
     /**
-     * Constructor for when the class is called
-     */
-    DataLogger()
-    {
-        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets a reference the preference object
-        this.externalStorageState = android.os.Environment.getExternalStorageState();       // Gets the state of the external storage of the device
-        this.Directory = this.sharedPreferences.getString("directory_key", "");     // Gets the main directory of the device
-        this.DeviceID = this.sharedPreferences.getString("device_info", "");     // Sets up the device identification information
-        this.mainDirectoryPath = this.externalStorageState + "/" + this.Directory;     // Sets up the path to the main directory information
-    }
-
-    /**
      * Overloaded constructor taking arguments to set up data information
      * @param subdirectory is the subdirectory where the data should be logged
      * @param fileName is the name of the file that is to be logged
@@ -45,6 +33,18 @@ public class DataLogger extends PreferenceActivity
         this.Subdirectory = subdirectory;     // Assigns the subdirectory
         this.FileName = DeviceID + "_" + fileName;      // Assigns the filename
         this.Content = content+"\n";     // Assigns the content to be logged to the file
+    }
+
+    /**
+     * Setup values for when the class is called
+     */
+    public void setUp()
+    {
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets a reference the preference object
+        this.externalStorageState = android.os.Environment.getExternalStorageState();       // Gets the state of the external storage of the device
+        this.Directory = this.sharedPreferences.getString("directory_key", "");     // Gets the main directory of the device
+        this.DeviceID = this.sharedPreferences.getString("device_info", "");     // Sets up the device identification information
+        this.mainDirectoryPath = this.externalStorageState + "/" + this.Directory;     // Sets up the path to the main directory information
     }
 
     /**
