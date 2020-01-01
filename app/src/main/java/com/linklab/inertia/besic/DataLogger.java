@@ -6,6 +6,7 @@ package com.linklab.inertia.besic;
 import android.content.*;
 import android.preference.*;
 import android.widget.*;
+import android.os.*;
 import java.io.*;
 
 /**
@@ -14,11 +15,11 @@ import java.io.*;
  */
 public class DataLogger
 {
-    private String FileName, Content, Subdirectory, DeviceID, mainDirectoryPath, Directory, externalStorageState, lineItems;        // Variable names for the file characters and contents.
+    private String FileName, Content, Subdirectory, DeviceID, mainDirectoryPath, Directory, externalStorageState, externalStorageDirectory, lineItems;        // Variable names for the file characters and contents.
     private SharedPreferences sharedPreferences;        // Gets the shared preference from the system.
     private Context context;
     private FileOutputStream outputFIle;        // File to be put out into the device
-    private File mainDirectory, dataFile;     // Sets up the file of the system
+    private File mainDirectory, subDirectory, dataFile;     // Sets up the file of the system
     private OutputStreamWriter outputWriter;        // Link to the writer of the device
     private StringBuilder fileContent;      // A string builder variable storing data
     private BufferedReader bufferedReader;      // A buffer reader to read from the file
@@ -54,21 +55,24 @@ public class DataLogger
             try     // Tries to perform the following actions
             {
                 this.mainDirectory = new File(this.mainDirectoryPath);      // Makes the main directory as a new file.
+                this.subDirectory = new File(this.mainDirectoryPath + "/" + this.Subdirectory);
 
-                if (!this.mainDirectory.isDirectory())
+                if (!this.mainDirectory.isDirectory() || !this.subDirectory.isDirectory())
                 {
                     this.mainDirectory.mkdirs();
+                    this.subDirectory.mkdirs();
                 }
 
                 this.dataFile = new File(this.mainDirectoryPath+"/"+this.Subdirectory+"/"+this.FileName);
+                Toast.makeText(context, this.dataFile.toString(), Toast.LENGTH_LONG).show();     // Shows a toast
                 this.dataFile.createNewFile();      // Creates a new file at the specified path name
-                this.outputFIle = new FileOutputStream(this.dataFile, true);        // Creates a new file to be read out into the device
+                this.outputFIle = new FileOutputStream(this.dataFile,true);        // Creates a new file to be read out into the device
                 this.outputWriter = new OutputStreamWriter(this.outputFIle);        // Assigns the output file to be written by the output writer
 
-                if (saveType.toLowerCase().equals("log"))       // Checks if the data is supposed to be in log mode
+                if (saveType.toLowerCase().contentEquals("log"))       // Checks if the data is supposed to be in log mode
                     this.outputWriter.append(this.Content);        // Appends the content to be saved into the file without erasing it
 
-                else if (saveType.toLowerCase().equals("write"))     // Checks if the data is supposed to be in write mode
+                else if (saveType.toLowerCase().contentEquals("write"))     // Checks if the data is supposed to be in write mode
                     this.outputWriter.write(this.Content);      // Writes the content to be saved into the file after erasing it.
 
                 else
@@ -139,10 +143,11 @@ public class DataLogger
     public void setUp()
     {
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);        // Gets a reference the preference object
-        this.externalStorageState = android.os.Environment.getExternalStorageState();       // Gets the state of the external storage of the device
+        this.externalStorageState = Environment.getExternalStorageState();       // Gets the state of the external storage of the device
+        this.externalStorageDirectory = Environment.getExternalStorageDirectory().toString();      // Gets the main directory of the device
         this.Directory = this.sharedPreferences.getString("directory_key", "");     // Gets the main directory of the device
         this.DeviceID = this.sharedPreferences.getString("device_info", "");     // Sets up the device identification information
-        this.mainDirectoryPath = this.externalStorageState + "/" + this.Directory;     // Sets up the path to the main directory information
+        this.mainDirectoryPath = this.externalStorageDirectory + "/" + this.Directory;     // Sets up the path to the main directory information
     }
 
     /**
@@ -151,7 +156,7 @@ public class DataLogger
      */
     private boolean isExternalStorageWritable()
     {
-        return android.os.Environment.MEDIA_MOUNTED.equals(this.externalStorageState);       // Returns if the space is available to be written to
+        return Environment.MEDIA_MOUNTED.equals(this.externalStorageState);       // Returns if the space is available to be written to
     }
 
     /**
@@ -160,6 +165,6 @@ public class DataLogger
      */
     private boolean isExternalStorageReadable()
     {
-        return android.os.Environment.MEDIA_MOUNTED.equals(this.externalStorageState) || android.os.Environment.MEDIA_MOUNTED_READ_ONLY.equals(this.externalStorageState);        // Checks if there is readable state
+        return Environment.MEDIA_MOUNTED.equals(this.externalStorageState) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(this.externalStorageState);        // Checks if there is readable state
     }
 }

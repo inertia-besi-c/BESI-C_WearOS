@@ -142,7 +142,7 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
-                            this.dataLogger = new DataLogger(getApplicationContext(),"TestSubdirectory", "TestFile", "Test Content of File, Pain Button");
+                            this.dataLogger = new DataLogger(getApplicationContext(),"Subdirectory", "TestFile.csv", "Test, Content, of, File");
                             this.dataLogger.saveData("log");
 
                             // This is where the pain EMA would be started.
