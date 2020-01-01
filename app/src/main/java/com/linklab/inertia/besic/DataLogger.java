@@ -3,8 +3,10 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+import android.annotation.SuppressLint;
 import android.content.*;
 import android.preference.*;
+import android.util.Log;
 import android.widget.*;
 import java.io.*;
 
@@ -16,6 +18,7 @@ public class DataLogger extends PreferenceActivity
 {
     private String FileName, Content, Subdirectory, DeviceID, mainDirectoryPath, Directory, externalStorageState, lineItems;        // Variable names for the file characters and contents.
     private SharedPreferences sharedPreferences;        // Gets the shared preference from the system.
+    private Context context;
     FileOutputStream outputFIle;        // File to be put out into the device
     File mainDirectory, dataFile;     // Sets up the file of the system
     OutputStreamWriter outputWriter;        // Link to the writer of the device
@@ -28,8 +31,10 @@ public class DataLogger extends PreferenceActivity
      * @param fileName is the name of the file that is to be logged
      * @param content is the content that the file should contain
      */
-    public DataLogger(String subdirectory, String fileName, String content)
+    public DataLogger(Context context, String subdirectory, String fileName, String content)
     {
+        this.context = context;
+        setUp();
         this.Subdirectory = subdirectory;     // Assigns the subdirectory
         this.FileName = DeviceID + "_" + fileName;      // Assigns the filename
         this.Content = content+"\n";     // Assigns the content to be logged to the file
@@ -40,7 +45,7 @@ public class DataLogger extends PreferenceActivity
      */
     public void setUp()
     {
-        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets a reference the preference object
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);        // Gets a reference the preference object
         this.externalStorageState = android.os.Environment.getExternalStorageState();       // Gets the state of the external storage of the device
         this.Directory = this.sharedPreferences.getString("directory_key", "");     // Gets the main directory of the device
         this.DeviceID = this.sharedPreferences.getString("device_info", "");     // Sets up the device identification information
@@ -81,23 +86,23 @@ public class DataLogger extends PreferenceActivity
                     this.outputWriter.write(this.Content);      // Writes the content to be saved into the file after erasing it.
 
                 else
-                    Toast.makeText(getApplicationContext(), "Error: Invalid Save Argument", Toast.LENGTH_LONG).show();     // Shows a toast
+                    Toast.makeText(context, "Error: Invalid Save Argument", Toast.LENGTH_LONG).show();     // Shows a toast
 
                 this.outputWriter.close();      // Closes the output writer
                 this.outputFIle.close();        // Closes the file that is output into the device
             }
             catch (IOException e)       // If a file error happens
             {
-                Toast.makeText(getApplicationContext(), "Error Making File", Toast.LENGTH_LONG).show();     // Shows a toast
+                Toast.makeText(context, "Error Making File", Toast.LENGTH_LONG).show();     // Shows a toast
             }
             catch (Exception e)     // If any other error happens
             {
-                Toast.makeText(getApplicationContext(), "Unknown Error", Toast.LENGTH_LONG).show();     // Shows a toast
+                Toast.makeText(context, "Unknown Error", Toast.LENGTH_LONG).show();     // Shows a toast
             }
         }
         else        // Runs if the external storage is not writable
         {
-            Toast.makeText(getApplicationContext(), "Cannot Write to sdcard", Toast.LENGTH_LONG).show();     // Shows a toast
+            Toast.makeText(context, "Cannot Write to sdcard", Toast.LENGTH_LONG).show();     // Shows a toast
         }
     }
 
@@ -125,18 +130,18 @@ public class DataLogger extends PreferenceActivity
             }
             catch (IOException e)       // If a file error happens
             {
-                Toast.makeText(getApplicationContext(), "Cannot Find File", Toast.LENGTH_LONG).show();     // Shows a toast
+                Toast.makeText(context, "Cannot Find File", Toast.LENGTH_LONG).show();     // Shows a toast
             }
             catch (Exception e)     // If any other error happens
             {
-                Toast.makeText(getApplicationContext(), "Unknown Error", Toast.LENGTH_LONG).show();     // Shows a toast
+                Toast.makeText(context, "Unknown Error", Toast.LENGTH_LONG).show();     // Shows a toast
             }
 
             return this.fileContent.toString();     // Returns the file contents a string
         }
         else        // Runs if the external storage is not readable
         {
-            Toast.makeText(getApplicationContext(), "Cannot Read from sdcard", Toast.LENGTH_LONG).show();     // Shows a toast
+            Toast.makeText(context, "Cannot Read from sdcard", Toast.LENGTH_LONG).show();     // Shows a toast
         }
 
         return "Cannot Read from sdcard";       // Returns a false cannot read from sdcard error message
@@ -148,7 +153,7 @@ public class DataLogger extends PreferenceActivity
      */
     private boolean isExternalStorageWritable()
     {
-        return android.os.Environment.MEDIA_MOUNTED.equals(externalStorageState);       // Returns if the space is available to be written to
+        return android.os.Environment.MEDIA_MOUNTED.equals(this.externalStorageState);       // Returns if the space is available to be written to
     }
 
     /**
@@ -157,6 +162,6 @@ public class DataLogger extends PreferenceActivity
      */
     private boolean isExternalStorageReadable()
     {
-        return android.os.Environment.MEDIA_MOUNTED.equals(externalStorageState) || android.os.Environment.MEDIA_MOUNTED_READ_ONLY.equals(externalStorageState);        // Checks if there is readable state
+        return android.os.Environment.MEDIA_MOUNTED.equals(this.externalStorageState) || android.os.Environment.MEDIA_MOUNTED_READ_ONLY.equals(this.externalStorageState);        // Checks if there is readable state
     }
 }

@@ -1,35 +1,37 @@
-<!-- This is the manifest file for the application. This file is needed and changes to this file can drastically affect the
-        performance of the application. For your information to insert a comment in a manifest file you can press the
-        "CTRL" + "SHIFT" + "/" keys and start typing your comment -->
-
-<!-- Defines the package name of the application that is used in compiling -->
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.linklab.inertia.besic">
-
-    <!-- Defines what features are need by the application to run  -->
+    <!-- Defines what features are need by the application to run -->
     <uses-feature android:name="android.hardware.type.watch" />
     <uses-feature android:name="android.software.type.watch" />
+
     <uses-permission android:name="com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
-    <!-- Defines the application itself including services and application file information -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/besic_logo_round"
         android:label="@string/app_name_abbreviated"
-        android:supportsRtl="true"
         android:launchMode="singleInstance"
+        android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -42,7 +44,6 @@
             android:name=".WatchFace"
             android:label="@string/watchface_name"
             android:permission="android.permission.BIND_WALLPAPER">
-
             <meta-data
                 android:name="android.service.wallpaper"
                 android:resource="@xml/watchface" />
@@ -55,23 +56,38 @@
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
+
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
 
         <activity
-            android:name=".Settings"
-            android:label="@string/preference_name"
-            android:launchMode="singleInstance"
-            android:icon="@mipmap/besic_logo_round">
+            android:name=".MainActivity"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/mainactivity_name"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <activity
-            android:name=".DataLogger"
-            android:label="@string/datalogger_name"
-            android:launchMode="singleInstance"
-            android:icon="@mipmap/besic_logo_round">
+            android:name=".Settings"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/preference_name"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
-
+        <activity
+            android:name=".DataLogger"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/datalogger_name"
+            android:launchMode="singleInstance">
+        </activity>
     </application>
+
 </manifest>
