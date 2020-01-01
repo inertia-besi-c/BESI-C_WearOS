@@ -9,9 +9,11 @@
     package="com.linklab.inertia.besic">
 
     <!-- Defines what features are need by the application to run  -->
-    <uses-permission android:name="com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA" />
     <uses-feature android:name="android.hardware.type.watch" />
     <uses-feature android:name="android.software.type.watch" />
+    <uses-permission android:name="com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- Defines the application itself including services and application file information -->
@@ -62,10 +64,13 @@
             android:label="@string/preference_name"
             android:launchMode="singleInstance"
             android:icon="@mipmap/besic_logo_round">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".DataLogger"
+            android:label="@string/datalogger_name"
+            android:launchMode="singleInstance"
+            android:icon="@mipmap/besic_logo_round">
         </activity>
 
     </application>
