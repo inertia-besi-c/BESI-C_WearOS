@@ -95,7 +95,7 @@ public class DataLogger extends PreferenceActivity
                 Toast.makeText(getApplicationContext(), "Unknown Error", Toast.LENGTH_LONG).show();     // Shows a toast
             }
         }
-        else
+        else        // Runs if the external storage is not writable
         {
             Toast.makeText(getApplicationContext(), "Cannot Write to sdcard", Toast.LENGTH_LONG).show();     // Shows a toast
         }
@@ -134,7 +134,7 @@ public class DataLogger extends PreferenceActivity
 
             return this.fileContent.toString();     // Returns the file contents a string
         }
-        else
+        else        // Runs if the external storage is not readable
         {
             Toast.makeText(getApplicationContext(), "Cannot Read from sdcard", Toast.LENGTH_LONG).show();     // Shows a toast
         }
