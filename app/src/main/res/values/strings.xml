@@ -1,3 +1,27 @@
+<!--
+    This file stores application specific items that is not expected to be changed. These values are hardcoded values needed for thr app to function properly.
+-->
 <resources>
-    <string name="app_name">SurveyMyHealth</string>
+    <!--General Application Naming and Information-->
+    <string name="app_name_full">Behavioral and Environmental Sensing and Intervention</string>     <!-- Full name of the application -->
+    <string name="app_name_abbreviated">BESI-C</string>     <!-- This is the abbreviated format of the application name -->
+
+    <!--User Interface Naming Information-->
+    <string name="battery_level_string">Battery:</string>   <!--This is the battery information shown in front of the battery information-->
+    <string name="start_string">START</string>  <!--This is the string that is shown on the green button-->
+    <string name="sleep_string">SLEEP</string>  <!--This is the string that is shown on the blue button-->
+    <string name="eodema_string">SURVEY</string>  <!--This is the string that is shown on the red button-->
+
+    <!--Name of Unique Device Screens-->
+    <string name="watchface_name">BESI-C</string>  <!--This is the string that is shown as the watchface name-->
+    <string name="preference_name">Preferences</string>  <!--This is the string that is shown as the settings name-->
+    <string name="datalogger_name">DataLogger</string>  <!--This is the string that is shown as the datalogger name-->
+
+    <!--User Interface Size Information-->
+    <string name="ui_time_size">85</string>     <!--Size of the time-->
+    <string name="ui_date_size">38</string>     <!--Size of the date-->
+    <string name="ui_battery_size">25</string>      <!--Size of the battery text-->
+    <string name="ui_start_button_size">65</string>     <!--Size of the start button-->
+    <string name="ui_sleep_button_size">50</string>     <!--Size of the sleep button-->
+    <string name="ui_survey_button_size">40</string>     <!--Size of the survey button-->
 </resources>
