@@ -3,14 +3,22 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-import android.content.*;
-import android.os.*;
-import android.preference.*;
-import android.support.wearable.watchface.*;
-import android.graphics.*;
-import android.text.*;
-import android.view.*;
-import android.widget.*;
+import android.support.wearable.watchface.CanvasWatchFaceService;
+import android.support.wearable.watchface.WatchFaceService;
+import android.content.SharedPreferences;
+import android.view.SurfaceHolder;
+import android.content.Context;
+import android.os.Vibrator;
+import android.support.wearable.watchface.WatchFaceStyle;
+import android.preference.PreferenceManager;
+import android.graphics.PorterDuff;
+import android.graphics.Canvas;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.text.TextPaint;
+import android.graphics.Rect;
+import android.widget.Toast;
 
 /**
  * On Android Wear Watch Face is implemented as a service. This is being used by the application to save resources by giving them to the android system to configure.

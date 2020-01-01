@@ -1,11 +1,12 @@
 package com.linklab.inertia.besic;
 
-import android.Manifest;
+import android.content.pm.PackageManager;
 import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
-import android.content.pm.PackageManager;
+import android.Manifest;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;

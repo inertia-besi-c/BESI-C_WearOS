@@ -3,10 +3,16 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-import android.annotation.*;
-import android.os.*;
-import android.preference.*;
-import androidx.annotation.*;
+import android.annotation.SuppressLint;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
+import android.preference.EditTextPreference;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
 
 /**
  * This class is responsible for setting up the settings for the application.
