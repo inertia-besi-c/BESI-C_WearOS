@@ -3,11 +3,18 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-import android.content.*;
-import android.preference.*;
-import android.widget.*;
-import android.os.*;
-import java.io.*;
+import android.preference.PreferenceManager;
+import android.os.Environment;
+import android.widget.Toast;
+import android.content.SharedPreferences;
+import android.content.Context;
+
+import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.FileReader;
+import java.io.File;
 
 /**
  * This class is made to enable the logging and reading of data from the saved location on the external storage
@@ -16,13 +23,15 @@ import java.io.*;
 public class DataLogger
 {
     private String FileName, Content, Subdirectory, DeviceID, mainDirectoryPath, Directory, externalStorageState, externalStorageDirectory, lineItems;        // Variable names for the file characters and contents.
-    private SharedPreferences sharedPreferences;        // Gets the shared preference from the system.
-    private Context context;
     private FileOutputStream outputFIle;        // File to be put out into the device
-    private File mainDirectory, subDirectory, dataFile;     // Sets up the file of the system
     private OutputStreamWriter outputWriter;        // Link to the writer of the device
     private StringBuilder fileContent;      // A string builder variable storing data
     private BufferedReader bufferedReader;      // A buffer reader to read from the file
+    private File mainDirectory, subDirectory, dataFile;     // Sets up the file of the system
+
+
+    private SharedPreferences sharedPreferences;        // Gets the shared preference from the system.
+    private Context context;        // Holds a context of the application
 
     /**
      * Overloaded constructor taking arguments to set up data information
@@ -32,8 +41,8 @@ public class DataLogger
      */
     DataLogger(Context context, String subdirectory, String fileName, String content)
     {
-        this.context = context;
-        this.setUp();
+        this.context = context;     // Sets the context of the application
+        this.setUp();       // Calls the method to set up the required values
         this.Subdirectory = subdirectory;     // Assigns the subdirectory
         this.FileName = DeviceID + "_" + fileName;      // Assigns the filename
         this.Content = content+"\n";     // Assigns the content to be logged to the file
@@ -55,16 +64,15 @@ public class DataLogger
             try     // Tries to perform the following actions
             {
                 this.mainDirectory = new File(this.mainDirectoryPath);      // Makes the main directory as a new file.
-                this.subDirectory = new File(this.mainDirectoryPath + "/" + this.Subdirectory);
+                this.subDirectory = new File(this.mainDirectoryPath + "/" + this.Subdirectory);     // Makes the subdirectory path into a new file
 
-                if (!this.mainDirectory.isDirectory() || !this.subDirectory.isDirectory())
+                if (!this.mainDirectory.isDirectory() || !this.subDirectory.isDirectory())      // Checks if both the main directory and subdirectory has been made
                 {
-                    this.mainDirectory.mkdirs();
-                    this.subDirectory.mkdirs();
+                    this.mainDirectory.mkdirs();        // If the main directory have not been made, it makes it
+                    this.subDirectory.mkdirs();         // If the sub directory has not been made, it makes it
                 }
 
-                this.dataFile = new File(this.mainDirectoryPath+"/"+this.Subdirectory+"/"+this.FileName);
-                Toast.makeText(context, this.dataFile.toString(), Toast.LENGTH_LONG).show();     // Shows a toast
+                this.dataFile = new File(this.mainDirectoryPath+"/"+this.Subdirectory+"/"+this.FileName);       // Makes the file desired for into a file path
                 this.dataFile.createNewFile();      // Creates a new file at the specified path name
                 this.outputFIle = new FileOutputStream(this.dataFile,true);        // Creates a new file to be read out into the device
                 this.outputWriter = new OutputStreamWriter(this.outputFIle);        // Assigns the output file to be written by the output writer
