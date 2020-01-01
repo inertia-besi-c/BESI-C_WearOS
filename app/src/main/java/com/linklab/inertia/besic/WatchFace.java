@@ -142,8 +142,9 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
-                            this.dataLogger = new DataLogger("TestSubdirectory", "TestFile", "Test Content of File, Pain Button");
+                            this.dataLogger = new DataLogger(getApplicationContext(),"TestSubdirectory", "TestFile", "Test Content of File, Pain Button");
                             this.dataLogger.saveData("log");
+
                             // This is where the pain EMA would be started.
                             Toast.makeText(getApplicationContext(), "Settings already set!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
                         }

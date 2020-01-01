@@ -3,10 +3,8 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-import android.annotation.SuppressLint;
 import android.content.*;
 import android.preference.*;
-import android.util.Log;
 import android.widget.*;
 import java.io.*;
 
@@ -14,16 +12,16 @@ import java.io.*;
  * This class is made to enable the logging and reading of data from the saved location on the external storage
  * of the device. There is a log mode, write mode, and read mode implementation for the file readers.
  */
-public class DataLogger extends PreferenceActivity
+public class DataLogger
 {
     private String FileName, Content, Subdirectory, DeviceID, mainDirectoryPath, Directory, externalStorageState, lineItems;        // Variable names for the file characters and contents.
     private SharedPreferences sharedPreferences;        // Gets the shared preference from the system.
     private Context context;
-    FileOutputStream outputFIle;        // File to be put out into the device
-    File mainDirectory, dataFile;     // Sets up the file of the system
-    OutputStreamWriter outputWriter;        // Link to the writer of the device
-    StringBuilder fileContent;      // A string builder variable storing data
-    BufferedReader bufferedReader;      // A buffer reader to read from the file
+    private FileOutputStream outputFIle;        // File to be put out into the device
+    private File mainDirectory, dataFile;     // Sets up the file of the system
+    private OutputStreamWriter outputWriter;        // Link to the writer of the device
+    private StringBuilder fileContent;      // A string builder variable storing data
+    private BufferedReader bufferedReader;      // A buffer reader to read from the file
 
     /**
      * Overloaded constructor taking arguments to set up data information
@@ -31,25 +29,13 @@ public class DataLogger extends PreferenceActivity
      * @param fileName is the name of the file that is to be logged
      * @param content is the content that the file should contain
      */
-    public DataLogger(Context context, String subdirectory, String fileName, String content)
+    DataLogger(Context context, String subdirectory, String fileName, String content)
     {
         this.context = context;
-        setUp();
+        this.setUp();
         this.Subdirectory = subdirectory;     // Assigns the subdirectory
         this.FileName = DeviceID + "_" + fileName;      // Assigns the filename
         this.Content = content+"\n";     // Assigns the content to be logged to the file
-    }
-
-    /**
-     * Setup values for when the class is called
-     */
-    public void setUp()
-    {
-        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);        // Gets a reference the preference object
-        this.externalStorageState = android.os.Environment.getExternalStorageState();       // Gets the state of the external storage of the device
-        this.Directory = this.sharedPreferences.getString("directory_key", "");     // Gets the main directory of the device
-        this.DeviceID = this.sharedPreferences.getString("device_info", "");     // Sets up the device identification information
-        this.mainDirectoryPath = this.externalStorageState + "/" + this.Directory;     // Sets up the path to the main directory information
     }
 
     /**
@@ -61,7 +47,7 @@ public class DataLogger extends PreferenceActivity
      *                 contents. An argument with "write" would erase the content of the file and add the
      *                 new contents to the file.
      */
-    public void saveData(String saveType)
+    void saveData(String saveType)
     {
         if (isExternalStorageWritable())        // Checks if the external storage is writable
         {
@@ -110,7 +96,7 @@ public class DataLogger extends PreferenceActivity
      * This method reads the content from a file specified with a path.
      * @return the string format of what the file contains.
      */
-    public String readData()
+    String readData()
     {
         if (isExternalStorageReadable())        // Checks if the external storage can be read from
         {
@@ -145,6 +131,18 @@ public class DataLogger extends PreferenceActivity
         }
 
         return "Cannot Read from sdcard";       // Returns a false cannot read from sdcard error message
+    }
+
+    /**
+     * Setup values for when the class is called
+     */
+    public void setUp()
+    {
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);        // Gets a reference the preference object
+        this.externalStorageState = android.os.Environment.getExternalStorageState();       // Gets the state of the external storage of the device
+        this.Directory = this.sharedPreferences.getString("directory_key", "");     // Gets the main directory of the device
+        this.DeviceID = this.sharedPreferences.getString("device_info", "");     // Sets up the device identification information
+        this.mainDirectoryPath = this.externalStorageState + "/" + this.Directory;     // Sets up the path to the main directory information
     }
 
     /**
