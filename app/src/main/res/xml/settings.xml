@@ -25,7 +25,7 @@
                 android:title="User"
                 android:entries="@array/userList"
                 android:entryValues="@array/userListValue"
-                android:defaultValue="PT-DEMO">
+                android:defaultValue="PT">
             </ListPreference>
 
             <!-- A list is made for the device information -->
