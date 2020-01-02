@@ -13,12 +13,13 @@ import android.support.wearable.watchface.WatchFaceStyle;
 import android.preference.PreferenceManager;
 import android.graphics.PorterDuff;
 import android.graphics.Canvas;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.TextPaint;
 import android.graphics.Rect;
 import android.widget.Toast;
+
+import java.util.Map;
 
 /**
  * On Android Wear Watch Face is implemented as a service. This is being used by the application to save resources by giving them to the android system to configure.
@@ -42,17 +43,18 @@ public class WatchFace extends CanvasWatchFaceService
     private class BESIWatchFace extends CanvasWatchFaceService.Engine
     {
         private SharedPreferences sharedPreferences;        // Gets a context to the system shared preferences object
+        private Map<String, ?> preferenceKeys;      // Creates a map to store key values
         private Vibrator vibrator;      // This is the variable that access the vibrator in the device
-        private DataLogger dataLogger;
         private SystemInformation systemInformation;        // Gets a context to the system information class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
+        private DataLogger dataLogger;      // Initializes a datalogger instance
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
-        private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage;        // Sets up string variables
+        private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas
         private boolean drawEODEMA;      // Sets up all the boolean to be run on the system
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
-                startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel, count;       // Sets up integer variables.
+                startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel;       // Sets up integer variables.
 
         /**
          * This method is called when the service of the watch face is called for the first time.
@@ -68,6 +70,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Get instance of Vibrator from current Context
 
             this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
+            this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
             this.systemInformation = new SystemInformation();       // Binds the variable to the calls in the class
 
             this.startBackground = new Paint.FontMetrics();     // Sets the background of the button
@@ -85,8 +88,12 @@ public class WatchFace extends CanvasWatchFaceService
 
             this.drawEODEMA = false;     // Initializes the boolean as a false value
 
+            this.logInitialSettings();      // Calls the method to log all the items in the settings file
+
             this.setUpDefaultValues();      // Calls the method
             this.setUpDefaultColors();      // Calls the method
+
+            invalidate();       // Refreshes the screen.
         }
 
         /**
@@ -131,7 +138,7 @@ public class WatchFace extends CanvasWatchFaceService
         public void onTapCommand(@TapType int tapType, int x, int y, long eventTime)
         {
             int startButtonXEnd = (getResources().getDisplayMetrics().widthPixels / 2)+(getResources().getDisplayMetrics().widthPixels / 15);       // The end of the start button x location
-            int sleepEODEMAXEnd = getResources().getDisplayMetrics().widthPixels;
+            int sleepEODEMAXEnd = getResources().getDisplayMetrics().widthPixels;       // The end position of the sleep button
 
             int buttonsYEnd = this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15;       // The end of the start button y location
 
@@ -140,22 +147,9 @@ public class WatchFace extends CanvasWatchFaceService
                 case WatchFaceService.TAP_TYPE_TOUCH:       // Checks if the tap type was a touch
                     if (x >= startX && x < startButtonXEnd && y >= startY && y <= buttonsYEnd)     // Determines if this was around the start button
                     {
-                        if (count==0)       // If this is the first time we are opening the app
-                        {
-                            this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
-                            startActivity(new Intent(WatchFace.this, Settings.class));      // Open the settings for them to be set
-                            this.count++;        // Increment the count variable
-                        }
-                        else    // If not, we have launched the app before.
-                        {
-                            this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
-
-                            this.dataLogger = new DataLogger(getApplicationContext(),"Subdirectory", "TestFile.csv", "Test, Content, of, File");
-                            this.dataLogger.saveData("log");
-
-                            // This is where the pain EMA would be started.
-                            Toast.makeText(getApplicationContext(), "Settings already set!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
-                        }
+                        this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
+                        /* This is where the pain EMA would be started. */
+                        Toast.makeText(getApplicationContext(), "Pain EMA not Implemented!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been don
                     }
 
                     if (x > startButtonXEnd && x < sleepEODEMAXEnd && y >= sleepEODEMAY && y <= buttonsYEnd)
@@ -229,6 +223,23 @@ public class WatchFace extends CanvasWatchFaceService
 
             this.currentTimePositionY = Math.abs((getResources().getDisplayMetrics().heightPixels / 2) - 15);     // Sets the y location of the time.
             this.currentDatePositionY = Math.abs((getResources().getDisplayMetrics().heightPixels / 2) - ((this.currentDateTextBounds.height()*2) + 20) - 15);     // Sets the y location of the date.
+        }
+
+        /**
+         * This method is called to log the data that is set in the shared preferences to the device.
+         */
+        private void logInitialSettings()
+        {
+            this.data = "Date --- Time, Key, Value";        // A header for the file
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.information), getResources().getString(R.string.settings), this.data);      // New datalogger inference
+            this.dataLogger.saveData("log");        // Type of log to make
+
+            for(Map.Entry<String,?> preferenceItem : preferenceKeys.entrySet())     // For every key in the map
+            {
+                this.data = this.systemInformation.getTimeMilitary() + "," + preferenceItem.getKey() + "," + preferenceItem.getValue();     // Make a new data variable to be logged
+                this.dataLogger = new DataLogger(getApplicationContext(), "Information", "Settings.csv", this.data);        // Make a new datalogger inference
+                this.dataLogger.saveData("log");        // Type of save to do
+            }
         }
 
         /**
