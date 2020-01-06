@@ -11,10 +11,10 @@
     <string name="start_string">START</string>  <!--This is the string that is shown on the green button-->
     <string name="sleep_string">SLEEP</string>  <!--This is the string that is shown on the blue button-->
     <string name="eodema_string">SURVEY</string>  <!--This is the string that is shown on the red button-->
+    <string name="survey_string">EMA Text</string>
     <string name="back_button">Back</string>
     <string name="next_button">Next</string>
     <string name="answer_button">Answer</string>
-    <string name="text_string">EMA Text</string>
 
     <!--Name of Unique Device Screens-->
     <string name="watchface_name">BESI-C</string>  <!--This is the string that is shown as the watchface name-->
