@@ -16,6 +16,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.TextPaint;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.widget.Toast;
 
@@ -148,7 +149,10 @@ public class WatchFace extends CanvasWatchFaceService
                     if (x >= startX && x < startButtonXEnd && y >= startY && y <= buttonsYEnd)     // Determines if this was around the start button
                     {
                         this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
-                        /* This is where the pain EMA would be started. */
+
+                        Intent surveyIntent = new Intent (WatchFace.this, PainSurvey.class);        // Calls an intent to start a new activity
+                        startActivity(surveyIntent);        // Starts the activity specified
+
                         Toast.makeText(getApplicationContext(), "Pain EMA not Implemented!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been don
                     }
 
