@@ -21,6 +21,7 @@ import android.graphics.Rect;
 import android.widget.Toast;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * On Android Wear Watch Face is implemented as a service. This is being used by the application to save resources by giving them to the android system to configure.
@@ -152,8 +153,6 @@ public class WatchFace extends CanvasWatchFaceService
 
                         Intent surveyIntent = new Intent (WatchFace.this, PainSurvey.class);        // Calls an intent to start a new activity
                         startActivity(surveyIntent);        // Starts the activity specified
-
-                        Toast.makeText(getApplicationContext(), "Pain EMA not Implemented!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been don
                     }
 
                     if (x > startButtonXEnd && x < sleepEODEMAXEnd && y >= sleepEODEMAY && y <= buttonsYEnd)
@@ -386,13 +385,12 @@ public class WatchFace extends CanvasWatchFaceService
         /**
          * This method initializes the required values for variables needed in the onDraw method.
          */
-        @SuppressWarnings("ALL")        // Suppresses the warnings for this method
         private void setUpDefaultValues()
         {
             this.currentDate = this.systemInformation.getDateForUI();        // Sets up the date from the specific method.
             this.currentTime = this.systemInformation.getTimeForUI();        // Sets up the time from the specific method.
             this.batteryLevel = this.getBatteryLevelString();      // Sets up the battery level by calling the specified method.
-            this.hapticLevel = Integer.valueOf(this.sharedPreferences.getString("haptic_level", ""));
+            this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
         }
 
         /**

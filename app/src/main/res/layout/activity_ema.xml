@@ -2,6 +2,7 @@
 <!--Layout to define the face-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,23 +12,25 @@
         android:layout_height="match_parent">
 
         <!--Text view for the questions-->
+
+        <!--Back button attributes-->
+
         <TextView
             android:id="@+id/question"
-            android:layout_width="98dp"
-            android:layout_height="34dp"
+            android:layout_width="93dp"
+            android:layout_height="84dp"
             android:layout_marginTop="4dp"
+            android:gravity="center"
             android:text="@string/survey_string"
             android:textAlignment="center"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/next"
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/back"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.178" />
+            app:layout_constraintVertical_bias="0.088" />
 
-        <!--Back button attributes-->
         <Button
             android:id="@+id/back"
             android:layout_width="44dp"
@@ -60,18 +63,18 @@
         <!--Answer button attributes-->
         <Button
             android:id="@+id/answer"
-            android:layout_width="93dp"
-            android:layout_height="128dp"
+            android:layout_width="95dp"
+            android:layout_height="91dp"
             android:background="@color/dark_blue"
             android:text="@string/answer_button"
             android:textColor="@color/white"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/next"
-            app:layout_constraintHorizontal_bias="0.581"
+            app:layout_constraintHorizontal_bias="0.55"
             app:layout_constraintStart_toEndOf="@+id/back"
             app:layout_constraintTop_toBottomOf="@+id/question"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="1.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>
