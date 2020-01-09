@@ -180,6 +180,8 @@ public class PainSurvey extends WearableActivity
                     }
                     else        // If none of the requirements are fulfilled
                     {
+                        userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+
                         currentQuestion++;      // Increments the current question position
                         deploySurvey();     // Calls the method on itself to move the question forward
                     }
@@ -209,6 +211,8 @@ public class PainSurvey extends WearableActivity
                     }
                     else        // If none of the requirements are fulfilled
                     {
+                        userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+
                         currentQuestion--;      // Decrements the current question position
                         deploySurvey();     // Calls the method on itself to move the question forward
                     }
@@ -226,6 +230,8 @@ public class PainSurvey extends WearableActivity
                     {
                         if (role.equalsIgnoreCase("CG"))        // Checks for the role of the device
                         {
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+
                             currentQuestion += 2;       // Increments the questions two steps forward
                             deploySurvey();     // Calls the method on itself
                         }
