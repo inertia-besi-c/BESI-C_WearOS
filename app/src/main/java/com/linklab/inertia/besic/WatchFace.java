@@ -240,7 +240,7 @@ public class WatchFace extends CanvasWatchFaceService
 
             for(Map.Entry<String,?> preferenceItem : preferenceKeys.entrySet())     // For every key in the map
             {
-                this.data = this.systemInformation.getTimeMilitary() + "," + preferenceItem.getKey() + "," + preferenceItem.getValue();     // Make a new data variable to be logged
+                this.data = this.systemInformation.getDateTime("HH:mm:ss") + "," + preferenceItem.getKey() + "," + preferenceItem.getValue();     // Make a new data variable to be logged
                 this.dataLogger = new DataLogger(getApplicationContext(), "Information", "Settings.csv", this.data);        // Make a new datalogger inference
                 this.dataLogger.saveData("log");        // Type of save to do
             }
@@ -328,7 +328,7 @@ public class WatchFace extends CanvasWatchFaceService
             int endMinute = Integer.valueOf(this.sharedPreferences.getString("eod_manual_end_minute", ""));     // Gets the end minute from preferences
             int endSecond = Integer.valueOf(this.sharedPreferences.getString("eod_manual_end_second", ""));     // Gets the end second from preferences
 
-            drawEODEMA = systemInformation.isTimeBetweenTimes(systemInformation.getTimeMilitary(), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
+            drawEODEMA = systemInformation.isTimeBetweenTimes(systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
         }
 
         /**
@@ -388,8 +388,8 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private void setUpDefaultValues()
         {
-            this.currentDate = this.systemInformation.getDateForUI();        // Sets up the date from the specific method.
-            this.currentTime = this.systemInformation.getTimeForUI();        // Sets up the time from the specific method.
+            this.currentDate = this.systemInformation.getDateTime("MMM d, yyyy");        // Sets up the date from the specific method.
+            this.currentTime = this.systemInformation.getDateTime("h:mm a");        // Sets up the time from the specific method.
             this.batteryLevel = this.getBatteryLevelString();      // Sets up the battery level by calling the specified method.
             this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
         }

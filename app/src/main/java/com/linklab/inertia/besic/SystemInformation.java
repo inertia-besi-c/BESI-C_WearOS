@@ -16,7 +16,7 @@ import java.util.Objects;
 
 class SystemInformation
 {
-    private DateFormat timeFormat, dateFormat;      // Private date format variables
+    private DateFormat dateTimeFormat;      // Private date format variables
     private Date current;       // Private date variables
     private boolean sleepMode;      // Private boolean variable for the sleep level of the application
     private int level, scale, batteryPercent;       // private integer variables
@@ -33,36 +33,14 @@ class SystemInformation
     }
 
     /**
-     * This gets only the current time from the system
-     * @return a time format designed for the UI.
+     * Gets the current date and time for the survey to be stamped with
+     * @return a string format of the date and time
      */
-    String getTimeForUI()
+    String getDateTime(String pattern)
     {
-        this.setCurrent(new Date());     // Resets te current variable to be a new date
-        this.setTimeFormat(new SimpleDateFormat("h:mm a", Locale.getDefault()));      // The time format is called in default format
-        return this.getTimeFormat().format(getCurrent());       // The current time is set to show on the time text view.
-    }
-
-    /**
-     * This gets only the current date from the system
-     * @return a date format for the UI.
-     */
-    String getDateForUI()
-    {
-        this.setCurrent(new Date());     // Resets te current variable to be a new date
-        this.setDateFormat(new SimpleDateFormat("MMM d, yyyy", Locale.getDefault()));     // The date is called in US format.
-        return this.getDateFormat().format(getCurrent());       // The current date is set to show on the date text view.
-    }
-
-    /**
-     * Gets the current time in military format
-     * @return a string of the current time in military format
-     */
-    String getTimeMilitary()
-    {
-        this.setCurrent(new Date());      // The current date and timer is set.
-        this.setDateFormat(new SimpleDateFormat("HH:mm:ss", Locale.getDefault()));      // The time format military wise is called in US format.
-        return this.getDateFormat().format(getCurrent());       // The current time in military format is returned
+        this.setCurrent(new Date());        // The current date and time is set
+        this.setDateTimeFormat(new SimpleDateFormat(pattern, Locale.getDefault()));       // The date and time is processed in the format requested
+        return this.getDateTimeFormat().format(getCurrent());       // The information is returned to the requester
     }
 
     /**
@@ -155,21 +133,12 @@ class SystemInformation
     }
 
     /**
-     * Sets the time format of the input
-     * @param timeFormat the time format argument
-     */
-    private void setTimeFormat(SimpleDateFormat timeFormat)
-    {
-        this.timeFormat = timeFormat;        // Sets the variable appropriately
-    }
-
-    /**
      * Sets the date format of the input
-     * @param dateFormat the date format argument
+     * @param dateTimeFormat the date format argument
      */
-    private void setDateFormat(SimpleDateFormat dateFormat)
+    private void setDateTimeFormat(SimpleDateFormat dateTimeFormat)
     {
-        this.dateFormat = dateFormat;        // Sets the variable appropriately
+        this.dateTimeFormat = dateTimeFormat;        // Sets the variable appropriately
     }
 
     /**
@@ -218,21 +187,12 @@ class SystemInformation
     }
 
     /**
-     * Gets the time format
-     * @return the time format variable value
-     */
-    private DateFormat getTimeFormat()
-    {
-        return this.timeFormat;      // Returns the variable
-    }
-
-    /**
      * Gets the date format
      * @return the date format variable
      */
-    private DateFormat getDateFormat()
+    private DateFormat getDateTimeFormat()
     {
-        return this.dateFormat;      // Returns the variable
+        return this.dateTimeFormat;      // Returns the variable
     }
 
     /**

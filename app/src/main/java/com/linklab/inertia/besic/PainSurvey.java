@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Button;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.Collections;
 import java.util.ArrayList;
@@ -30,9 +31,8 @@ public class PainSurvey extends WearableActivity
     private Button back, next, answer;      // The buttons on the screen
     private TextView question;      // Links to the text shown on the survey screen
     private String role;        // Sets up all the string variable in the system
-    private String[] userResponses;     // This is the user response.
-    private String[] questions;     // This is the variable question that is assigned a position from the preference menu
-    private String[][] answers;     // Based on the assigned questions the variable answer is modified.
+    private String[] userResponses, questions;     // String list variables used in the method
+    private String[][] answers;     // String list in list variables used in the class
     private SystemInformation systemInformation;        // Gets a reference to the system information class
     private ArrayList<String> responses;    // This is a string that is appended to.
 
@@ -169,8 +169,20 @@ public class PainSurvey extends WearableActivity
                 {
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
-                    currentQuestion++;      // Increments the current question position
-                    deploySurvey();     // Calls the method on itself to move the question forward
+                    if (currentQuestion == questions.length-3)
+                    {
+                        currentQuestion += 2;       // Skips a question not pertaining to the survey
+                        deploySurvey();       // Calls the question system method
+                    }
+                    else if (currentQuestion == questions.length-1)      // Checks if this is the last question in the survey
+                    {
+                        submitSurvey();     // Calls the method to run
+                    }
+                    else        // If none of the requirements are fulfilled
+                    {
+                        currentQuestion++;      // Increments the current question position
+                        deploySurvey();     // Calls the method on itself to move the question forward
+                    }
                 }
             });
 
@@ -181,8 +193,25 @@ public class PainSurvey extends WearableActivity
                 {
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
-                    currentQuestion--;      // Increments the current question position
-                    deploySurvey();     // Calls the method on itself to move the question forward
+                    if (currentQuestion == 0)      // Checks if this is the last question in the survey
+                    {
+                        submitSurvey();     // Calls the method to run
+                    }
+                    else if (currentQuestion == questions.length-3)     // If the question position is fulfilled
+                    {
+                        currentQuestion++;      // Increment the question
+                        deploySurvey();     // Call the method on itself
+                    }
+                    else if (currentQuestion == questions.length-1)     // If this is the last question
+                    {
+                        currentQuestion = 0;        // Reset to the start of the survey
+                        deploySurvey();     // Call the method on itself
+                    }
+                    else        // If none of the requirements are fulfilled
+                    {
+                        currentQuestion--;      // Decrements the current question position
+                        deploySurvey();     // Calls the method on itself to move the question forward
+                    }
                 }
             });
 
@@ -195,7 +224,11 @@ public class PainSurvey extends WearableActivity
 
                     if (currentQuestion == questions.length-3)      // Checks if this is the third question
                     {
-                        // Do nothing
+                        if (role.equalsIgnoreCase("CG"))        // Checks for the role of the device
+                        {
+                            currentQuestion += 2;       // Increments the questions two steps forward
+                            deploySurvey();     // Calls the method on itself
+                        }
                     }
                     else        // If any other question
                     {
@@ -205,6 +238,27 @@ public class PainSurvey extends WearableActivity
                 }
             });
         }
+        else        // If this is not a survey question
+        {
+            submitSurvey();     // Automatically submits the survey
+        }
+    }
+
+    /**
+     * This method aggregates all the values of the responses into a single variable and logs them all into a file with a specific format.
+     * Upon completing the logs, it finishes the survey and initiates a timer for a followup if it is needed.
+     */
+    private void submitSurvey()
+    {
+        StringBuilder surveyLogs = new StringBuilder(systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss"));     // Starts to log the data
+
+        for (String userResponse : userResponses)       // Checks every response in the responses
+        {
+            surveyLogs.append(",").append(userResponse);        // Appends every answer to a string builder variable
+        }
+
+        Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
+        finish();       // Finishes the survey and cleans up the system
     }
 
     /**
