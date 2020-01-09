@@ -25,7 +25,7 @@ public class PainSurvey extends WearableActivity
 {
     private SharedPreferences sharedPreferences;        // Gets a reference to the shared preferences of the wearable activity
     private Vibrator vibrator;      // Gets a link to the system vibrator
-    private int currentQuestion, answersTapped, index, hapticLevel;       // Initializes various integers to be used by the system
+    private int currentQuestion, answersTapped, index, hapticLevel, activityStartLevel;       // Initializes various integers to be used by the system
     private int[] userResponseIndex;        // This is the user response index that keeps track of the index response of the user.
     private Button back, next, answer;      // The buttons on the screen
     private TextView question;      // Links to the text shown on the survey screen
@@ -92,11 +92,14 @@ public class PainSurvey extends WearableActivity
         this.systemInformation = new SystemInformation();       // Gets a reference to the system information of the wearable activity
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Initializes the vibrator variable
 
+        this.setContentView(R.layout.activity_ema);      // Sets the view of the watch to be the specified activity
+
         this.decideRoleQuestions();      // Decides the role the device is playing
+
         this.userResponses = new String[questions.length];      // Sets up the responses needed by the user to be the length of the number given
         this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
-
-        this.setContentView(R.layout.activity_ema);      // Sets the view of the watch to be the specified activity.
+        this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
+        this.currentQuestion = 0;       // Sets the number of questioned answered by the user
 
         this.back = findViewById(R.id.back);        // Gets a reference to the back button
         this.next = findViewById(R.id.next);        // Gets a reference to the next button
@@ -104,8 +107,8 @@ public class PainSurvey extends WearableActivity
         this.question = findViewById(R.id.question);        // Gets a reference to the question text view
 
         this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
-        this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
-        this.currentQuestion = 0;       // Sets the number of questioned answered by the user
+        this.activityStartLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;      // Alert for starting the activity
+        this.vibrator.vibrate(this.activityStartLevel);     // Vibrates the watch to signify the start of an activity
 
         this.deploySurvey();        // Calls on the method for the survey to begin
     }
@@ -116,7 +119,14 @@ public class PainSurvey extends WearableActivity
      */
     private void deploySurvey()
     {
-        if (this.currentQuestion < questions.length)
+        this.question.setText(questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
+        this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
+        this.responses.clear();     // Cleats the array list of any values in it
+
+        Collections.addAll(this.responses, this.answers[this.currentQuestion]);     // Calls on the collections object to add all the values in the array list so it can remember them
+        this.nextAnswer();      // Calls on the method to update the answer view
+
+        if (this.currentQuestion < questions.length)        // Checks to make sure there is still questions to be asked
         {
             if (this.currentQuestion == 0)       // Checks if the is the first question
             {
@@ -124,19 +134,33 @@ public class PainSurvey extends WearableActivity
                 this.back.setText(this.answers[0][1]);      // Sets the back button to be an answer choice
                 this.answer.setVisibility(View.INVISIBLE);     // Removes the middle button option from the user
             }
-            else
+            else if (this.currentQuestion == questions.length-3)        // Checks the question location of the watch
+            {
+                if (this.role.equalsIgnoreCase("PT"))       // Checks the role of the watch
+                {
+                    this.next.setText(this.answers[questions.length-3][0]);     // Assigns a value for the next button
+                    this.back.setText(this.answers[questions.length-3][1]);     // Assigns a value for the back button
+                    this.answer.setVisibility(View.INVISIBLE);      // Removes the answer button
+                }
+                else if (this.role.equalsIgnoreCase("CG"))      // Checks the role of the watch
+                {
+                    this.next.setText(this.answers[questions.length-3][0]);     // Assigns a value to the next button
+                    this.back.setText(this.answers[questions.length-3][1]);     // Assigns a value to the back button
+                    this.answer.setText(this.answers[questions.length-3][2]);       // Assigns a value to the answer button
+                }
+            }
+            else if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
+            {
+                this.next.setText(this.answers[questions.length-1][0]);     // Sets the next button accordingly
+                this.back.setText(this.answers[questions.length-1][1]);     // Sets the back button accordingly
+                this.answer.setVisibility(View.INVISIBLE);      // Removes the middle answer button from view
+            }
+            else        // If this is just any other question
             {
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
                 this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
             }
-
-            this.question.setText(questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
-            this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
-            this.responses.clear();     // Cleats the array list of any values in it
-
-            Collections.addAll(this.responses, this.answers[this.currentQuestion]);     // Calls on the collections object to add all the values in the array list so it can remember them
-            this.nextAnswer();      // Calls on the method to update the answer view
 
             this.next.setOnClickListener(new View.OnClickListener()         // Listens for the button to be clicked
             {
@@ -169,8 +193,15 @@ public class PainSurvey extends WearableActivity
                 {
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
-                    answersTapped += 1;         // Increments the tap on the answer by the specified amount
-                    nextAnswer();        // Calls on the method to update the answer view
+                    if (currentQuestion == questions.length-3)      // Checks if this is the third question
+                    {
+                        // Do nothing
+                    }
+                    else        // If any other question
+                    {
+                        answersTapped += 1;         // Increments the tap on the answer by the specified amount
+                        nextAnswer();        // Calls on the method to update the answer view
+                    }
                 }
             });
         }
