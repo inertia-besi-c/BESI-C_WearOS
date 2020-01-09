@@ -18,7 +18,7 @@
         <TextView
             android:id="@+id/question"
             android:layout_width="93dp"
-            android:layout_height="84dp"
+            android:layout_height="109dp"
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:text="@string/survey_string"
@@ -64,7 +64,7 @@
         <Button
             android:id="@+id/answer"
             android:layout_width="95dp"
-            android:layout_height="91dp"
+            android:layout_height="72dp"
             android:background="@color/dark_blue"
             android:text="@string/answer_button"
             android:textColor="@color/white"

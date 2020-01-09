@@ -118,24 +118,62 @@ public class PainSurvey extends WearableActivity
     {
         if (this.currentQuestion < questions.length)
         {
+            if (this.currentQuestion == 0)       // Checks if the is the first question
+            {
+                this.next.setText(this.answers[0][0]);      // Sets the next button to be an answer choice
+                this.back.setText(this.answers[0][1]);      // Sets the back button to be an answer choice
+                this.answer.setVisibility(View.INVISIBLE);     // Removes the middle button option from the user
+            }
+            else
+            {
+                this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
+                this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
+                this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
+            }
+
             this.question.setText(questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
             this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
             this.responses.clear();     // Cleats the array list of any values in it
 
             Collections.addAll(this.responses, this.answers[this.currentQuestion]);     // Calls on the collections object to add all the values in the array list so it can remember them
             this.nextAnswer();      // Calls on the method to update the answer view
-        }
 
-        this.answer.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
+            this.next.setOnClickListener(new View.OnClickListener()         // Listens for the button to be clicked
             {
-                vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
-                answersTapped += 1;         // Increments the tap on the answer by the specified amount
-                nextAnswer();        // Calls on the method to update the answer view
-            }
-        });
+                @Override
+                public void onClick(View v)         // When the button is clicked
+                {
+                    vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
+
+                    currentQuestion++;      // Increments the current question position
+                    deploySurvey();     // Calls the method on itself to move the question forward
+                }
+            });
+
+            this.back.setOnClickListener(new View.OnClickListener()         // Listens for the button to be clicked
+            {
+                @Override
+                public void onClick(View v)         // When the button is clicked
+                {
+                    vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
+
+                    currentQuestion--;      // Increments the current question position
+                    deploySurvey();     // Calls the method on itself to move the question forward
+                }
+            });
+
+            this.answer.setOnClickListener(new View.OnClickListener()       // Sets a listener for the button
+            {
+                @Override
+                public void onClick(View v)     // When the button is clicked
+                {
+                    vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
+
+                    answersTapped += 1;         // Increments the tap on the answer by the specified amount
+                    nextAnswer();        // Calls on the method to update the answer view
+                }
+            });
+        }
     }
 
     /**
