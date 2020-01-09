@@ -25,7 +25,7 @@
 
     <!--The name of the Sub Folders for information to be stored-->
     <string name="information">Information</string>     <!--This is the sub folder where some system information will be stored-->
-    <string name="Surveys">Surveys</string>     <!--This is the sub folder where the surveys will be stored-->
+    <string name="surveys">Surveys</string>     <!--This is the sub folder where the surveys will be stored-->
 
     <!--The general name of the files where items will be stored-->
     <string name="settings">Settings.csv</string>       <!--Name of the settings file-->

@@ -30,9 +30,10 @@ public class PainSurvey extends WearableActivity
     private int[] userResponseIndex;        // This is the user response index that keeps track of the index response of the user.
     private Button back, next, answer;      // The buttons on the screen
     private TextView question;      // Links to the text shown on the survey screen
-    private String role;        // Sets up all the string variable in the system
+    private String role, data;        // Sets up all the string variable in the system
     private String[] userResponses, questions;     // String list variables used in the method
     private String[][] answers;     // String list in list variables used in the class
+    private DataLogger dataLogger;      // Makes a global variable for the data logger
     private SystemInformation systemInformation;        // Gets a reference to the system information class
     private ArrayList<String> responses;    // This is a string that is appended to.
 
@@ -171,16 +172,27 @@ public class PainSurvey extends WearableActivity
 
                     if (currentQuestion == questions.length-3)
                     {
+                        userResponses[currentQuestion] = next.getText().toString();     // Adds the data to be saved to an array list
+                        logActivity();      // Calls the method to log the data
+
+                        userResponses[currentQuestion+1] = "Question Skipped Automatically";     // Adds the data to be saved to an array list
+                        logActivity();      // Calls the method to log the data
+
                         currentQuestion += 2;       // Skips a question not pertaining to the survey
                         deploySurvey();       // Calls the question system method
                     }
                     else if (currentQuestion == questions.length-1)      // Checks if this is the last question in the survey
                     {
+                        userResponses[currentQuestion] = next.getText().toString();     // Adds the data to be saved to an array list
+                        logActivity();      // Calls the method to log the data
+
                         submitSurvey();     // Calls the method to run
                     }
                     else        // If none of the requirements are fulfilled
                     {
+                        userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
                         userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                        logActivity();      // Calls the method to log the data
 
                         currentQuestion++;      // Increments the current question position
                         deploySurvey();     // Calls the method on itself to move the question forward
@@ -197,21 +209,32 @@ public class PainSurvey extends WearableActivity
 
                     if (currentQuestion == 0)      // Checks if this is the last question in the survey
                     {
+                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
+                        logActivity();      // Calls the method to log the data
+
                         submitSurvey();     // Calls the method to run
                     }
                     else if (currentQuestion == questions.length-3)     // If the question position is fulfilled
                     {
+                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
+                        logActivity();      // Calls the method to log the data
+
                         currentQuestion++;      // Increment the question
                         deploySurvey();     // Call the method on itself
                     }
                     else if (currentQuestion == questions.length-1)     // If this is the last question
                     {
+                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
+                        logActivity();      // Calls the method to log the data
+
                         currentQuestion = 0;        // Reset to the start of the survey
                         deploySurvey();     // Call the method on itself
                     }
                     else        // If none of the requirements are fulfilled
                     {
+                        userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
                         userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                        logActivity();      // Calls the method to log the data
 
                         currentQuestion--;      // Decrements the current question position
                         deploySurvey();     // Calls the method on itself to move the question forward
@@ -230,7 +253,9 @@ public class PainSurvey extends WearableActivity
                     {
                         if (role.equalsIgnoreCase("CG"))        // Checks for the role of the device
                         {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
                             userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
 
                             currentQuestion += 2;       // Increments the questions two steps forward
                             deploySurvey();     // Calls the method on itself
@@ -256,7 +281,7 @@ public class PainSurvey extends WearableActivity
      */
     private void submitSurvey()
     {
-        StringBuilder surveyLogs = new StringBuilder(systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss"));     // Starts to log the data
+        StringBuilder surveyLogs = new StringBuilder(systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS"));     // Starts to log the data
 
         for (String userResponse : userResponses)       // Checks every response in the responses
         {
@@ -273,7 +298,7 @@ public class PainSurvey extends WearableActivity
      */
     private void decideRoleQuestions()
     {
-        this.role = this.sharedPreferences.getString("user_info", "");
+        this.role = this.sharedPreferences.getString("user_info", "");      // Sets the role of the device based on the preferences setting
 
         assert this.role != null;       // Makes sure that the role variable is not a null value
         if(this.role.equalsIgnoreCase("PT"))        // Checks the role value against a patient identifier
@@ -286,6 +311,17 @@ public class PainSurvey extends WearableActivity
             this.questions = this.caregiverQuestions;       // Sets the questions to be that of the patient
             this.answers = this.caregiverAnswers;       // Sets the answers to be that of the caregiver
         }
+    }
+
+    /**
+     * Sets up the information to be saved by the activity and actions happening in the activity
+     */
+    private void logActivity()
+    {
+        this.data =  this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + getResources().getString(R.string.painsurvey_name) + "," +       // Data to be saved by the device
+                this.currentQuestion + "," + userResponses[currentQuestion] + "," + this.index;       // Data to save
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.surveys), getResources().getString(R.string.painctivity), this.data);      // Sets up data save path and information.
+        this.dataLogger.saveData("log");      // Logs the data into the directory specified.
     }
 
     /**
