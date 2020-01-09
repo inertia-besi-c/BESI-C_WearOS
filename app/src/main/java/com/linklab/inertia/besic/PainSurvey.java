@@ -3,6 +3,8 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+import android.os.Handler;
+import android.os.Looper;
 import android.support.wearable.activity.WearableActivity;
 import android.content.SharedPreferences;
 import android.content.Context;
@@ -14,9 +16,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.TimerTask;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Timer;
 
 /**
  * The logic for the survey in regards to immediate pain. This activity is launched as soon as the start button in the watchface is pressed.
@@ -26,14 +30,16 @@ public class PainSurvey extends WearableActivity
 {
     private SharedPreferences sharedPreferences;        // Gets a reference to the shared preferences of the wearable activity
     private Vibrator vibrator;      // Gets a link to the system vibrator
-    private int currentQuestion, answersTapped, index, hapticLevel, activityStartLevel;       // Initializes various integers to be used by the system
+    private int currentQuestion, answersTapped, index, hapticLevel, activityStartLevel, activityRemindLevel, emaReminderInterval, emaDelayInterval, maxReminder;       // Initializes various integers to be used by the system
     private int[] userResponseIndex;        // This is the user response index that keeps track of the index response of the user.
     private Button back, next, answer;      // The buttons on the screen
+    private Timer reminderTimer;        // Sets up the timers for the survey
     private TextView question;      // Links to the text shown on the survey screen
     private String role, data;        // Sets up all the string variable in the system
     private String[] userResponses, questions;     // String list variables used in the method
     private String[][] answers;     // String list in list variables used in the class
     private DataLogger dataLogger;      // Makes a global variable for the data logger
+    private StringBuilder surveyLogs;       // Initializes a global string builder variable
     private SystemInformation systemInformation;        // Gets a reference to the system information class
     private ArrayList<String> responses;    // This is a string that is appended to.
 
@@ -100,6 +106,7 @@ public class PainSurvey extends WearableActivity
         this.userResponses = new String[questions.length];      // Sets up the responses needed by the user to be the length of the number given
         this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
         this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
+        this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
         this.currentQuestion = 0;       // Sets the number of questioned answered by the user
 
         this.back = findViewById(R.id.back);        // Gets a reference to the back button
@@ -109,8 +116,13 @@ public class PainSurvey extends WearableActivity
 
         this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
         this.activityStartLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;      // Alert for starting the activity
-        this.vibrator.vibrate(this.activityStartLevel);     // Vibrates the watch to signify the start of an activity
+        this.activityRemindLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_remind", ""))) * 1000;      // Alert for starting the activity
+        this.emaReminderInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind_interval", ""))) * 1000;       // Alert to continue survey initialized
+        this.emaDelayInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind", ""))) * 1000;       // Amount to offset reminder alert by
+        this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind_max", "")));        // Maximum reminders allowed for the survey
 
+        this.vibrator.vibrate(this.activityStartLevel);     // Vibrates the watch to signify the start of an activity
+        this.scheduleReminderTimer();       // Calls the method to schedule the timer for the survey
         this.deploySurvey();        // Calls on the method for the survey to begin
     }
 
@@ -175,7 +187,7 @@ public class PainSurvey extends WearableActivity
                         userResponses[currentQuestion] = next.getText().toString();     // Adds the data to be saved to an array list
                         logActivity();      // Calls the method to log the data
 
-                        userResponses[currentQuestion+1] = "Question Skipped Automatically";     // Adds the data to be saved to an array list
+                        userResponses[currentQuestion+1] = "**Skipped**";     // Adds the data to be saved to an array list
                         logActivity();      // Calls the method to log the data
 
                         currentQuestion += 2;       // Skips a question not pertaining to the survey
@@ -281,13 +293,7 @@ public class PainSurvey extends WearableActivity
      */
     private void submitSurvey()
     {
-        StringBuilder surveyLogs = new StringBuilder(systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS"));     // Starts to log the data
-
-        for (String userResponse : userResponses)       // Checks every response in the responses
-        {
-            surveyLogs.append(",").append(userResponse);        // Appends every answer to a string builder variable
-        }
-
+        this.logResponse();     // Calls the method to perform an action
         Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
         finish();       // Finishes the survey and cleans up the system
     }
@@ -311,6 +317,51 @@ public class PainSurvey extends WearableActivity
             this.questions = this.caregiverQuestions;       // Sets the questions to be that of the patient
             this.answers = this.caregiverAnswers;       // Sets the answers to be that of the caregiver
         }
+    }
+
+    /**
+     * Sets up and runs the timer that reminds the user to complete the survey if not completed after a specified amount of time.
+     * This timer will run for a specified amount of time before automatically submitting the survey and ending.
+     */
+    private void scheduleReminderTimer()
+    {
+        this.reminderTimer.scheduleAtFixedRate(new TimerTask()         // Sets up a new timer task for this survey
+        {
+            @Override
+            public void run()           // When the timer is called to run
+            {
+                if (maxReminder == 0)       // Checks if the max amount has been reached
+                {
+                    new Handler(Looper.getMainLooper()).post(new Runnable()     // Gets a lopper to find the main thread of the application
+                    {
+                        @Override
+                        public void run()       // Runs the following on the main thread
+                        {
+                            submitSurvey();     // Calls the method to automatically submit the survey
+                        }
+                    });
+                }
+
+                vibrator.vibrate(activityRemindLevel);      // Vibrates the device for a specified amount of time
+                maxReminder--;      // Reduces the reminder to a certain value '0'
+            }
+        }, this.emaDelayInterval, this.emaReminderInterval);        // Sets up the delay offset and how often to run the logic in the timer
+    }
+
+    /**
+     * Sets up the only the responses to the answers and logs them to a specified file given
+     */
+    private void logResponse()
+    {
+        this.surveyLogs = new StringBuilder(systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS"));     // Starts to log the data
+
+        for (String userResponse : userResponses)       // Checks every response in the responses
+        {
+            this.surveyLogs.append(",").append(userResponse);        // Appends every answer to a string builder variable
+        }
+
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.surveys), getResources().getString(R.string.painresponse), String.valueOf(this.surveyLogs));        // Makes a new data logger item
+        this.dataLogger.saveData("log");        // Saves the data in the format given
     }
 
     /**
@@ -342,5 +393,7 @@ public class PainSurvey extends WearableActivity
     public void onDestroy()
     {
         super.onDestroy();      // Calls the super class method
+
+        this.reminderTimer.cancel();        // Cancels the timer that is running
     }
 }
