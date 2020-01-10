@@ -3,6 +3,7 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+import android.os.Environment;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.content.SharedPreferences;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import java.util.Map;
 import java.util.Objects;
+import java.io.File;
 
 /**
  * On Android Wear Watch Face is implemented as a service. This is being used by the application to save resources by giving them to the android system to configure.
@@ -90,6 +92,7 @@ public class WatchFace extends CanvasWatchFaceService
 
             this.drawEODEMA = false;     // Initializes the boolean as a false value
 
+            this.logHeaders();      // Calls the method to log the headers needed for the files
             this.logInitialSettings();      // Calls the method to log all the items in the settings file
 
             this.setUpDefaultValues();      // Calls the method
@@ -234,14 +237,10 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private void logInitialSettings()
         {
-            this.data = "Date --- Time, Key, Value";        // A header for the file
-            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.information), getResources().getString(R.string.settings), this.data);      // New datalogger inference
-            this.dataLogger.saveData("log");        // Type of log to make
-
             for(Map.Entry<String,?> preferenceItem : preferenceKeys.entrySet())     // For every key in the map
             {
-                this.data = this.systemInformation.getDateTime("HH:mm:ss") + "," + preferenceItem.getKey() + "," + preferenceItem.getValue();     // Make a new data variable to be logged
-                this.dataLogger = new DataLogger(getApplicationContext(), "Information", "Settings.csv", this.data);        // Make a new datalogger inference
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + preferenceItem.getKey() + "," + preferenceItem.getValue();     // Make a new data variable to be logged
+                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), this.data);        // Make a new datalogger inference
                 this.dataLogger.saveData("log");        // Type of save to do
             }
         }
@@ -350,6 +349,29 @@ public class WatchFace extends CanvasWatchFaceService
             else        // If the screen is off on the device
             {
                 this.sleepEODEMAPaint.setColor(Color.DKGRAY);      // Sets color to this level
+            }
+        }
+
+        /**
+         * This method creates the header files for the directories data is logged to
+         */
+        private void logHeaders()
+        {
+            File directory = new File(Environment.getExternalStorageDirectory() + "/" + this.sharedPreferences.getString("directory_key", ""));     // Makes a reference to a directory
+            if (!directory.isDirectory())       // Checks if the directory is a directory or not, if not, it runs the following
+            {
+                String[][] Files =      // A list of file and their headers to be made
+                        {
+                                {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), getResources().getString(R.string.settings_header)},        // Settings file
+                                {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painctivity), getResources().getString(R.string.painactivity_header)},        // Pain activity file
+                                {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.painresponse), getResources().getString(R.string.painresponse_header)}        // Pain response file
+                        };
+
+                for (String[] file : Files)     // Foe every file in the files
+                {
+                    this.dataLogger = new DataLogger(getApplicationContext(), file[0], file[1], file[2]);       // Make a specified data to the file
+                    this.dataLogger.saveData("log");        // Save that data in log mode
+                }
             }
         }
 

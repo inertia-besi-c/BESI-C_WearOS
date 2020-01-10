@@ -353,14 +353,14 @@ public class PainSurvey extends WearableActivity
      */
     private void logResponse()
     {
-        this.surveyLogs = new StringBuilder(systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS"));     // Starts to log the data
+        this.surveyLogs = new StringBuilder(systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + getResources().getString(R.string.painsurvey_name));     // Starts to log the data
 
         for (String userResponse : userResponses)       // Checks every response in the responses
         {
             this.surveyLogs.append(",").append(userResponse);        // Appends every answer to a string builder variable
         }
 
-        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.surveys), getResources().getString(R.string.painresponse), String.valueOf(this.surveyLogs));        // Makes a new data logger item
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.painresponse), String.valueOf(this.surveyLogs));        // Makes a new data logger item
         this.dataLogger.saveData("log");        // Saves the data in the format given
     }
 
@@ -371,7 +371,7 @@ public class PainSurvey extends WearableActivity
     {
         this.data =  this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + getResources().getString(R.string.painsurvey_name) + "," +       // Data to be saved by the device
                 this.currentQuestion + "," + userResponses[currentQuestion] + "," + this.index;       // Data to save
-        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.surveys), getResources().getString(R.string.painctivity), this.data);      // Sets up data save path and information.
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painctivity), this.data);      // Sets up data save path and information.
         this.dataLogger.saveData("log");      // Logs the data into the directory specified.
     }
 

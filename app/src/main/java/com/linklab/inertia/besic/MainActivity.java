@@ -49,20 +49,20 @@ public class MainActivity extends AppCompatActivity
     private void CheckPermissions()
     {
         String[] Required_Permissions =     // Checks if Device has permission to work on device.
-                {
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,     // This is to access the storage
-                        Manifest.permission.READ_EXTERNAL_STORAGE,      // This is to access the storage
-                        Manifest.permission.VIBRATE,        // This is to access the vibrator of the device
-                        Manifest.permission.BODY_SENSORS,       // This is to access the sensors of the device
-                        Manifest.permission.ACCESS_WIFI_STATE,      // This is to access the wifi of the device.
-                        Manifest.permission.CHANGE_WIFI_STATE,      // This is to change the wifi state of the device.
-                        Manifest.permission.ACCESS_NETWORK_STATE,       // This is to access the network
-                        Manifest.permission.CHANGE_NETWORK_STATE,        // This is to change the network setting of the device.
-                        Manifest.permission.ACCESS_COARSE_LOCATION,     // This is to access the location in a general sense
-                        Manifest.permission.ACCESS_FINE_LOCATION,       // This is to access the location in a more specific manner
-                        Manifest.permission.BLUETOOTH,      // This is to access th bluetooth
-                        Manifest.permission.BLUETOOTH_ADMIN     // This is access the bluetooth and allow changes
-                };
+        {
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,     // This is to access the storage
+                Manifest.permission.READ_EXTERNAL_STORAGE,      // This is to access the storage
+                Manifest.permission.VIBRATE,        // This is to access the vibrator of the device
+                Manifest.permission.BODY_SENSORS,       // This is to access the sensors of the device
+                Manifest.permission.ACCESS_WIFI_STATE,      // This is to access the wifi of the device.
+                Manifest.permission.CHANGE_WIFI_STATE,      // This is to change the wifi state of the device.
+                Manifest.permission.ACCESS_NETWORK_STATE,       // This is to access the network
+                Manifest.permission.CHANGE_NETWORK_STATE,        // This is to change the network setting of the device.
+                Manifest.permission.ACCESS_COARSE_LOCATION,     // This is to access the location in a general sense
+                Manifest.permission.ACCESS_FINE_LOCATION,       // This is to access the location in a more specific manner
+                Manifest.permission.BLUETOOTH,      // This is to access th bluetooth
+                Manifest.permission.BLUETOOTH_ADMIN     // This is access the bluetooth and allow changes
+        };
 
         boolean needPermissions = false;        // To begin the permission is set to false.
 
