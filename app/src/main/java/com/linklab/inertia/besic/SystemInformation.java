@@ -5,8 +5,13 @@ package com.linklab.inertia.besic;
  */
 import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.BatteryManager;
 import android.content.Intent;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -41,6 +46,21 @@ class SystemInformation
         this.setCurrent(new Date());        // The current date and time is set
         this.setDateTimeFormat(new SimpleDateFormat(pattern, Locale.getDefault()));       // The date and time is processed in the format requested
         return this.getDateTimeFormat().format(getCurrent());       // The information is returned to the requester
+    }
+
+    /**
+     * This method makes a toast on the screen with the given requirements
+     * @param context the application context of the activity
+     * @param message the message to be displayed by the toast
+     */
+    void toast(Context context, String message)
+    {
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);          // A short message at the end to say thank you.
+        View view = toast.getView();        // Gets the view from the toast maker
+        TextView textSeen = view.findViewById(android.R.id.message);        // Finds the text being used
+        toast.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);        // Sets the toast to show up at the center of the screen
+        textSeen.setTextColor(Color.WHITE);     // Changes the color of the text
+        toast.show();       // Shows the toast.
     }
 
     /**

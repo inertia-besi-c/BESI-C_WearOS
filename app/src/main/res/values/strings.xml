@@ -15,6 +15,7 @@
     <string name="back_button">Back</string>        <!--The id for the back button-->
     <string name="next_button">Next</string>        <!--The id for the next button-->
     <string name="answer_button">Answer</string>        <!--The id for the answer button-->
+    <string name="thank_toast">Thank You!</string>      <!--The thank you toast for completing a survey-->
 
     <!--Name of Unique Device Screens-->
     <string name="watchface_name">BESI-C</string>  <!--This is the string that is shown as the watchface name-->

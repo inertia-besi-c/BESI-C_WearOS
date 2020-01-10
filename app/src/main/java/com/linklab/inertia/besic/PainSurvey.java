@@ -13,7 +13,6 @@ import android.view.Window;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
 import android.widget.Button;
-import android.widget.Toast;
 import android.os.Bundle;
 import android.view.View;
 import android.os.Handler;
@@ -333,7 +332,7 @@ public class PainSurvey extends WearableActivity
     {
         this.endTime = String.valueOf(this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS"));     // Sets the end time of the survey
         this.logResponse();     // Calls the method to perform an action
-        Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
+        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_toast));     // Makes a special thank you toast
         finish();       // Finishes the survey and cleans up the system
     }
 

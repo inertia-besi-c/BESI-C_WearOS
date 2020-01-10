@@ -19,7 +19,6 @@ import android.graphics.Paint;
 import android.text.TextPaint;
 import android.content.Intent;
 import android.graphics.Rect;
-import android.widget.Toast;
 
 import java.util.Map;
 import java.util.Objects;
@@ -165,7 +164,7 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
                             // This is where an intent to launch the end of day ema would be made
-                            Toast.makeText(getApplicationContext(), "EODEMA not Implemented!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
+                            this.systemInformation.toast(getApplicationContext(), "EODEMA not Implemented!");        // Shows a toast that settings have already been done
                         }
                         else
                         {
