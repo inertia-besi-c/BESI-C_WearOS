@@ -45,7 +45,7 @@ public class PainSurvey extends WearableActivity
     private String[] userResponses, questions;     // String list variables used in the method
     private String[][] answers;     // String list in list variables used in the class
     private DataLogger dataLogger;      // Makes a global variable for the data logger
-    private StringBuilder surveyLogs;       // Initializes a global string builder variable
+    private StringBuilder surveyLogs, systemLogs;       // Initializes a global string builder variable
     private SimpleDateFormat timeFormatter;     // Initiates a date time variable
     private SystemInformation systemInformation;        // Gets a reference to the system information class
     private ArrayList<String> responses;    // This is a string that is appended to.
@@ -106,6 +106,9 @@ public class PainSurvey extends WearableActivity
         this.systemInformation = new SystemInformation();       // Gets a reference to the system information of the wearable activity
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Initializes the vibrator variable
 
+        this.startTime = this.getEstablishedTime();    // Sets the start time of the survey
+        this.systemLogs = new StringBuilder(this.startTime).append(",").append("Pain Survey").append(",").append("Starting Pain Survey").append("\n");       // Logs to the string builder variable
+
         this.unlockScreen();        // Calls the method to unlock the screen in a specified manner
 
         this.setContentView(R.layout.activity_ema);      // Sets the view of the watch to be the specified activity
@@ -117,7 +120,6 @@ public class PainSurvey extends WearableActivity
         this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
         this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
         this.currentQuestion = 0;       // Sets the number of questioned answered by the user
-        this.startTime = String.valueOf(this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS"));     // Sets the start time of the survey
 
         this.back = findViewById(R.id.back);        // Gets a reference to the back button
         this.next = findViewById(R.id.next);        // Gets a reference to the next button
@@ -133,6 +135,8 @@ public class PainSurvey extends WearableActivity
 
         this.vibrator.vibrate(this.activityStartLevel);     // Vibrates the watch to signify the start of an activity
         this.scheduleReminderTimer();       // Calls the method to schedule the timer for the survey
+        this.setAmbientEnabled();        // Sets ambient mode ability
+        this.setAutoResumeEnabled(true);     // Resumes the activity if not killed properly
         this.deploySurvey();        // Calls on the method for the survey to begin
     }
 
@@ -190,6 +194,7 @@ public class PainSurvey extends WearableActivity
                 @Override
                 public void onClick(View v)         // When the button is clicked
                 {
+                    systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append(next.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
                     if (currentQuestion == questions.length-3)
@@ -227,6 +232,7 @@ public class PainSurvey extends WearableActivity
                 @Override
                 public void onClick(View v)         // When the button is clicked
                 {
+                    systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append(back.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
                     if (currentQuestion == 0)      // Checks if this is the last question in the survey
@@ -275,6 +281,8 @@ public class PainSurvey extends WearableActivity
                     {
                         if (role.equalsIgnoreCase("CG"))        // Checks for the role of the device
                         {
+                            systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append(answer.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
+
                             userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
                             userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
                             logActivity();      // Calls the method to log the data
@@ -285,6 +293,8 @@ public class PainSurvey extends WearableActivity
                     }
                     else        // If any other question
                     {
+                        systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Answer Choice Toggled Forward").append("\n");       // Logs to the system logs
+
                         answersTapped += 1;         // Increments the tap on the answer by the specified amount
                         nextAnswer();        // Calls on the method to update the answer view
                     }
@@ -293,6 +303,8 @@ public class PainSurvey extends WearableActivity
         }
         else        // If this is not a survey question
         {
+            this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Submitting Survey").append("\n");       // Logs to the system logs
+
             submitSurvey();     // Automatically submits the survey
         }
     }
@@ -330,7 +342,7 @@ public class PainSurvey extends WearableActivity
      */
     private void submitSurvey()
     {
-        this.endTime = String.valueOf(this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS"));     // Sets the end time of the survey
+        this.endTime = this.getEstablishedTime();     // Sets the end time of the survey
         this.logResponse();     // Calls the method to perform an action
         this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_toast));     // Makes a special thank you toast
         finish();       // Finishes the survey and cleans up the system
@@ -347,11 +359,13 @@ public class PainSurvey extends WearableActivity
         assert this.role != null;       // Makes sure that the role variable is not a null value
         if(this.role.equalsIgnoreCase("PT"))        // Checks the role value against a patient identifier
         {
+            this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Device is set as Patient").append("\n");       // Logs to the system logs
             this.questions = this.patientQuestions;     // Sets the questions to be that of the patient
             this.answers = this.patientAnswers;     // Sets the answers to be that of the patient
         }
         else if (this.role.equalsIgnoreCase("CG"))      // Checks the role value against a caregiver identifier
         {
+            this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Device is set as Caregiver").append("\n");       // Logs to the system logs
             this.questions = this.caregiverQuestions;       // Sets the questions to be that of the patient
             this.answers = this.caregiverAnswers;       // Sets the answers to be that of the caregiver
         }
@@ -363,11 +377,15 @@ public class PainSurvey extends WearableActivity
      */
     private void scheduleReminderTimer()
     {
+        this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Scheduling Reminder Timer").append("\n");       // Logs to the system logs
+
         this.reminderTimer.scheduleAtFixedRate(new TimerTask()         // Sets up a new timer task for this survey
         {
             @Override
             public void run()           // When the timer is called to run
             {
+                systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Reminding User to Complete Survey").append("\n");       // Logs to the system logs
+
                 if (maxReminder == 0)       // Checks if the max amount has been reached
                 {
                     new Handler(Looper.getMainLooper()).post(new Runnable()     // Gets a lopper to find the main thread of the application
@@ -375,6 +393,8 @@ public class PainSurvey extends WearableActivity
                         @Override
                         public void run()       // Runs the following on the main thread
                         {
+                            systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Automatically Submitting Survey").append("\n");       // Logs to the system logs
+
                             submitSurvey();     // Calls the method to automatically submit the survey
                         }
                     });
@@ -391,6 +411,7 @@ public class PainSurvey extends WearableActivity
      */
     private void logResponse()
     {
+        this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Logging Survey Activity").append("\n");       // Logs to the system logs
         this.surveyLogs = new StringBuilder(systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + getResources().getString(R.string.painsurvey_name));     // Starts to log the data
 
         for (String userResponse : userResponses)       // Checks every response in the responses
@@ -399,8 +420,13 @@ public class PainSurvey extends WearableActivity
         }
         this.surveyLogs.append(",").append(this.emaDuration());      // Appends the duration of the survey to the end of the string builder
 
+        this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append(" Pain Survey Finished and Submitted").append("\n");       // Logs to the system logs
+
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.painresponse), String.valueOf(this.surveyLogs));        // Makes a new data logger item
         this.dataLogger.saveData("log");        // Saves the data in the format given
+
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), String.valueOf(this.systemLogs));        // Makes a new data logger item
+        this.dataLogger.saveData("log");        // Saves the data in the format specified
     }
 
     /**
@@ -434,6 +460,15 @@ public class PainSurvey extends WearableActivity
         this.index = this.answersTapped%this.responses.size();      // Sets up the index that the user is currently on
         this.answer.setText(this.responses.get(this.index));        // Sets the answer choice seen by the user to be that of the index in the answer choice
         return index;       // Returns the index to where the method was called
+    }
+
+    /**
+     * Makes it easier to get the time in the predetermined format
+     * @return the date and time
+     */
+    private String getEstablishedTime()
+    {
+        return this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS");       // Returns the time in this format
     }
 
     /**

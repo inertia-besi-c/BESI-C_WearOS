@@ -51,8 +51,9 @@ public class WatchFace extends CanvasWatchFaceService
         private SystemInformation systemInformation;        // Gets a context to the system information class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
         private DataLogger dataLogger;      // Initializes a datalogger instance
+        private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
-        private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
+        private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage;        // Sets up string variables
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas
         private boolean drawEODEMA;      // Sets up all the boolean to be run on the system
         private int batteryLevelPositionX, batteryLevelPositionY,
@@ -236,12 +237,16 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private void logInitialSettings()
         {
+            this.stringBuilder = new StringBuilder();       // Initializes the string builder variable
+
             for(Map.Entry<String,?> preferenceItem : preferenceKeys.entrySet())     // For every key in the map
             {
-                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + preferenceItem.getKey() + "," + preferenceItem.getValue();     // Make a new data variable to be logged
-                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), this.data);        // Make a new datalogger inference
-                this.dataLogger.saveData("log");        // Type of save to do
+                this.stringBuilder.append(this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS")).append(",").append(preferenceItem.getKey()).append(",").append(preferenceItem.getValue());     // Appends the data to be logged
+                this.stringBuilder.append("\n");        // Appends a new line to the data
             }
+
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), String.valueOf(this.stringBuilder));        // Make a new datalogger inference
+            this.dataLogger.saveData("log");        // Type of save to do
         }
 
         /**
@@ -362,6 +367,7 @@ public class WatchFace extends CanvasWatchFaceService
                 String[][] Files =      // A list of file and their headers to be made
                         {
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), getResources().getString(R.string.settings_header)},        // Settings file
+                                {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), getResources().getString(R.string.system_header)},        // System response file
                                 {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painctivity), getResources().getString(R.string.painactivity_header)},        // Pain activity file
                                 {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.painresponse), getResources().getString(R.string.painresponse_header)}        // Pain response file
                         };
