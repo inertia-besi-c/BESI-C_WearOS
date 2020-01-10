@@ -4,27 +4,29 @@ package com.linklab.inertia.besic;
  * Imports needed by the system to function appropriately
  */
 import android.annotation.SuppressLint;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.wearable.activity.WearableActivity;
 import android.content.SharedPreferences;
+import android.view.WindowManager;
 import android.content.Context;
 import android.os.Vibrator;
+import android.view.Window;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
 import android.widget.Button;
+import android.widget.Toast;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
+import android.os.Handler;
+import android.os.Looper;
 
+import java.util.TimerTask;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimerTask;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Timer;
+import java.util.Date;
 
 /**
  * The logic for the survey in regards to immediate pain. This activity is launched as soon as the start button in the watchface is pressed.
@@ -34,6 +36,7 @@ public class PainSurvey extends WearableActivity
 {
     private SharedPreferences sharedPreferences;        // Gets a reference to the shared preferences of the wearable activity
     private Vibrator vibrator;      // Gets a link to the system vibrator
+    private Window window;      // Gets access to the touch screen of the device
     private int currentQuestion, answersTapped, index, hapticLevel, activityStartLevel, activityRemindLevel, emaReminderInterval, emaDelayInterval, maxReminder;       // Initializes various integers to be used by the system
     private int[] userResponseIndex;        // This is the user response index that keeps track of the index response of the user.
     private Button back, next, answer;      // The buttons on the screen
@@ -103,6 +106,8 @@ public class PainSurvey extends WearableActivity
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets a reference to the shared preferences of the activity
         this.systemInformation = new SystemInformation();       // Gets a reference to the system information of the wearable activity
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Initializes the vibrator variable
+
+        this.unlockScreen();        // Calls the method to unlock the screen in a specified manner
 
         this.setContentView(R.layout.activity_ema);      // Sets the view of the watch to be the specified activity
 
@@ -408,6 +413,17 @@ public class PainSurvey extends WearableActivity
                 this.currentQuestion + "," + userResponses[currentQuestion] + "," + this.index;       // Data to save
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painctivity), this.data);      // Sets up data save path and information.
         this.dataLogger.saveData("log");      // Logs the data into the directory specified.
+    }
+
+    /**
+     * This method sets up the screen actions that go along with waking up to the activity and how the screen behaves while the activity is ongoing
+     */
+    private void unlockScreen()
+    {
+        this.window = this.getWindow();     // Gets access to the screen of the device
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
+        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);        // Makes sure the screen is on if off
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        // Makes sure the screen stays on for the duration of the activity
     }
 
     /**
