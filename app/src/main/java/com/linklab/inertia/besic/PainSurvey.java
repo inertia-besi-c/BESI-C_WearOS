@@ -3,6 +3,7 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.wearable.activity.WearableActivity;
@@ -16,6 +17,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.TimerTask;
 import java.util.Collections;
 import java.util.ArrayList;
@@ -35,11 +39,12 @@ public class PainSurvey extends WearableActivity
     private Button back, next, answer;      // The buttons on the screen
     private Timer reminderTimer;        // Sets up the timers for the survey
     private TextView question;      // Links to the text shown on the survey screen
-    private String role, data;        // Sets up all the string variable in the system
+    private String role, data, startTime, endTime, duration;        // Sets up all the string variable in the system
     private String[] userResponses, questions;     // String list variables used in the method
     private String[][] answers;     // String list in list variables used in the class
     private DataLogger dataLogger;      // Makes a global variable for the data logger
     private StringBuilder surveyLogs;       // Initializes a global string builder variable
+    private SimpleDateFormat timeFormatter;     // Initiates a date time variable
     private SystemInformation systemInformation;        // Gets a reference to the system information class
     private ArrayList<String> responses;    // This is a string that is appended to.
 
@@ -108,6 +113,7 @@ public class PainSurvey extends WearableActivity
         this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
         this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
         this.currentQuestion = 0;       // Sets the number of questioned answered by the user
+        this.startTime = String.valueOf(this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS"));     // Sets the start time of the survey
 
         this.back = findViewById(R.id.back);        // Gets a reference to the back button
         this.next = findViewById(R.id.next);        // Gets a reference to the next button
@@ -288,11 +294,39 @@ public class PainSurvey extends WearableActivity
     }
 
     /**
+     * This Method figures out how long it took for the user to complete the survey.
+     * @return a string containing the amount of time it took for the survey to be completed
+     */
+    @SuppressLint("SimpleDateFormat")       // Removes a warning from the date time format
+    private String emaDuration()      // This is the duration of the EMA
+    {
+        this.timeFormatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSS");       // This is the format that the times given for comparison will be in.
+
+        try     // The system tires the following.
+        {
+            Date startTime = timeFormatter.parse(this.startTime);     // Sets the start time to the start time
+            Date stopTime = timeFormatter.parse(this.endTime);     // Sets the stop time to be the immediate time
+            long EMADuration = stopTime.getTime() - startTime.getTime();        // Gets the difference between both times
+            String EMADurationHours = String.valueOf(EMADuration / (60 * 60 * 1000) % 24);      // Sets the hour difference to the variable
+            String EMADurationMinutes = String.valueOf(EMADuration / (60 * 1000) % 60);     // Sets the minutes difference to the variable
+            String EMADurationSeconds = String.valueOf((EMADuration / 1000) % 60);      // Sets the seconds difference to the variable
+            this.duration = EMADurationHours + ":" + EMADurationMinutes + ":" + EMADurationSeconds;       // Sets the duration to the variable
+        }
+        catch (ParseException e)        // If an error occurs in the process
+        {
+            this.duration = "Error, Please Consult the Pain EMA Activities File for the EMA Duration";      // This is the time between the EMAs
+        }
+
+        return this.duration;     // Returns the duration time as a string
+    }
+
+    /**
      * This method aggregates all the values of the responses into a single variable and logs them all into a file with a specific format.
      * Upon completing the logs, it finishes the survey and initiates a timer for a followup if it is needed.
      */
     private void submitSurvey()
     {
+        this.endTime = String.valueOf(this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS"));     // Sets the end time of the survey
         this.logResponse();     // Calls the method to perform an action
         Toast.makeText(getApplicationContext(), "Thank you!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
         finish();       // Finishes the survey and cleans up the system
@@ -359,6 +393,7 @@ public class PainSurvey extends WearableActivity
         {
             this.surveyLogs.append(",").append(userResponse);        // Appends every answer to a string builder variable
         }
+        this.surveyLogs.append(",").append(this.emaDuration());      // Appends the duration of the survey to the end of the string builder
 
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.painresponse), String.valueOf(this.surveyLogs));        // Makes a new data logger item
         this.dataLogger.saveData("log");        // Saves the data in the format given
