@@ -63,6 +63,13 @@
         </service>
 
         <activity
+            android:name=".DataLogger"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/datalogger_name"
+            android:launchMode="singleInstance">
+        </activity>
+
+        <activity
             android:name=".MainActivity"
             android:icon="@mipmap/besic_logo_round"
             android:label="@string/mainactivity_name"
@@ -85,10 +92,14 @@
         </activity>
 
         <activity
-            android:name=".DataLogger"
+            android:name=".PainSurvey"
             android:icon="@mipmap/besic_logo_round"
-            android:label="@string/datalogger_name"
+            android:label="@string/preference_name"
             android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

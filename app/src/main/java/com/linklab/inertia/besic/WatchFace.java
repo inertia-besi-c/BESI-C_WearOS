@@ -3,6 +3,7 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+import android.os.Environment;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.content.SharedPreferences;
@@ -16,10 +17,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.TextPaint;
+import android.content.Intent;
 import android.graphics.Rect;
-import android.widget.Toast;
 
 import java.util.Map;
+import java.util.Objects;
+import java.io.File;
 
 /**
  * On Android Wear Watch Face is implemented as a service. This is being used by the application to save resources by giving them to the android system to configure.
@@ -48,8 +51,9 @@ public class WatchFace extends CanvasWatchFaceService
         private SystemInformation systemInformation;        // Gets a context to the system information class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
         private DataLogger dataLogger;      // Initializes a datalogger instance
+        private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
-        private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
+        private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage;        // Sets up string variables
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas
         private boolean drawEODEMA;      // Sets up all the boolean to be run on the system
         private int batteryLevelPositionX, batteryLevelPositionY,
@@ -88,6 +92,7 @@ public class WatchFace extends CanvasWatchFaceService
 
             this.drawEODEMA = false;     // Initializes the boolean as a false value
 
+            this.logHeaders();      // Calls the method to log the headers needed for the files
             this.logInitialSettings();      // Calls the method to log all the items in the settings file
 
             this.setUpDefaultValues();      // Calls the method
@@ -148,8 +153,10 @@ public class WatchFace extends CanvasWatchFaceService
                     if (x >= startX && x < startButtonXEnd && y >= startY && y <= buttonsYEnd)     // Determines if this was around the start button
                     {
                         this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
-                        /* This is where the pain EMA would be started. */
-                        Toast.makeText(getApplicationContext(), "Pain EMA not Implemented!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been don
+
+                        Intent surveyIntent = new Intent (WatchFace.this, PainSurvey.class);        // Calls an intent to start a new activity
+                        surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+                        startActivity(surveyIntent);        // Starts the activity specified
                     }
 
                     if (x > startButtonXEnd && x < sleepEODEMAXEnd && y >= sleepEODEMAY && y <= buttonsYEnd)
@@ -158,7 +165,7 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
                             // This is where an intent to launch the end of day ema would be made
-                            Toast.makeText(getApplicationContext(), "EODEMA not Implemented!", Toast.LENGTH_LONG).show();     // Shows a toast that settings have already been done
+                            this.systemInformation.toast(getApplicationContext(), "EODEMA not Implemented!");        // Shows a toast that settings have already been done
                         }
                         else
                         {
@@ -230,16 +237,16 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private void logInitialSettings()
         {
-            this.data = "Date --- Time, Key, Value";        // A header for the file
-            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.information), getResources().getString(R.string.settings), this.data);      // New datalogger inference
-            this.dataLogger.saveData("log");        // Type of log to make
+            this.stringBuilder = new StringBuilder();       // Initializes the string builder variable
 
             for(Map.Entry<String,?> preferenceItem : preferenceKeys.entrySet())     // For every key in the map
             {
-                this.data = this.systemInformation.getTimeMilitary() + "," + preferenceItem.getKey() + "," + preferenceItem.getValue();     // Make a new data variable to be logged
-                this.dataLogger = new DataLogger(getApplicationContext(), "Information", "Settings.csv", this.data);        // Make a new datalogger inference
-                this.dataLogger.saveData("log");        // Type of save to do
+                this.stringBuilder.append(this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS")).append(",").append(preferenceItem.getKey()).append(",").append(preferenceItem.getValue());     // Appends the data to be logged
+                this.stringBuilder.append("\n");        // Appends a new line to the data
             }
+
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), String.valueOf(this.stringBuilder));        // Make a new datalogger inference
+            this.dataLogger.saveData("log");        // Type of save to do
         }
 
         /**
@@ -324,7 +331,7 @@ public class WatchFace extends CanvasWatchFaceService
             int endMinute = Integer.valueOf(this.sharedPreferences.getString("eod_manual_end_minute", ""));     // Gets the end minute from preferences
             int endSecond = Integer.valueOf(this.sharedPreferences.getString("eod_manual_end_second", ""));     // Gets the end second from preferences
 
-            drawEODEMA = systemInformation.isTimeBetweenTimes(systemInformation.getTimeMilitary(), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
+            drawEODEMA = systemInformation.isTimeBetweenTimes(systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
         }
 
         /**
@@ -346,6 +353,30 @@ public class WatchFace extends CanvasWatchFaceService
             else        // If the screen is off on the device
             {
                 this.sleepEODEMAPaint.setColor(Color.DKGRAY);      // Sets color to this level
+            }
+        }
+
+        /**
+         * This method creates the header files for the directories data is logged to
+         */
+        private void logHeaders()
+        {
+            File directory = new File(Environment.getExternalStorageDirectory() + "/" + this.sharedPreferences.getString("directory_key", ""));     // Makes a reference to a directory
+            if (!directory.isDirectory())       // Checks if the directory is a directory or not, if not, it runs the following
+            {
+                String[][] Files =      // A list of file and their headers to be made
+                        {
+                                {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), getResources().getString(R.string.settings_header)},        // Settings file
+                                {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), getResources().getString(R.string.system_header)},        // System response file
+                                {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painctivity), getResources().getString(R.string.painactivity_header)},        // Pain activity file
+                                {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.painresponse), getResources().getString(R.string.painresponse_header)}        // Pain response file
+                        };
+
+                for (String[] file : Files)     // Foe every file in the files
+                {
+                    this.dataLogger = new DataLogger(getApplicationContext(), file[0], file[1], file[2]);       // Make a specified data to the file
+                    this.dataLogger.saveData("log");        // Save that data in log mode
+                }
             }
         }
 
@@ -382,13 +413,12 @@ public class WatchFace extends CanvasWatchFaceService
         /**
          * This method initializes the required values for variables needed in the onDraw method.
          */
-        @SuppressWarnings("ALL")        // Suppresses the warnings for this method
         private void setUpDefaultValues()
         {
-            this.currentDate = this.systemInformation.getDateForUI();        // Sets up the date from the specific method.
-            this.currentTime = this.systemInformation.getTimeForUI();        // Sets up the time from the specific method.
+            this.currentDate = this.systemInformation.getDateTime("MMM d, yyyy");        // Sets up the date from the specific method.
+            this.currentTime = this.systemInformation.getDateTime("h:mm a");        // Sets up the time from the specific method.
             this.batteryLevel = this.getBatteryLevelString();      // Sets up the battery level by calling the specified method.
-            this.hapticLevel = Integer.valueOf(this.sharedPreferences.getString("haptic_level", ""));
+            this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
         }
 
         /**

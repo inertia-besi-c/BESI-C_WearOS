@@ -5,8 +5,13 @@ package com.linklab.inertia.besic;
  */
 import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.BatteryManager;
 import android.content.Intent;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -16,7 +21,7 @@ import java.util.Objects;
 
 class SystemInformation
 {
-    private DateFormat timeFormat, dateFormat;      // Private date format variables
+    private DateFormat dateTimeFormat;      // Private date format variables
     private Date current;       // Private date variables
     private boolean sleepMode;      // Private boolean variable for the sleep level of the application
     private int level, scale, batteryPercent;       // private integer variables
@@ -33,36 +38,29 @@ class SystemInformation
     }
 
     /**
-     * This gets only the current time from the system
-     * @return a time format designed for the UI.
+     * Gets the current date and time for the survey to be stamped with
+     * @return a string format of the date and time
      */
-    String getTimeForUI()
+    String getDateTime(String pattern)
     {
-        this.setCurrent(new Date());     // Resets te current variable to be a new date
-        this.setTimeFormat(new SimpleDateFormat("h:mm a", Locale.getDefault()));      // The time format is called in default format
-        return this.getTimeFormat().format(getCurrent());       // The current time is set to show on the time text view.
+        this.setCurrent(new Date());        // The current date and time is set
+        this.setDateTimeFormat(new SimpleDateFormat(pattern, Locale.getDefault()));       // The date and time is processed in the format requested
+        return this.getDateTimeFormat().format(getCurrent());       // The information is returned to the requester
     }
 
     /**
-     * This gets only the current date from the system
-     * @return a date format for the UI.
+     * This method makes a toast on the screen with the given requirements
+     * @param context the application context of the activity
+     * @param message the message to be displayed by the toast
      */
-    String getDateForUI()
+    void toast(Context context, String message)
     {
-        this.setCurrent(new Date());     // Resets te current variable to be a new date
-        this.setDateFormat(new SimpleDateFormat("MMM d, yyyy", Locale.getDefault()));     // The date is called in US format.
-        return this.getDateFormat().format(getCurrent());       // The current date is set to show on the date text view.
-    }
-
-    /**
-     * Gets the current time in military format
-     * @return a string of the current time in military format
-     */
-    String getTimeMilitary()
-    {
-        this.setCurrent(new Date());      // The current date and timer is set.
-        this.setDateFormat(new SimpleDateFormat("HH:mm:ss", Locale.getDefault()));      // The time format military wise is called in US format.
-        return this.getDateFormat().format(getCurrent());       // The current time in military format is returned
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);          // A short message at the end to say thank you.
+        View view = toast.getView();        // Gets the view from the toast maker
+        TextView textSeen = view.findViewById(android.R.id.message);        // Finds the text being used
+        toast.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);        // Sets the toast to show up at the center of the screen
+        textSeen.setTextColor(Color.WHITE);     // Changes the color of the text
+        toast.show();       // Shows the toast.
     }
 
     /**
@@ -155,21 +153,12 @@ class SystemInformation
     }
 
     /**
-     * Sets the time format of the input
-     * @param timeFormat the time format argument
-     */
-    private void setTimeFormat(SimpleDateFormat timeFormat)
-    {
-        this.timeFormat = timeFormat;        // Sets the variable appropriately
-    }
-
-    /**
      * Sets the date format of the input
-     * @param dateFormat the date format argument
+     * @param dateTimeFormat the date format argument
      */
-    private void setDateFormat(SimpleDateFormat dateFormat)
+    private void setDateTimeFormat(SimpleDateFormat dateTimeFormat)
     {
-        this.dateFormat = dateFormat;        // Sets the variable appropriately
+        this.dateTimeFormat = dateTimeFormat;        // Sets the variable appropriately
     }
 
     /**
@@ -218,21 +207,12 @@ class SystemInformation
     }
 
     /**
-     * Gets the time format
-     * @return the time format variable value
-     */
-    private DateFormat getTimeFormat()
-    {
-        return this.timeFormat;      // Returns the variable
-    }
-
-    /**
      * Gets the date format
      * @return the date format variable
      */
-    private DateFormat getDateFormat()
+    private DateFormat getDateTimeFormat()
     {
-        return this.dateFormat;      // Returns the variable
+        return this.dateTimeFormat;      // Returns the variable
     }
 
     /**

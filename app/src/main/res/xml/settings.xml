@@ -231,7 +231,7 @@
                 android:inputType="number"
                 android:key="pain_remind_max"
                 android:title="Maximum Reminders"
-                android:defaultValue="2">
+                android:defaultValue="3">
             </EditTextPreference>
 
             <!-- A text input is initialized for the delay associated with starting the reminders -->
