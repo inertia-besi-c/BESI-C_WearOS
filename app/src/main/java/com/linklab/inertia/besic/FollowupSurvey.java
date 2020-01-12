@@ -50,17 +50,17 @@ public class FollowupSurvey extends WearableActivity
 
     private final String[] caregiverQuestions =       // These are the questions for the care giver in order.
             {
-                    "Is patient having pain now II?",
-                    "What is patient's pain level?",
+                    "Is patient still in pain now?",
+                    "What is the patient's pain level?",
                     "How distressed are you?",
                     "How distressed is the patient?",
-                    "Did patient take an opioid for the pain?",
+                    "Did the patient take another opioid for the pain?",
                     "Why not?",
                     "Ready to submit your answers?",
             };
     private final String[][] caregiverAnswers =       // These are the answers for the care giver in order.
             {
-                    {"Yes", "No"},
+                    {"Yes", "No", "Unsure"},
                     {"1","2","3","4","5","6","7","8","9","10"},
                     {"Not at all", "A little", "Fairly", "Very"},
                     {"Not at all", "A little", "Fairly", "Very", "Unsure"},
@@ -71,11 +71,11 @@ public class FollowupSurvey extends WearableActivity
 
     private final String[] patientQuestions =         // These are the patient questions in order.
             {
-                    "Are you in pain now? II",
+                    "Are you still having pain now?",
                     "What is your pain level?",
                     "How distressed are you?",
                     "How distressed is your caregiver?",
-                    "Did you take an opioid for the pain?",
+                    "Did you take another opioid for the pain?",
                     "Why not?",
                     "Ready to submit your answers?",
             };
@@ -87,7 +87,7 @@ public class FollowupSurvey extends WearableActivity
                     {"Not at all", "A little", "Fairly", "Very", "Unsure"},
                     {"Yes", "No"},
                     {"Not time yet", "Side effects", "Out of pills", "Worried taking too many", "Pain not bad enough", "Other Reason"},
-                    {"Yes", "No"}
+                    {"Yes", "No"},
             };
 
     /**
