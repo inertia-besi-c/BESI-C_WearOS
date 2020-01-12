@@ -101,10 +101,11 @@ public class FollowupSurvey extends WearableActivity
 
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets a reference to the shared preferences of the activity
         this.systemInformation = new SystemInformation();       // Gets a reference to the system information of the wearable activity
+
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Initializes the vibrator variable
 
         this.startTime = this.getEstablishedTime();    // Sets the start time of the survey
-        this.systemLogs = new StringBuilder(this.startTime).append(",").append("Pain Survey").append(",").append("Starting Pain Survey II").append("\n");       // Logs to the string builder variable
+        this.systemLogs = new StringBuilder(this.startTime).append(",").append("Followup Survey").append(",").append("Starting Followup Survey").append("\n");       // Logs to the string builder variable
 
         this.unlockScreen();        // Calls the method to unlock the screen in a specified manner
 
@@ -126,9 +127,9 @@ public class FollowupSurvey extends WearableActivity
         this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
         this.activityStartLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;      // Alert for starting the activity
         this.activityRemindLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_remind", ""))) * 1000;      // Alert for starting the activity
-        this.emaReminderInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind_interval", ""))) * 1000;       // Alert to continue survey initialized
-        this.emaDelayInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind", ""))) * 1000;       // Amount to offset reminder alert by
-        this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind_max", "")));        // Maximum reminders allowed for the survey
+        this.emaReminderInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_remind_interval", ""))) * 1000;       // Alert to continue survey initialized
+        this.emaDelayInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_remind", ""))) * 1000;       // Amount to offset reminder alert by
+        this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_remind_max", "")));        // Maximum reminders allowed for the survey
 
         this.vibrator.vibrate(this.activityStartLevel);     // Vibrates the watch to signify the start of an activity
         this.scheduleReminderTimer();       // Calls the method to schedule the timer for the survey
@@ -146,8 +147,7 @@ public class FollowupSurvey extends WearableActivity
         this.question.setText(questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
         this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
         this.responses.clear();     // Cleats the array list of any values in it
-//        this.reminderTimer.cancel();        // Cancels whatever timer is currently running
-//        this.scheduleReminderTimer();       // Reschedules the ema reminder timer to run
+        this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_remind_max", "")));        // Maximum reminders allowed for the survey
 
         Collections.addAll(this.responses, this.answers[this.currentQuestion]);     // Calls on the collections object to add all the values in the array list so it can remember them
         this.nextAnswer();      // Calls on the method to update the answer view
@@ -156,9 +156,18 @@ public class FollowupSurvey extends WearableActivity
         {
             if (this.currentQuestion == 0)       // Checks if the is the first question
             {
-                this.next.setText(this.answers[0][0]);      // Sets the next button to be an answer choice
-                this.back.setText(this.answers[0][1]);      // Sets the back button to be an answer choice
-                this.answer.setVisibility(View.INVISIBLE);     // Removes the middle button option from the user
+                if (this.role.equalsIgnoreCase("CG"))       // Checks the role of the watch
+                {
+                    this.next.setText(this.answers[0][0]);      // Sets the next button to be an answer choice
+                    this.back.setText(this.answers[0][1]);      // Sets the back button to be an answer choice
+                    this.answer.setText(this.answers[0][2]);       // Assigns a value to the answer button
+                }
+                else if (this.role.equalsIgnoreCase("PT"))      // Checks the role of the watch
+                {
+                    this.next.setText(this.answers[questions.length-3][0]);     // Assigns a value to the next button
+                    this.back.setText(this.answers[questions.length-3][1]);     // Assigns a value to the back button
+                    this.answer.setVisibility(View.INVISIBLE);     // Removes the middle button option from the user
+                }
             }
             else if (this.currentQuestion == questions.length-3)        // Checks the question location of the watch
             {
@@ -193,7 +202,7 @@ public class FollowupSurvey extends WearableActivity
                 @Override
                 public void onClick(View v)         // When the button is clicked
                 {
-                    systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append(next.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
+                    systemLogs.append(getEstablishedTime()).append(",").append("Followup Survey").append(",").append(next.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
                     if (currentQuestion == questions.length-3)
@@ -231,7 +240,7 @@ public class FollowupSurvey extends WearableActivity
                 @Override
                 public void onClick(View v)         // When the button is clicked
                 {
-                    systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append(back.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
+                    systemLogs.append(getEstablishedTime()).append(",").append("Followup Survey").append(",").append(back.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
                     if (currentQuestion == 0)      // Checks if this is the last question in the survey
@@ -276,11 +285,11 @@ public class FollowupSurvey extends WearableActivity
                 {
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
-                    if (currentQuestion == questions.length-3)      // Checks if this is the third question
+                    if (currentQuestion == 0 || currentQuestion == questions.length-3)      // Checks if this is the third question
                     {
                         if (role.equalsIgnoreCase("CG"))        // Checks for the role of the device
                         {
-                            systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append(answer.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
+                            systemLogs.append(getEstablishedTime()).append(",").append("Followup Survey").append(",").append(answer.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
 
                             userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
                             userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
@@ -292,7 +301,7 @@ public class FollowupSurvey extends WearableActivity
                     }
                     else        // If any other question
                     {
-                        systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Answer Choice Toggled Forward").append("\n");       // Logs to the system logs
+                        systemLogs.append(getEstablishedTime()).append(",").append("Followup Survey").append(",").append("Answer Choice Toggled Forward").append("\n");       // Logs to the system logs
 
                         answersTapped += 1;         // Increments the tap on the answer by the specified amount
                         nextAnswer();        // Calls on the method to update the answer view
@@ -302,7 +311,7 @@ public class FollowupSurvey extends WearableActivity
         }
         else        // If this is not a survey question
         {
-            this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Submitting Survey").append("\n");       // Logs to the system logs
+            this.systemLogs.append(this.getEstablishedTime()).append(",").append("Followup Survey").append(",").append("Submitting Survey").append("\n");       // Logs to the system logs
 
             submitSurvey();     // Automatically submits the survey
         }
@@ -329,7 +338,7 @@ public class FollowupSurvey extends WearableActivity
         }
         catch (ParseException e)        // If an error occurs in the process
         {
-            this.duration = "Error, Please Consult the Pain EMA Activities File for the EMA Duration";      // This is the time between the EMAs
+            this.duration = "Error, Please Consult the Followup EMA Activities File for the EMA Duration";      // This is the time between the EMAs
         }
 
         return this.duration;     // Returns the duration time as a string
@@ -358,13 +367,13 @@ public class FollowupSurvey extends WearableActivity
         assert this.role != null;       // Makes sure that the role variable is not a null value
         if(this.role.equalsIgnoreCase("PT"))        // Checks the role value against a patient identifier
         {
-            this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Device is set as Patient").append("\n");       // Logs to the system logs
+            this.systemLogs.append(this.getEstablishedTime()).append(",").append("Followup Survey").append(",").append("Device is set as Patient").append("\n");       // Logs to the system logs
             this.questions = this.patientQuestions;     // Sets the questions to be that of the patient
             this.answers = this.patientAnswers;     // Sets the answers to be that of the patient
         }
         else if (this.role.equalsIgnoreCase("CG"))      // Checks the role value against a caregiver identifier
         {
-            this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Device is set as Caregiver").append("\n");       // Logs to the system logs
+            this.systemLogs.append(this.getEstablishedTime()).append(",").append("Followup Survey").append(",").append("Device is set as Caregiver").append("\n");       // Logs to the system logs
             this.questions = this.caregiverQuestions;       // Sets the questions to be that of the patient
             this.answers = this.caregiverAnswers;       // Sets the answers to be that of the caregiver
         }
@@ -376,14 +385,14 @@ public class FollowupSurvey extends WearableActivity
      */
     private void scheduleReminderTimer()
     {
-        this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Scheduling Reminder Timer").append("\n");       // Logs to the system logs
+        this.systemLogs.append(this.getEstablishedTime()).append(",").append("Followup Survey").append(",").append("Scheduling Reminder Timer").append("\n");       // Logs to the system logs
 
         this.reminderTimer.scheduleAtFixedRate(new TimerTask()         // Sets up a new timer task for this survey
         {
             @Override
             public void run()           // When the timer is called to run
             {
-                systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Reminding User to Complete Survey").append("\n");       // Logs to the system logs
+                systemLogs.append(getEstablishedTime()).append(",").append("Followup Survey").append(",").append("Reminding User to Complete Survey").append("\n");       // Logs to the system logs
 
                 if (maxReminder == 0)       // Checks if the max amount has been reached
                 {
@@ -392,7 +401,7 @@ public class FollowupSurvey extends WearableActivity
                         @Override
                         public void run()       // Runs the following on the main thread
                         {
-                            systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Automatically Submitting Survey").append("\n");       // Logs to the system logs
+                            systemLogs.append(getEstablishedTime()).append(",").append("Followup Survey").append(",").append("Automatically Submitting Survey").append("\n");       // Logs to the system logs
 
                             submitSurvey();     // Calls the method to automatically submit the survey
                         }
@@ -410,8 +419,8 @@ public class FollowupSurvey extends WearableActivity
      */
     private void logResponse()
     {
-        this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Logging Survey Activity").append("\n");       // Logs to the system logs
-        this.surveyLogs = new StringBuilder(systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + getResources().getString(R.string.painsurvey_name));     // Starts to log the data
+        this.systemLogs.append(this.getEstablishedTime()).append(",").append("Followup Survey").append(",").append("Logging Survey Activity").append("\n");       // Logs to the system logs
+        this.surveyLogs = new StringBuilder(systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + getResources().getString(R.string.followupsurvey_name));     // Starts to log the data
 
         for (String userResponse : userResponses)       // Checks every response in the responses
         {
@@ -419,9 +428,9 @@ public class FollowupSurvey extends WearableActivity
         }
         this.surveyLogs.append(",").append(this.emaDuration());      // Appends the duration of the survey to the end of the string builder
 
-        this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append(" Pain Survey Finished and Submitted").append("\n");       // Logs to the system logs
+        this.systemLogs.append(this.getEstablishedTime()).append(",").append("Followup Survey").append(",").append(" Followup Survey Finished and Submitted").append("\n");       // Logs to the system logs
 
-        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.painresponse), String.valueOf(this.surveyLogs));        // Makes a new data logger item
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.followupresponse), String.valueOf(this.surveyLogs));        // Makes a new data logger item
         this.dataLogger.saveData("log");        // Saves the data in the format given
 
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), String.valueOf(this.systemLogs));        // Makes a new data logger item
@@ -433,9 +442,9 @@ public class FollowupSurvey extends WearableActivity
      */
     private void logActivity()
     {
-        this.data =  this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + getResources().getString(R.string.painsurvey_name) + "," +       // Data to be saved by the device
+        this.data =  this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + getResources().getString(R.string.followupsurvey_name) + "," +       // Data to be saved by the device
                 this.currentQuestion + "," + userResponses[currentQuestion] + "," + this.index;       // Data to save
-        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painctivity), this.data);      // Sets up data save path and information.
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.followupctivity), this.data);      // Sets up data save path and information.
         this.dataLogger.saveData("log");      // Logs the data into the directory specified.
     }
 

@@ -40,7 +40,7 @@ public class PainSurvey extends WearableActivity
     private SharedPreferences sharedPreferences;        // Gets a reference to the shared preferences of the wearable activity
     private Vibrator vibrator;      // Gets a link to the system vibrator
     private Window window;      // Gets access to the touch screen of the device
-    private int currentQuestion, answersTapped, index, hapticLevel, activityStartLevel, activityRemindLevel, emaReminderInterval, emaDelayInterval, maxReminder;       // Initializes various integers to be used by the system
+    private int currentQuestion, answersTapped, index, hapticLevel, activityStartLevel, activityRemindLevel, emaReminderInterval, emaDelayInterval, maxReminder, followupTime;       // Initializes various integers to be used by the system
     private int[] userResponseIndex;        // This is the user response index that keeps track of the index response of the user.
     private Button back, next, answer;      // The buttons on the screen
     private Timer reminderTimer;        // Sets up the timers for the survey
@@ -140,6 +140,7 @@ public class PainSurvey extends WearableActivity
         this.activityRemindLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_remind", ""))) * 1000;      // Alert for starting the activity
         this.emaReminderInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind_interval", ""))) * 1000;       // Alert to continue survey initialized
         this.emaDelayInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind", ""))) * 1000;       // Amount to offset reminder alert by
+        this.followupTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_trigger", ""))) * 1000;       // Followup ema timer extension
         this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind_max", "")));        // Maximum reminders allowed for the survey
 
         this.vibrator.vibrate(this.activityStartLevel);     // Vibrates the watch to signify the start of an activity
@@ -371,7 +372,7 @@ public class PainSurvey extends WearableActivity
             this.runFollowup.putExtra(getResources().getString(R.string.survey_alarm_key), getResources().getString(R.string.followup_identifier));     // Puts some extra information into the intent service
             this.pendingIntent = PendingIntent.getBroadcast(this, 0, this.runFollowup, 0);     // Initializes a pending intent to be run by the alarm manager
 
-            this.alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 15*1000, this.pendingIntent);        // Sets the alarm to run in some specified future time
+            this.alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + this.followupTime, this.pendingIntent);        // Sets the alarm to run in some specified future time
             this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA Scheduled by AlarmManager").append("\n");       // Logs to the system logs
         }
         else        // If the requirement was failed

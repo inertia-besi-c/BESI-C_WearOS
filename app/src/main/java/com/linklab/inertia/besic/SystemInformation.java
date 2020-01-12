@@ -34,7 +34,7 @@ class SystemInformation
         this.level = 0;     // Sets the level
         this.scale = 0;     // Sets the scale
         this.batteryPercent = 0;        // Sets the battery percentage
-        this.sleepMode = false;     // Sets the initial sleepMode of the system
+        this.sleepMode = true;     // Sets the initial sleepMode of the system
     }
 
     /**

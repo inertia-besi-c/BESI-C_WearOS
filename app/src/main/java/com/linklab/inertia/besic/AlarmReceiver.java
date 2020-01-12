@@ -21,17 +21,34 @@ public class AlarmReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        String KEY, followupValue;      // Sets up the string variable for the identifiers
+        SystemInformation systemInformation;        // sets a system information variable
+        DataLogger dataLogger;      // Sets a datalogger variable
+        String KEY, followupValue, data;      // Sets up the string variable for the identifiers
         Intent surveyIntent;        // Sets the intents for the broadcast receiver
 
         KEY = intent.getStringExtra(context.getResources().getString(R.string.survey_alarm_key));        // Gets the key identifier from the resource file
         followupValue = context.getResources().getString(R.string.followup_identifier);        // Gets the key identifier from the resource file
 
+        systemInformation = new SystemInformation();        // Initializes the system information variable
+        dataLogger = new DataLogger(context, context.getResources().getString(R.string.subdirectory_information), context.getResources().getString(R.string.sleepmode), "SleepMode Checker");        // Makes a new data logger item
+
         if (KEY.equalsIgnoreCase(followupValue))        // Checks if the value of the key is the same as the followup value
         {
-            surveyIntent = new Intent (context, FollowupSurvey.class);        // Calls an intent for a new activity
-            surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
-            context.startActivity(surveyIntent);        // Starts the activity specified
+            if (dataLogger.readData().contains("false"))        // Checks for the sleepmode level
+            {
+                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Followup Survey Broadcaster" + (",") + "Starting Followup Survey" + ("\n");       // Data to be logged by the system
+
+                surveyIntent = new Intent (context, FollowupSurvey.class);        // Calls an intent for a new activity
+                surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+                context.startActivity(surveyIntent);        // Starts the activity specified
+            }
+            else        // If sleepmode is enabled
+            {
+                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Followup Survey Broadcaster" + (",") + "Did NOT start Followup Survey due to SleepMode ENABLED" + ("\n");       // Data to be logged by the system
+            }
+
+            dataLogger = new DataLogger(context, context.getResources().getString(R.string.subdirectory_logs), context.getResources().getString(R.string.system), data);        // Makes a new data logger item
+            dataLogger.saveData("log");        // Logs the data
         }
     }
 }

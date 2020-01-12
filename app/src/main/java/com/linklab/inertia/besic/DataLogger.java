@@ -74,14 +74,20 @@ public class DataLogger
 
                 this.dataFile = new File(this.mainDirectoryPath+"/"+this.Subdirectory+"/"+this.FileName);       // Makes the file desired for into a file path
                 this.dataFile.createNewFile();      // Creates a new file at the specified path name
-                this.outputFIle = new FileOutputStream(this.dataFile,true);        // Creates a new file to be read out into the device
-                this.outputWriter = new OutputStreamWriter(this.outputFIle);        // Assigns the output file to be written by the output writer
 
                 if (saveType.toLowerCase().contentEquals("log"))       // Checks if the data is supposed to be in log mode
+                {
+                    this.outputFIle = new FileOutputStream(this.dataFile,true);        // Creates a new file to be read out into the device
+                    this.outputWriter = new OutputStreamWriter(this.outputFIle);        // Assigns the output file to be written by the output writer
                     this.outputWriter.append(this.Content);        // Appends the content to be saved into the file without erasing it
+                }
 
                 else if (saveType.toLowerCase().contentEquals("write"))     // Checks if the data is supposed to be in write mode
+                {
+                    this.outputFIle = new FileOutputStream(this.dataFile,false);        // Creates a new file to be read out into the device
+                    this.outputWriter = new OutputStreamWriter(this.outputFIle);        // Assigns the output file to be written by the output writer
                     this.outputWriter.write(this.Content);      // Writes the content to be saved into the file after erasing it.
+                }
 
                 else
                     Toast.makeText(context, "Error: Invalid Save Argument", Toast.LENGTH_LONG).show();     // Shows a toast
