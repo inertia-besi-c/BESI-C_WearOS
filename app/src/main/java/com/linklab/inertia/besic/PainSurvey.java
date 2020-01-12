@@ -4,6 +4,7 @@ package com.linklab.inertia.besic;
  * Imports needed by the system to function appropriately
  */
 import android.annotation.SuppressLint;
+import android.os.SystemClock;
 import android.support.wearable.activity.WearableActivity;
 import android.content.SharedPreferences;
 import android.view.WindowManager;
@@ -11,7 +12,10 @@ import android.content.Context;
 import android.os.Vibrator;
 import android.view.Window;
 import android.preference.PreferenceManager;
+import android.app.PendingIntent;
+import android.app.AlarmManager;
 import android.widget.TextView;
+import android.content.Intent;
 import android.widget.Button;
 import android.os.Bundle;
 import android.view.View;
@@ -149,8 +153,8 @@ public class PainSurvey extends WearableActivity
         this.question.setText(questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
         this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
         this.responses.clear();     // Cleats the array list of any values in it
-        this.reminderTimer.cancel();        // Cancels whatever timer is currently running
-        this.scheduleReminderTimer();       // Reschedules the ema reminder timer to run
+//        this.reminderTimer.cancel();        // Cancels whatever timer is currently running
+//        this.scheduleReminderTimer();       // Reschedules the ema reminder timer to run
 
         Collections.addAll(this.responses, this.answers[this.currentQuestion]);     // Calls on the collections object to add all the values in the array list so it can remember them
         this.nextAnswer();      // Calls on the method to update the answer view
@@ -347,7 +351,22 @@ public class PainSurvey extends WearableActivity
         this.endTime = this.getEstablishedTime();     // Sets the end time of the survey
         this.logResponse();     // Calls the method to perform an action
         this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_toast));     // Makes a special thank you toast
+        this.scheduleFollowupSurvey();
         finish();       // Finishes the survey and cleans up the system
+    }
+
+    private void scheduleFollowupSurvey()
+    {
+        AlarmManager alarmMgr = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent intent = new Intent(this, FollowupSurveyReceiver.class);
+        intent.putExtra("Alarm Type", "Followup Survey");
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() +
+                        10 * 1000, alarmIntent);
+
+        this.systemInformation.toast(getApplicationContext(),"Alarm Set, Going to Receiver");
     }
 
     /**
