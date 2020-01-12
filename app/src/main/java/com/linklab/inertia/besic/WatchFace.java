@@ -53,7 +53,7 @@ public class WatchFace extends CanvasWatchFaceService
         private DataLogger dataLogger;      // Initializes a datalogger instance
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
-        private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage;        // Sets up string variables
+        private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas
         private boolean drawEODEMA;      // Sets up all the boolean to be run on the system
         private int batteryLevelPositionX, batteryLevelPositionY,
@@ -170,7 +170,16 @@ public class WatchFace extends CanvasWatchFaceService
                         else
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
-                            setSleepMode(!getSleepMode());     // Sets the sleepMode level to be altered
+
+                            this.systemInformation.setSleepMode(!this.systemInformation.getSleepMode());     // Sets the sleepMode level to be altered
+                            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Watch Face" + "," + "SleepMode Enabled?: "+this.systemInformation.getSleepMode() + ("\n");     // Sets data to be logged by system
+                            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+                            this.dataLogger.saveData("log");        // Saves the data
+
+                            this.data = String.valueOf(this.systemInformation.getSleepMode());      // Sets the data to be written
+                            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), this.data);      // Sets a new datalogger variable
+                            this.dataLogger.saveData("write");      // Saves the data in the mode specified
+
                             invalidate();       // Immediately updates the screen
                         }
                     }
@@ -341,7 +350,7 @@ public class WatchFace extends CanvasWatchFaceService
         {
             if (isScreenOn())       // Checks if the screen is on on the device
             {
-                if (getSleepMode())     // Checks if sleep mode on the system is not enabled
+                if (this.systemInformation.getSleepMode())     // Checks if sleep mode on the system is not enabled
                 {
                     this.sleepEODEMAPaint.setColor(Color.GRAY);      // Sets color to this level
                 }
@@ -432,14 +441,6 @@ public class WatchFace extends CanvasWatchFaceService
         }
 
         /**
-         * This method changes the sleepMode level of the system
-         */
-        private void setSleepMode(boolean bool)
-        {
-            this.systemInformation.setSleepMode(bool);        // Calls to the information class for the sleepMode level to be changed
-        }
-
-        /**
          * This method gives the string value modified for battery level text.
          * @return the string needed to set up the battery level.
          */
@@ -455,15 +456,6 @@ public class WatchFace extends CanvasWatchFaceService
         private int getBatteryLevelInteger()
         {
             return this.systemInformation.getBatteryLevel(getApplicationContext());     // Gets the battery level as an integer from the helper class
-        }
-
-        /**
-         * This method provides the sleepMode of the system
-         * @return a boolean checking if sleepMode is enabled
-         */
-        private boolean getSleepMode()
-        {
-            return systemInformation.getSleepMode();        // Calls to the information class for the sleepMode level
         }
 
         /**

@@ -62,6 +62,14 @@
             </intent-filter>
         </service>
 
+        <receiver
+            android:name=".AlarmReceiver"
+            android:directBootAware="true"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true">
+        </receiver>
+
         <activity
             android:name=".DataLogger"
             android:icon="@mipmap/besic_logo_round"
@@ -94,7 +102,18 @@
         <activity
             android:name=".PainSurvey"
             android:icon="@mipmap/besic_logo_round"
-            android:label="@string/preference_name"
+            android:label="@string/painsurvey_name"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".FollowupSurvey"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/followupsurvey_name"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
