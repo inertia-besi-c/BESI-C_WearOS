@@ -149,6 +149,8 @@ public class PainSurvey extends WearableActivity
         this.question.setText(questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
         this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
         this.responses.clear();     // Cleats the array list of any values in it
+        this.reminderTimer.cancel();        // Cancels whatever timer is currently running
+        this.scheduleReminderTimer();       // Reschedules the ema reminder timer to run
 
         Collections.addAll(this.responses, this.answers[this.currentQuestion]);     // Calls on the collections object to add all the values in the array list so it can remember them
         this.nextAnswer();      // Calls on the method to update the answer view
