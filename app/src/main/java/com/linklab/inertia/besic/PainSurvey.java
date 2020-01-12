@@ -48,6 +48,9 @@ public class PainSurvey extends WearableActivity
     private String role, data, startTime, endTime, duration;        // Sets up all the string variable in the system
     private String[] userResponses, questions;     // String list variables used in the method
     private String[][] answers;     // String list in list variables used in the class
+    private AlarmManager alarmManager;      // Initializes an alarm manager variable
+    private PendingIntent pendingIntent;        // Initializes a pending intent variable
+    private Intent runFollowup;     // Initializes an intent variable
     private DataLogger dataLogger;      // Makes a global variable for the data logger
     private StringBuilder surveyLogs, systemLogs;       // Initializes a global string builder variable
     private SimpleDateFormat timeFormatter;     // Initiates a date time variable
@@ -108,7 +111,9 @@ public class PainSurvey extends WearableActivity
 
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets a reference to the shared preferences of the activity
         this.systemInformation = new SystemInformation();       // Gets a reference to the system information of the wearable activity
+
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Initializes the vibrator variable
+        this.alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);     // Initializes the alarm variable
 
         this.startTime = this.getEstablishedTime();    // Sets the start time of the survey
         this.systemLogs = new StringBuilder(this.startTime).append(",").append("Pain Survey").append(",").append("Starting Pain Survey").append("\n");       // Logs to the string builder variable
@@ -153,8 +158,7 @@ public class PainSurvey extends WearableActivity
         this.question.setText(questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
         this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
         this.responses.clear();     // Cleats the array list of any values in it
-//        this.reminderTimer.cancel();        // Cancels whatever timer is currently running
-//        this.scheduleReminderTimer();       // Reschedules the ema reminder timer to run
+        this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind_max", "")));        // Maximum reminders allowed for the survey
 
         Collections.addAll(this.responses, this.answers[this.currentQuestion]);     // Calls on the collections object to add all the values in the array list so it can remember them
         this.nextAnswer();      // Calls on the method to update the answer view
@@ -349,24 +353,31 @@ public class PainSurvey extends WearableActivity
     private void submitSurvey()
     {
         this.endTime = this.getEstablishedTime();     // Sets the end time of the survey
+        this.scheduleFollowupSurvey();      // Calls the method to perform the actions specified
         this.logResponse();     // Calls the method to perform an action
         this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_toast));     // Makes a special thank you toast
-        this.scheduleFollowupSurvey();
         finish();       // Finishes the survey and cleans up the system
     }
 
+    /**
+     * Schedules the timer that runs the followup survey at the intended time. This method sends a broadcast after the specified time to the
+     * AlarmReceiver class allowing the class to decide what to do with the receiver.
+     */
     private void scheduleFollowupSurvey()
     {
-        AlarmManager alarmMgr = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent intent = new Intent(this, FollowupSurveyReceiver.class);
-        intent.putExtra("Alarm Type", "Followup Survey");
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        if(this.userResponses[this.questions.length-3] != null && this.userResponses[this.questions.length-3].equalsIgnoreCase(this.answers[this.questions.length-3][0]))     // Checks for a specific requirement
+        {
+            this.runFollowup = new Intent(this, AlarmReceiver.class);       // Initializes an intent to be run by the system
+            this.runFollowup.putExtra(getResources().getString(R.string.survey_alarm_key), getResources().getString(R.string.followup_identifier));     // Puts some extra information into the intent service
+            this.pendingIntent = PendingIntent.getBroadcast(this, 0, this.runFollowup, 0);     // Initializes a pending intent to be run by the alarm manager
 
-        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() +
-                        10 * 1000, alarmIntent);
-
-        this.systemInformation.toast(getApplicationContext(),"Alarm Set, Going to Receiver");
+            this.alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 15*1000, this.pendingIntent);        // Sets the alarm to run in some specified future time
+            this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA Scheduled by AlarmManager").append("\n");       // Logs to the system logs
+        }
+        else        // If the requirement was failed
+        {
+            this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA NOT Scheduled by AlarmManager").append("\n");       // Logs to the system logs
+        }
     }
 
     /**

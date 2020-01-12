@@ -104,7 +104,7 @@ public class FollowupSurvey extends WearableActivity
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Initializes the vibrator variable
 
         this.startTime = this.getEstablishedTime();    // Sets the start time of the survey
-        this.systemLogs = new StringBuilder(this.startTime).append(",").append("Pain Survey").append(",").append("Starting Pain Survey").append("\n");       // Logs to the string builder variable
+        this.systemLogs = new StringBuilder(this.startTime).append(",").append("Pain Survey").append(",").append("Starting Pain Survey II").append("\n");       // Logs to the string builder variable
 
         this.unlockScreen();        // Calls the method to unlock the screen in a specified manner
 
