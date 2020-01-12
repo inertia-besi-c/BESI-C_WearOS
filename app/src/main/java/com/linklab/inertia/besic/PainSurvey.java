@@ -452,7 +452,7 @@ public class PainSurvey extends WearableActivity
         }
         this.surveyLogs.append(",").append(this.emaDuration());      // Appends the duration of the survey to the end of the string builder
 
-        this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append(" Pain Survey Finished and Submitted").append("\n");       // Logs to the system logs
+        this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Pain Survey Finished and Submitted").append("\n");       // Logs to the system logs
 
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.painresponse), String.valueOf(this.surveyLogs));        // Makes a new data logger item
         this.dataLogger.saveData("log");        // Saves the data in the format given
