@@ -468,7 +468,7 @@ public class PainSurvey extends WearableActivity
     private void logActivity()
     {
         this.data =  this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + getResources().getString(R.string.painsurvey_name) + "," +       // Data to be saved by the device
-                this.currentQuestion + "," + userResponses[currentQuestion] + "," + this.index + ("\n");       // Data to save
+                this.currentQuestion + "," + userResponses[currentQuestion] + "," + this.index;       // Data to save
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painctivity), this.data);      // Sets up data save path and information.
         this.dataLogger.saveData("log");      // Logs the data into the directory specified.
     }
