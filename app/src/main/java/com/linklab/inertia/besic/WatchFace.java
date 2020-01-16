@@ -50,7 +50,7 @@ public class WatchFace extends CanvasWatchFaceService
         private Vibrator vibrator;      // This is the variable that access the vibrator in the device
         private SystemInformation systemInformation;        // Gets a context to the system information class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
-        private DataLogger dataLogger;      // Initializes a datalogger instance
+        private DataLogger dataLogger, checkEODDate;      // Initializes a datalogger instance
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
@@ -98,7 +98,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.setUpDefaultValues();      // Calls the method
             this.setUpDefaultColors();      // Calls the method
 
-            invalidate();       // Refreshes the screen.
+            this.invalidate();       // Refreshes the screen.
         }
 
         /**
@@ -164,10 +164,12 @@ public class WatchFace extends CanvasWatchFaceService
                         if (drawEODEMA)     // Checks if the daily ema button needs is available
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
-                            // This is where an intent to launch the end of day ema would be made
-                            this.systemInformation.toast(getApplicationContext(), "EODEMA not Implemented!");        // Shows a toast that settings have already been done
+
+                            Intent surveyIntent = new Intent (WatchFace.this, EndOfDay.class);        // Calls an intent to start a new activity
+                            surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+                            startActivity(surveyIntent);        // Starts the activity specified
                         }
-                        else
+                        else        // If the daily EMA button is not needed to show
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
@@ -180,7 +182,7 @@ public class WatchFace extends CanvasWatchFaceService
                             this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), this.data);      // Sets a new datalogger variable
                             this.dataLogger.saveData("write");      // Saves the data in the mode specified
 
-                            invalidate();       // Immediately updates the screen
+                            this.invalidate();       // Immediately updates the screen
                         }
                     }
 
@@ -208,18 +210,18 @@ public class WatchFace extends CanvasWatchFaceService
 
             this.startMessage = getResources().getString(R.string.start_string);        // Sets the string of the button
 
-            drawStartButton();      // Calls the method
-            decideSleepEODEMAButton();      // Calls the method
+            this.drawStartButton();      // Calls the method
+            this.decideSleepEODEMAButton();      // Calls the method
 
             if (drawEODEMA)     // If it is time to draw the end of day EMA
             {
                 this.sleepEODEMAMessage = getResources().getString(R.string.eodema_string);      // Sets the string of the button
-                drawEODEMAButton();      // Calls the method
+                this.drawEODEMAButton();      // Calls the method
             }
             else        // If not, draw the sleep automatically
             {
                 this.sleepEODEMAMessage = getResources().getString(R.string.sleep_string);      // Sets the string of the button
-                drawSleepButton();      // Calls the method
+                this.drawSleepButton();      // Calls the method
             }
         }
 
@@ -275,7 +277,7 @@ public class WatchFace extends CanvasWatchFaceService
         @SuppressWarnings("ALL")        // Suppresses the warnings for this method
         private void setUpDefaultColors()
         {
-            if (isScreenOn())      // Checks if the system is in Ambient mode
+            if (this.isScreenOn())      // Checks if the system is in Ambient mode
             {
                 this.datePaint.setColor(Color.WHITE);       // Sets the color of the date on the UI
                 this.timePaint.setColor(Color.WHITE);       // Sets the color of the time on the UI.
@@ -305,7 +307,9 @@ public class WatchFace extends CanvasWatchFaceService
         {
             this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
 
-            if (drawEODEMA)     // If it is time to draw the end of day ema button
+            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.endofdayresponse), "Checking End Of Day File");        // Makes a new data logger item
+
+            if (this.drawEODEMA && this.checkEODDate.readData() != null && this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))     // If it is time to draw the end of day ema button
             {
                 this.sleepEODEMAPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_survey_button_size)));    // Sets the text size
             }
@@ -314,7 +318,7 @@ public class WatchFace extends CanvasWatchFaceService
                 this.sleepEODEMAPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_sleep_button_size)));    // Sets the text size
             }
 
-            if (isScreenOn())       // Checks if the screen is on
+            if (this.isScreenOn())       // Checks if the screen is on
             {
                 this.startPaint.setColor(Color.WHITE);      // Sets the color
                 this.sleepEODEMAPaint.setColor(Color.WHITE);        // Sets the color
@@ -340,7 +344,7 @@ public class WatchFace extends CanvasWatchFaceService
             int endMinute = Integer.valueOf(this.sharedPreferences.getString("eod_manual_end_minute", ""));     // Gets the end minute from preferences
             int endSecond = Integer.valueOf(this.sharedPreferences.getString("eod_manual_end_second", ""));     // Gets the end second from preferences
 
-            drawEODEMA = systemInformation.isTimeBetweenTimes(systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
+            this.drawEODEMA = systemInformation.isTimeBetweenTimes(systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
         }
 
         /**
@@ -348,7 +352,7 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private void drawSleepButton()
         {
-            if (isScreenOn())       // Checks if the screen is on on the device
+            if (this.isScreenOn())       // Checks if the screen is on on the device
             {
                 if (this.systemInformation.getSleepMode())     // Checks if sleep mode on the system is not enabled
                 {
@@ -377,10 +381,12 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), getResources().getString(R.string.settings_header)},        // Settings file
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), getResources().getString(R.string.system_header)},        // System response file
-                                {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painctivity), getResources().getString(R.string.painactivity_header)},        // Pain activity file
+                                {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painactivity), getResources().getString(R.string.painactivity_header)},        // Pain activity file
+                                {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.followupactivity), getResources().getString(R.string.followupactivity_header)},        // Followup activity file
+                                {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.endofdayactivity), getResources().getString(R.string.endofdayactivity_header)},        // Followup activity file
                                 {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.painresponse), getResources().getString(R.string.painresponse_header)},       // Pain response file
-                                {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.followupctivity), getResources().getString(R.string.followupactivity_header)},        // Followup activity file
-                                {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.followupresponse), getResources().getString(R.string.followupresponse_header)}        // Followup response file
+                                {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.followupresponse), getResources().getString(R.string.followupresponse_header)},        // Followup response file
+                                {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.endofdayresponse), getResources().getString(R.string.endofdayresponse_header)},        // End of Day response file
                         };
 
                 for (String[] file : Files)     // Foe every file in the files
@@ -396,7 +402,7 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private void drawEODEMAButton()
         {
-            if (isScreenOn())       // Checks if the screen is on on the device
+            if (this.isScreenOn())       // Checks if the screen is on on the device
             {
                 this.sleepEODEMAPaint.setColor(Color.RED);      // Sets color to this level
             }
@@ -411,7 +417,7 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private void drawStartButton()
         {
-            if (isScreenOn())       // If the screen is on
+            if (this.isScreenOn())       // If the screen is on
             {
                 this.startPaint.setColor(Color.GREEN);      // Sets color to this level
             }
@@ -439,7 +445,7 @@ public class WatchFace extends CanvasWatchFaceService
         public void onTimeTick()
         {
             super.onTimeTick();     // Calls to superclass
-            invalidate();       // Redraws the screen
+            this.invalidate();       // Redraws the screen
         }
 
         /**
@@ -448,7 +454,7 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private String getBatteryLevelString()
         {
-            return getResources().getString(R.string.battery_level_string) + " " + getBatteryLevelInteger() + "%";      // Sets up the string shown on the canvas for battery level.
+            return getResources().getString(R.string.battery_level_string) + " " + this.getBatteryLevelInteger() + "%";      // Sets up the string shown on the canvas for battery level.
         }
 
         /**
@@ -475,7 +481,7 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private boolean isScreenOn()
         {
-            return isVisible() && !isInAmbientMode();       // Checks the ambient mode level and the visibility
+            return this.isVisible() && !this.isInAmbientMode();       // Checks the ambient mode level and the visibility
         }
     }
 }
