@@ -161,7 +161,7 @@ public class WatchFace extends CanvasWatchFaceService
 
                     if (x > startButtonXEnd && x < sleepEODEMAXEnd && y >= sleepEODEMAY && y <= buttonsYEnd)
                     {
-                        if (drawEODEMA)     // Checks if the daily ema button needs is available
+                        if (drawEODEMA && !this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))     // Checks if the daily ema button needs is available
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
@@ -306,16 +306,17 @@ public class WatchFace extends CanvasWatchFaceService
         private void reconfigureButtons()
         {
             this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
+            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
 
-            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.endofdayresponse), "Checking End Of Day File");        // Makes a new data logger item
-
-            if (this.drawEODEMA && this.checkEODDate.readData() != null && this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))     // If it is time to draw the end of day ema button
+            if (this.drawEODEMA && this.checkEODDate.readData() != null && !this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))     // If it is time to draw the end of day ema button
             {
                 this.sleepEODEMAPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_survey_button_size)));    // Sets the text size
+                this.drawEODEMAButton();        // Draws the appropriate button
             }
             else        // If not, draw the sleep button attribute automatically.
             {
                 this.sleepEODEMAPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_sleep_button_size)));    // Sets the text size
+                this.drawSleepButton();     // Draws the appropriate button
             }
 
             if (this.isScreenOn())       // Checks if the screen is on

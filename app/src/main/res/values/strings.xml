@@ -62,6 +62,7 @@
     <string name="sensors">Sensors.csv</string>         <!--Name of the file where actions performed by sensor activity is stored-->
     <string name="system">Systems.csv</string>           <!--Name of the file where actions done by the system are stored-->
     <string name="sleepmode">SleepMode.csv</string>     <!--Name of the file that updates the sleepmode level-->
+    <string name="eodmode">EndOfDayMode.csv</string>    <!--Name of the file that updates the endofday button-->
 
 
     <!--The headers for the given files in the system-->

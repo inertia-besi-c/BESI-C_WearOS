@@ -44,7 +44,7 @@ public class EndOfDay extends WearableActivity
     private String role, data, startTime, endTime, duration;        // Sets up all the string variable in the system
     private String[] userResponses, questions;     // String list variables used in the method
     private String[][] answers;     // String list in list variables used in the class
-    private DataLogger dataLogger;      // Makes a global variable for the data logger
+    private DataLogger dataLogger, checkEODDate;      // Makes a global variable for the data logger
     private StringBuilder surveyLogs, systemLogs;       // Initializes a global string builder variable
     private SimpleDateFormat timeFormatter;     // Initiates a date time variable
     private SystemInformation systemInformation;        // Gets a reference to the system information class
@@ -385,6 +385,9 @@ public class EndOfDay extends WearableActivity
 
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), String.valueOf(this.systemLogs));        // Makes a new data logger item
         this.dataLogger.saveData("log");        // Saves the data in the format specified
+
+        this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.eodmode), this.systemInformation.getDateTime("yyyy/MM/dd"));        // Makes a new data logger item
+        this.checkEODDate.saveData("write");        // Saves the data in the format specified
     }
 
     /**
