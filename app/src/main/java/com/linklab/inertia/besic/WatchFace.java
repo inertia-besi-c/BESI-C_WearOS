@@ -209,11 +209,12 @@ public class WatchFace extends CanvasWatchFaceService
             this.sleepEODEMAPaint.getFontMetrics(this.sleepEODEMABackground);       // Sets background
 
             this.startMessage = getResources().getString(R.string.start_string);        // Sets the string of the button
+            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
 
             this.drawStartButton();      // Calls the method
             this.decideSleepEODEMAButton();      // Calls the method
 
-            if (drawEODEMA)     // If it is time to draw the end of day EMA
+            if (drawEODEMA && !this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))     // If it is time to draw the end of day EMA
             {
                 this.sleepEODEMAMessage = getResources().getString(R.string.eodema_string);      // Sets the string of the button
                 this.drawEODEMAButton();      // Calls the method
@@ -311,12 +312,10 @@ public class WatchFace extends CanvasWatchFaceService
             if (this.drawEODEMA && this.checkEODDate.readData() != null && !this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))     // If it is time to draw the end of day ema button
             {
                 this.sleepEODEMAPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_survey_button_size)));    // Sets the text size
-                this.drawEODEMAButton();        // Draws the appropriate button
             }
             else        // If not, draw the sleep button attribute automatically.
             {
                 this.sleepEODEMAPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_sleep_button_size)));    // Sets the text size
-                this.drawSleepButton();     // Draws the appropriate button
             }
 
             if (this.isScreenOn())       // Checks if the screen is on
