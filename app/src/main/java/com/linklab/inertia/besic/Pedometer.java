@@ -1,5 +1,8 @@
 package com.linklab.inertia.besic;
 
+/*
+ * Imports needed by the system to function appropriately
+ */
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
@@ -37,7 +40,7 @@ public class Pedometer extends Service implements SensorEventListener
         this.sensorManager.registerListener(this, this.pedometer, SensorManager.SENSOR_DELAY_UI);       // Sets up the listener rate
 
         this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pedometer Service" + (",") + "Starting Pedometer Service";       // Data to be logged by the system
-        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
         return START_STICKY;        // Returns an integer for the service schedule
@@ -50,7 +53,7 @@ public class Pedometer extends Service implements SensorEventListener
     @Override
     public void onSensorChanged(SensorEvent event)
     {
-        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + event.values[0] + (",") + event.accuracy;       // Data to be logged
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + event.values[0] + (",") + event.accuracy + (",") + this.systemInformation.getBatteryLevel(getApplicationContext());       // Data to be logged
 
         new Thread(new Runnable()       // Sets a runnable thread
             {
@@ -60,7 +63,7 @@ public class Pedometer extends Service implements SensorEventListener
                 @Override
                 public void run()
                 {
-                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.sensors), getResources().getString(R.string.pedometer), data);       // Sets up the items to be logged
+                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.pedometer), data);       // Sets up the items to be logged
                     dataLogger.saveData("log");     // Saves the data in the format specified
                 }
             }).start();     // Starts the runnable
@@ -76,7 +79,7 @@ public class Pedometer extends Service implements SensorEventListener
         this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
 
         this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pedometer Service" + (",") + "Killing Pedometer Service";       // Data to be logged by the system
-        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");      // Saves the data in the mode specified
     }
 
