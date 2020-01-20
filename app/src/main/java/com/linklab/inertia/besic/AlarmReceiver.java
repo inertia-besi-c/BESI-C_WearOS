@@ -32,7 +32,7 @@ public class AlarmReceiver extends BroadcastReceiver
 
         systemInformation = new SystemInformation();        // Initializes the system information variable
 
-        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Alarm Manager Broadcaster" + (",") + "Activated for a Survey Instance" + ("\n");       // Data to be logged by the system
+        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Alarm Manager Broadcaster" + (",") + "Activated for a Survey Instance";       // Data to be logged by the system
         dataLogger = new DataLogger(context, context.getResources().getString(R.string.subdirectory_logs), context.getResources().getString(R.string.system), data);        // Makes a new data logger item
         dataLogger.saveData("log");        // Logs the data
 
