@@ -425,9 +425,9 @@ public class WatchFace extends CanvasWatchFaceService
 
             long startTime = this.calendar.getTimeInMillis();       // Gets the time in milliseconds
 
-            if (System.currentTimeMillis() > startTime)
+            if (System.currentTimeMillis() > startTime)     // If the time we want is passed
             {
-                startTime = startTime + 24*60*60*1000;
+                startTime = startTime + 24*60*60*1000;      // Move it to the next day
             }
 
             this.alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, startTime, AlarmManager.INTERVAL_DAY, this.pendingIntent);        // Sets the alarm to run in some specified future time
