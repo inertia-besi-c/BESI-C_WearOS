@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.preference.PreferenceManager;
 
 import java.text.DecimalFormat;
 import java.util.Objects;
@@ -24,16 +25,23 @@ public class Accelerometer extends Service implements SensorEventListener
     private int currentCount;
     private double[] accelerometer_data;
 
+    public Accelerometer()
+    {
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        this.decimalFormat = new DecimalFormat("#.####");
+        this.systemInformation = new SystemInformation();
+        this.stringBuilder1 = new StringBuilder();
+        this.stringBuilder2 = new StringBuilder();
+
+        this.currentCount = 0;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startID)
     {
         this.sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         this.accelerometer = this.sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         this.sensorManager.registerListener(this, this.accelerometer, SensorManager.SENSOR_DELAY_UI);
-        this.stringBuilder1 = new StringBuilder();
-        this.stringBuilder2 = new StringBuilder();
-        this.decimalFormat = new DecimalFormat("#.####");
-        this.currentCount = 0;
 
         return START_STICKY;
     }
