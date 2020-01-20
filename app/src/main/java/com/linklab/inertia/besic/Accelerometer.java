@@ -117,11 +117,13 @@ public class Accelerometer extends Service implements SensorEventListener
     @Override
     public void onDestroy()
     {
-        this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
-
         this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Accelerometer Service" + (",") + "Killing Accelerometer Service";       // Data to be logged by the system
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");      // Saves the data in the mode specified
+
+        this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
+
+        super.onDestroy();          // Calls the higher on destroy function
     }
 
     /**
