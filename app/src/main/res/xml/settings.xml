@@ -317,7 +317,7 @@
                     android:inputType="number"
                     android:key="eod_remind_max"
                     android:title="Maximum Reminders"
-                    android:defaultValue="2">
+                    android:defaultValue="3">
                 </EditTextPreference>
 
                 <!-- A text input is initialized for the delay associated with starting the reminders -->
@@ -408,7 +408,7 @@
             <!-- A preference list is made for the hour time -->
                 <ListPreference
                     android:key="eod_manual_end_hour"
-                    android:title="Manual Start Hour"
+                    android:title="Manual End Hour"
                     android:entries="@array/hourList"
                     android:entryValues="@array/hourList"
                     android:defaultValue="23">
@@ -417,7 +417,7 @@
                 <!-- A preference list is made for the minute time -->
                 <ListPreference
                     android:key="eod_manual_end_minute"
-                    android:title="Manual Start Minute"
+                    android:title="Manual End Minute"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
                     android:defaultValue="59">
@@ -426,7 +426,7 @@
                 <!-- A preference list is made for the seconds time -->
                 <ListPreference
                     android:key="eod_manual_end_second"
-                    android:title="Manual Start Second"
+                    android:title="Manual End Second"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
                     android:defaultValue="59">

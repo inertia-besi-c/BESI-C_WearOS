@@ -20,6 +20,7 @@
     <!--Alarm Key and Value Information-->
     <string name="survey_alarm_key">Survey Alarm</string>       <!--The key for the survey alarm-->
     <string name="followup_identifier">Followup Survey</string>     <!--The identifier value for the followup survey-->
+    <string name="endofday_identifier">End of Day Survey</string>     <!--The identifier value for the end of day survey-->
 
     <!--User Interface Size Information-->
     <string name="ui_time_size">85</string>     <!--Size of the time-->
@@ -36,6 +37,7 @@
     <string name="datalogger_name">BESI-C: DataLogger</string>  <!--This is the string that is shown as the datalogger name-->
     <string name="painsurvey_name">BESI-C: Pain Survey</string>  <!--This is the string that is shown as the pain survey name-->
     <string name="followupsurvey_name">BESI-C: Followup Survey</string>  <!--This is the string that is shown as the followup survey name-->
+    <string name="endofdaysurvey_name">BESI-C: End Of Day Survey</string>   <!--This is the string that is shown as the endofday survey name-->
 
     <!--The name of the Sub Folders for information to be stored-->
     <string name="subdirectory_information">Information</string>     <!--This is the sub folder where some system information will be stored-->
@@ -48,11 +50,11 @@
 
     <!--The general name of the files where items will be stored-->
     <string name="settings">Settings.csv</string>       <!--Name of the settings file-->
-    <string name="painctivity">Pain_EMA_Activity.csv</string>       <!--Name of the file that would store individual answers about the ema-->
+    <string name="painactivity">Pain_EMA_Activity.csv</string>       <!--Name of the file that would store individual answers about the ema-->
     <string name="painresponse">Pain_EMA_Responses.csv</string>         <!--Name of the file that would store the answers to the survey questions in a separate file-->
-    <string name="followupctivity">Followup_EMA_Activity.csv</string>       <!--Name of the file that would store individual answers about the ema-->
+    <string name="followupactivity">Followup_EMA_Activity.csv</string>       <!--Name of the file that would store individual answers about the ema-->
     <string name="followupresponse">Followup_EMA_Responses.csv</string>         <!--Name of the file that would store the answers to the survey questions in a separate file-->
-    <string name="endofdayctivity">EndOfDay_EMA_Activity.csv</string>       <!--Name of the file that would store individual answers about the ema-->
+    <string name="endofdayactivity">EndOfDay_EMA_Activity.csv</string>       <!--Name of the file that would store individual answers about the ema-->
     <string name="endofdayresponse">EndOfDay_EMA_Responses.csv</string>         <!--Name of the file that would store the answers to the survey questions in a separate file-->
     <string name="battery">Battery_Information.csv</string>     <!--Name of the folder where the battery information is stored-->
     <string name="accelerometer">Accelerometer.csv</string>     <!--Name of the file where the accelerometer data is stored-->
@@ -61,6 +63,7 @@
     <string name="sensors">Sensors.csv</string>         <!--Name of the file where actions performed by sensor activity is stored-->
     <string name="system">Systems.csv</string>           <!--Name of the file where actions done by the system are stored-->
     <string name="sleepmode">SleepMode.csv</string>     <!--Name of the file that updates the sleepmode level-->
+    <string name="eodmode">EndOfDayMode.csv</string>    <!--Name of the file that updates the endofday button-->
 
 
     <!--The headers for the given files in the system-->
@@ -68,6 +71,8 @@
     <string name="system_header">Date and Time, System Location, Action Performed</string>      <!--Header items for the systems file-->
     <string name="painactivity_header">Date and Time, Survey Type, Question Index, Verbose Answer, Answer Index</string>        <!--Header for the activity file-->
     <string name="followupactivity_header">Date and Time, Survey Type, Question Index, Verbose Answer, Answer Index</string>        <!--Header for the activity file-->
+    <string name="endofdayactivity_header">Date and Time, Survey Type, Question Index, Verbose Answer, Answer Index</string>        <!--Header for the activity file-->
     <string name="painresponse_header">Date and Time, Survey Type, Question 1 Answer, Question 2 Answer, Question 3 Answer, Question 4 Answer, Question 5 Answer, Question 6 Answer, Question 7 Answer, Survey Duration</string>        <!--Header for the activity file-->
     <string name="followupresponse_header">Date and Time, Survey Type, Question 1 Answer, Question 2 Answer, Question 3 Answer, Question 4 Answer, Question 5 Answer, Question 6 Answer, Question 7 Answer, Survey Duration</string>        <!--Header for the activity file-->
+    <string name="endofdayresponse_header">Date and Time, Survey Type, Question 1 Answer, Question 2 Answer, Question 3 Answer, Question 4 Answer, Question 5 Answer, Question 6 Answer, Question 7 Answer, Survey Duration</string>        <!--Header for the activity file-->
 </resources>
