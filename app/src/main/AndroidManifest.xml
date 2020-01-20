@@ -130,7 +130,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EndOfDay"
+            android:name=".EndOfDaySurvey"
             android:icon="@mipmap/besic_logo_round"
             android:label="@string/endofdaysurvey_name"
             android:launchMode="singleInstance">

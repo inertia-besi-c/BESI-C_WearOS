@@ -31,7 +31,7 @@ import java.util.Date;
  * The logic for the survey in regards to immediate pain. This activity is launched as soon as the start button in the watchface is pressed.
  * This survey only comes up with a button press and is not initiated by any timer or notification.
  */
-public class EndOfDay extends WearableActivity
+public class EndOfDaySurvey extends WearableActivity
 {
     private SharedPreferences sharedPreferences;        // Gets a reference to the shared preferences of the wearable activity
     private Vibrator vibrator;      // Gets a link to the system vibrator

@@ -176,7 +176,7 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
-                            Intent surveyIntent = new Intent (WatchFace.this, EndOfDay.class);        // Calls an intent to start a new activity
+                            Intent surveyIntent = new Intent (WatchFace.this, EndOfDaySurvey.class);        // Calls an intent to start a new activity
                             surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
                             startActivity(surveyIntent);        // Starts the activity specified
                         }

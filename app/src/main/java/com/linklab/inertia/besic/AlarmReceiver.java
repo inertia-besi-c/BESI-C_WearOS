@@ -64,7 +64,7 @@ public class AlarmReceiver extends BroadcastReceiver
             {
                 data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Alarm Manager Broadcaster" + (",") + "Starting End of Day Survey" + ("\n");       // Data to be logged by the system
 
-                surveyIntent = new Intent (context, EndOfDay.class);        // Calls an intent for a new activity
+                surveyIntent = new Intent (context, EndOfDaySurvey.class);        // Calls an intent for a new activity
                 surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
                 context.startActivity(surveyIntent);        // Starts the activity specified
             }
