@@ -101,7 +101,7 @@ public class HeartRate extends Service implements SensorEventListener
         this.timer.cancel();        // Cancels the timer from the system
         this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
 
-        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Heart Rate Service" + (",") + "Killing Heart Rate Service";       // Data to be logged by the system
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Heart Rate Service" + (",") + "Ended and Left Heart Rate Service";       // Data to be logged by the system
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");      // Saves the data in the mode specified
     }

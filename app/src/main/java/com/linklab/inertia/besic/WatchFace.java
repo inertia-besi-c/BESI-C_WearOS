@@ -108,32 +108,13 @@ public class WatchFace extends CanvasWatchFaceService
             this.logHeaders();      // Calls the method to log the headers needed for the files
             this.logInitialSettings();      // Calls the method to log all the items in the settings file
             this.scheduleEndOfDaySurvey();      // Calls the method to perform the action
-            this.startAllServices();        // Calls the method
+            this.startAccelerometer();        // Calls the method
 
             this.setUpDefaultValues();      // Calls the method
             this.setUpDefaultColors();      // Calls the method
-            this.startAllServices();        // Calls the method
-
-            this.heartrateInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("heartrate_interval", ""))) * 1000;
-            this.heartrateTimer = new Timer();      // Assigns a new timer
-            this.heartrateTimer.scheduleAtFixedRate(new TimerTask()         // Schedules the timer to run once
-            {
-                /**
-                 * The following is called to run
-                 */
-                @Override
-                public void run()
-                {
-                    if(!isRunning(HeartRate.class))     // Checks if the service is already running, if it is not
-                    {
-                        startService(heartrate);        // Starts the heart rate service class
-
-                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Heart Rate Class";       // Data to be logged by the system
-                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-                        dataLogger.saveData("log");      // Saves the data in the mode specified
-                    }
-                }
-            }, 0, this.heartrateInterval);      // Repeats at the specified interval
+            this.startPedometer();      // Calls the method
+            this.startAccelerometer();        // Calls the method
+            this.startHeartRate();      // Calls the method
 
             this.invalidate();       // Refreshes the screen.
         }
@@ -441,14 +422,11 @@ public class WatchFace extends CanvasWatchFaceService
         }
 
         /**
-         * This method starts all the sensors that is needed to run for the application
+         * This method starts the accelerometer sensor
          */
-        private void startAllServices()
+        private void startAccelerometer()
         {
             this.accelerometer = new Intent(getBaseContext(), Accelerometer.class);     // Sets up the intent to start the service
-            this.pedometer = new Intent(getBaseContext(), Pedometer.class);     // Sets up the intent to start the service
-            this.heartrate = new Intent(getBaseContext(), HeartRate.class);
-
             if(!isRunning(Accelerometer.class))     // Checks if the service is already running, if it is not
             {
                 startService(this.accelerometer);       // Automatically starts the service
@@ -457,7 +435,14 @@ public class WatchFace extends CanvasWatchFaceService
                 this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
             }
+        }
 
+        /**
+         * This method starts the pedometer sensor
+         */
+        private void startPedometer()
+        {
+            this.pedometer = new Intent(getBaseContext(), Pedometer.class);     // Sets up the intent to start the service
             if(!isRunning(Pedometer.class))     // Checks if the service is already running, if it is not
             {
                 startService(this.pedometer);       // Automatically starts the service
@@ -466,27 +451,35 @@ public class WatchFace extends CanvasWatchFaceService
                 this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
             }
+        }
 
-//            this.heartrateInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("heartrate_interval", ""))) * 1000;
-//            this.heartrateTimer = new Timer();      // Assigns a new timer
-//            this.heartrateTimer.schedule(new TimerTask()         // Schedules the timer to run once
-//            {
-//                /**
-//                 * The following is called to run
-//                 */
-//                @Override
-//                public void run()
-//                {
-//                    if(!isRunning(HeartRate.class))     // Checks if the service is already running, if it is not
-//                    {
-//                        startService(heartrate);        // Starts the heart rate service class
-//
-//                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Heart Rate Class";       // Data to be logged by the system
-//                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-//                        dataLogger.saveData("log");      // Saves the data in the mode specified
-//                    }
-//                }
-//            }, 0, this.heartrateInterval);      // Repeats at the specified interval
+        /**
+         * This method starts the heartrate sensor and keeps a repeated instance
+         */
+        private void startHeartRate()
+        {
+            this.heartrate = new Intent(getBaseContext(), HeartRate.class);     // Sets up the intent for the service
+            this.heartrateInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("heartrate_interval", ""))) * 1000;        // Sets the value for the interval
+
+            this.heartrateTimer = new Timer();      // Assigns a new timer
+            this.heartrateTimer.scheduleAtFixedRate(new TimerTask()         // Schedules the timer to run once
+            {
+                /**
+                 * The following is called to run
+                 */
+                @Override
+                public void run()
+                {
+                    if(!isRunning(HeartRate.class))     // Checks if the service is already running, if it is not
+                    {
+                        startService(heartrate);        // Starts the heart rate service class
+
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Heart Rate Class";       // Data to be logged by the system
+                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                        dataLogger.saveData("log");      // Saves the data in the mode specified
+                    }
+                }
+            }, 0, this.heartrateInterval);      // Repeats at the specified interval
         }
 
         /**
@@ -519,7 +512,7 @@ public class WatchFace extends CanvasWatchFaceService
                 this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
-                this.eodemaAlreadyExecuted = true;
+                this.eodemaAlreadyExecuted = true;      // Assigns a value that the method has been executed
             }
         }
 
