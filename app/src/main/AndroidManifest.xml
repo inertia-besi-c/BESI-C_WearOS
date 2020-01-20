@@ -70,6 +70,7 @@
             android:launchMode="singleInstance">
         </service>
         <service android:name=".Pedometer" />
+        <service android:name=".HeartRate" />
 
         <receiver
             android:name=".AlarmReceiver"

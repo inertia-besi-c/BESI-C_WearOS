@@ -58,7 +58,7 @@ public class WatchFace extends CanvasWatchFaceService
         private PendingIntent pendingIntent;        // Initializes the pending intents of the class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
         private DataLogger dataLogger, checkEODDate;      // Initializes a datalogger instance
-        private Intent runEndOfDay, accelerometer, pedometer;     // Initializes the intents of the class
+        private Intent runEndOfDay, accelerometer, pedometer, heartrate;     // Initializes the intents of the class
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
@@ -394,6 +394,7 @@ public class WatchFace extends CanvasWatchFaceService
                                 {getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), String.valueOf(systemInformation.getSleepMode())},      // SleepMode Updater file
                                 {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.pedometer), getResources().getString(R.string.pedometer_header)},       // Pedometer file
                                 {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.accelerometer), getResources().getString(R.string.accelerometer_header)},      // Accelerometer file
+                                {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.heartrate), getResources().getString(R.string.heartrate_header)},       // Heart Rate File
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), getResources().getString(R.string.settings_header)},        // Settings file
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), getResources().getString(R.string.system_header)},        // System response file
                                 {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painactivity), getResources().getString(R.string.painactivity_header)},        // Pain activity file
@@ -419,6 +420,7 @@ public class WatchFace extends CanvasWatchFaceService
         {
             this.accelerometer = new Intent(getBaseContext(), Accelerometer.class);     // Sets up the intent to start the service
             this.pedometer = new Intent(getBaseContext(), Pedometer.class);     // Sets up the intent to start the service
+            this.heartrate = new Intent(getBaseContext(), HeartRate.class);     // Sets up the intent to start the service
 
             if(!isRunning(Accelerometer.class))     // Checks if the service is already running, if it is not
             {
@@ -434,6 +436,15 @@ public class WatchFace extends CanvasWatchFaceService
                 startService(this.pedometer);       // Automatically starts the service
 
                 this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Pedometer Class";       // Data to be logged by the system
+                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+                this.dataLogger.saveData("log");      // Saves the data in the mode specified
+            }
+
+            if(!isRunning(HeartRate.class))     // Checks if the service is already running, if it is not
+            {
+                startService(this.heartrate);       // Automatically starts the service
+
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Heart Rate Class";       // Data to be logged by the system
                 this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
             }

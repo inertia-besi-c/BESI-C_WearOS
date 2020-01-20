@@ -23,12 +23,13 @@ public class AlarmReceiver extends BroadcastReceiver
     {
         SystemInformation systemInformation;        // sets a system information variable
         DataLogger dataLogger, checkEODDate;      // Sets a datalogger variable
-        String KEY, data, followupValue, endOfDayValue;      // Sets up the string variable for the identifiers
+        String KEY, data, followupValue, endOfDayValue, heartRateValue;      // Sets up the string variable for the identifiers
         Intent surveyIntent;        // Sets the intents for the broadcast receiver
 
         KEY = intent.getStringExtra(context.getResources().getString(R.string.survey_alarm_key));        // Gets the key identifier from the resource file
         followupValue = context.getResources().getString(R.string.followup_identifier);        // Gets the key identifier from the resource file
         endOfDayValue = context.getResources().getString(R.string.endofday_identifier);     // Gets the key identifier from the resource file
+        heartRateValue = context.getResources().getString(R.string.heartrate_identifier);       // Gets the key identifier from the resource file
 
         systemInformation = new SystemInformation();        // Initializes the system information variable
 
@@ -80,6 +81,18 @@ public class AlarmReceiver extends BroadcastReceiver
         {
             data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Alarm Manager Broadcaster" + (",") + "Dismissing Automatic End of Day Survey due to already completed" + ("\n");       // Data to be logged by the system
             dataLogger = new DataLogger(context, context.getResources().getString(R.string.subdirectory_logs), context.getResources().getString(R.string.system), data);        // Makes a new data logger item
+            dataLogger.saveData("log");        // Logs the data
+        }
+
+        if (KEY.equalsIgnoreCase(heartRateValue))
+        {
+            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Alarm Manager Broadcaster" + (",") + "Starting Heart Rate Sensor" + ("\n");       // Data to be logged by the system
+
+            surveyIntent = new Intent (context, HeartRate.class);        // Calls an intent for a new activity
+            surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+            context.startService(surveyIntent);        // Starts the activity specified
+
+            dataLogger = new DataLogger(context, context.getResources().getString(R.string.subdirectory_logs), context.getResources().getString(R.string.sensors), data);        // Makes a new data logger item
             dataLogger.saveData("log");        // Logs the data
         }
     }
