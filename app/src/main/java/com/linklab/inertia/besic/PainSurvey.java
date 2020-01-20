@@ -372,7 +372,7 @@ public class PainSurvey extends WearableActivity
             this.runFollowup.putExtra(getResources().getString(R.string.survey_alarm_key), getResources().getString(R.string.followup_identifier));     // Puts some extra information into the intent service
             this.pendingIntent = PendingIntent.getBroadcast(this, 0, this.runFollowup, 0);     // Initializes a pending intent to be run by the alarm manager
 
-            this.alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + this.followupTime, this.pendingIntent);        // Sets the alarm to run in some specified future time
+            this.alarmManager.set(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime() + this.followupTime, this.pendingIntent);        // Sets the alarm to run in some specified future time
             this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA Scheduled by AlarmManager").append("\n");       // Logs to the system logs
         }
         else        // If the requirement was failed

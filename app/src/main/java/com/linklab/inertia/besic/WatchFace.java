@@ -3,7 +3,6 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-import android.os.Environment;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.content.SharedPreferences;
@@ -13,6 +12,9 @@ import android.os.Vibrator;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.preference.PreferenceManager;
 import android.graphics.PorterDuff;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.os.Environment;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -20,6 +22,7 @@ import android.text.TextPaint;
 import android.content.Intent;
 import android.graphics.Rect;
 
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Objects;
 import java.io.File;
@@ -48,9 +51,13 @@ public class WatchFace extends CanvasWatchFaceService
         private SharedPreferences sharedPreferences;        // Gets a context to the system shared preferences object
         private Map<String, ?> preferenceKeys;      // Creates a map to store key values
         private Vibrator vibrator;      // This is the variable that access the vibrator in the device
+        private Calendar calendar;      // The calendar for the time
         private SystemInformation systemInformation;        // Gets a context to the system information class
+        private AlarmManager alarmManager;      // Initializes the alarm manager of the class
+        private PendingIntent pendingIntent;        // Initializes the pending intents of the class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
         private DataLogger dataLogger, checkEODDate;      // Initializes a datalogger instance
+        private Intent runEndOfDay;     // Initializes the intents of the class
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
@@ -76,6 +83,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
             this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
             this.systemInformation = new SystemInformation();       // Binds the variable to the calls in the class
+            this.alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);     // Sets up the alarm manger
 
             this.startBackground = new Paint.FontMetrics();     // Sets the background of the button
             this.sleepEODEMABackground = new Paint.FontMetrics();       // Sets the background of the sleep/EODEMA button
@@ -94,6 +102,7 @@ public class WatchFace extends CanvasWatchFaceService
 
             this.logHeaders();      // Calls the method to log the headers needed for the files
             this.logInitialSettings();      // Calls the method to log all the items in the settings file
+            this.scheduleEndOfDaySurvey();      // Calls the method to perform the action
 
             this.setUpDefaultValues();      // Calls the method
             this.setUpDefaultColors();      // Calls the method
@@ -209,7 +218,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.sleepEODEMAPaint.getFontMetrics(this.sleepEODEMABackground);       // Sets background
 
             this.startMessage = getResources().getString(R.string.start_string);        // Sets the string of the button
-            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
+            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
 
             this.drawStartButton();      // Calls the method
             this.decideSleepEODEMAButton();      // Calls the method
@@ -307,7 +316,7 @@ public class WatchFace extends CanvasWatchFaceService
         private void reconfigureButtons()
         {
             this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
-            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
+            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
 
             if (this.drawEODEMA && this.checkEODDate.readData() != null && !this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))     // If it is time to draw the end of day ema button
             {
@@ -379,6 +388,8 @@ public class WatchFace extends CanvasWatchFaceService
             {
                 String[][] Files =      // A list of file and their headers to be made
                         {
+                                {getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date"},       // End of day Updater file
+                                {getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), String.valueOf(systemInformation.getSleepMode())},      // SleepMode Updater file
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), getResources().getString(R.string.settings_header)},        // Settings file
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), getResources().getString(R.string.system_header)},        // System response file
                                 {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painactivity), getResources().getString(R.string.painactivity_header)},        // Pain activity file
@@ -395,6 +406,35 @@ public class WatchFace extends CanvasWatchFaceService
                     this.dataLogger.saveData("log");        // Save that data in log mode
                 }
             }
+        }
+
+        /**
+         * Schedules the timer that runs the end of day survey at the intended time. This method sends a broadcast after the specified time to the
+         * AlarmReceiver class allowing the class to decide what to do with the receiver.
+         */
+        private void scheduleEndOfDaySurvey()
+        {
+            this.runEndOfDay = new Intent(getApplicationContext(), AlarmReceiver.class);       // Initializes an intent to be run by the system
+            this.runEndOfDay.putExtra(getResources().getString(R.string.survey_alarm_key), getResources().getString(R.string.endofday_identifier));     // Puts some extra information into the intent service
+            this.pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, this.runEndOfDay, 0);     // Initializes a pending intent to be run by the alarm manager
+
+            this.calendar = Calendar.getInstance();     // Makes an instance of the calendar
+            this.calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_hour", ""))));     // Assigns the hour
+            this.calendar.set(Calendar.MINUTE, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_minute", ""))));        // Assigns the minute
+            this.calendar.set(Calendar.SECOND, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_second", ""))));        // Assigns the seconds
+
+            long startTime = this.calendar.getTimeInMillis();       // Gets the time in milliseconds
+
+            if (System.currentTimeMillis() > startTime)
+            {
+                startTime = startTime + 24*60*60*1000;
+            }
+
+            this.alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, startTime, AlarmManager.INTERVAL_DAY, this.pendingIntent);        // Sets the alarm to run in some specified future time
+
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Successfully set up Alarm for End of Day Survey";       // Data to be logged by the system
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");      // Saves the data in the mode specified
         }
 
         /**
