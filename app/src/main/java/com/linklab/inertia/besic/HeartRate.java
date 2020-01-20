@@ -17,7 +17,6 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
 import java.util.Objects;
-import java.util.TimerTask;
 import java.util.Timer;
 
 public class HeartRate extends Service implements SensorEventListener
@@ -57,19 +56,6 @@ public class HeartRate extends Service implements SensorEventListener
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
-//        this.timer.scheduleAtFixedRate(new TimerTask()
-//        {
-//            @Override
-//            public void run()
-//            {
-//                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Heart Rate Service" + (",") + "Stopping Heart Rate Service";       // Data to be logged by the system
-//                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-//                dataLogger.saveData("log");      // Saves the data in the mode specified
-//
-//                stopSelf();
-//            }
-//        }, 0, this.duration);
-
         return START_NOT_STICKY;        // Returns an integer for the service schedule
     }
 
@@ -104,7 +90,6 @@ public class HeartRate extends Service implements SensorEventListener
     public void onDestroy()
     {
         this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
-//        this.timer.cancel();        // Cancels the timer
 
         this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Heart Rate Service" + (",") + "Killing Heart Rate Service";       // Data to be logged by the system
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
