@@ -56,7 +56,7 @@ public class Accelerometer extends Service implements SensorEventListener
         this.sensorManager.registerListener(this, this.accelerometer, SensorManager.SENSOR_DELAY_UI);       // Sets up the listener rate
 
         this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Accelerometer Service" + (",") + "Starting Accelerometer Service";       // Data to be logged by the system
-        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
         return START_STICKY;        // Returns an integer for the service schedule
@@ -104,7 +104,7 @@ public class Accelerometer extends Service implements SensorEventListener
                 @Override
                 public void run()
                 {
-                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_accelerometer), getResources().getString(R.string.accelerometer), stringBuilder2.toString());       // Sets up the items to be logged
+                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.accelerometer), stringBuilder2.toString());       // Sets up the items to be logged
                     dataLogger.saveData("log");     // Saves the data in the format specified
                 }
             }).start();     // Starts the runnable
@@ -120,7 +120,7 @@ public class Accelerometer extends Service implements SensorEventListener
         this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
 
         this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Accelerometer Service" + (",") + "Killing Accelerometer Service";       // Data to be logged by the system
-        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");      // Saves the data in the mode specified
     }
 
