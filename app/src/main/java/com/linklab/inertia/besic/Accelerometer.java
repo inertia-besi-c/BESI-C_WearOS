@@ -104,7 +104,7 @@ public class Accelerometer extends Service implements SensorEventListener
                 @Override
                 public void run()
                 {
-                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_accelerometer), getResources().getString(R.string.accelerometer), stringBuilder2.toString());       // Sets up the items to be logged
+                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.accelerometer), stringBuilder2.toString());       // Sets up the items to be logged
                     dataLogger.saveData("log");     // Saves the data in the format specified
                 }
             }).start();     // Starts the runnable

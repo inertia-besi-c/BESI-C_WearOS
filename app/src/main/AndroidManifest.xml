@@ -69,6 +69,7 @@
             android:permission="true"
             android:launchMode="singleInstance">
         </service>
+        <service android:name=".Pedometer" />
 
         <receiver
             android:name=".AlarmReceiver"

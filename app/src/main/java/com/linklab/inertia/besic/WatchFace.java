@@ -422,7 +422,7 @@ public class WatchFace extends CanvasWatchFaceService
                 startService(this.accelerometer);       // Automatically starts the service
 
                 this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling Start to Accelerometer Class";       // Data to be logged by the system
-                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_accelerometer), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
             }
         }
