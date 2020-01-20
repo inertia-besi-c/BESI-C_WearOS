@@ -180,16 +180,6 @@ class SystemInformation
         this.sleepMode = sleepMode;        // Sets the variable appropriately
     }
 
-
-    /**
-     * Sets the HR timer of the system
-     * @param runningLevel is the level needed to be changed to
-     */
-    void setHRtimer(boolean runningLevel)
-    {
-        this.HRtimer = runningLevel;        // Sets the variable appropriately
-    }
-
     /**
      * Gets the level
      * @return the level variable value
@@ -242,14 +232,5 @@ class SystemInformation
     boolean getSleepMode()
     {
         return this.sleepMode;      // Returns the value associated with the variable
-    }
-
-    /**
-     * Creates a global access to the timer variable
-     * @return the value associated with the timer
-     */
-    boolean getHRTimer()
-    {
-        return this.HRtimer;      // Returns the value associated with the variable
     }
 }

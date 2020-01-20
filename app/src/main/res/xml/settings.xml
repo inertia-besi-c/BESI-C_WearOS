@@ -462,7 +462,7 @@
                 android:inputType="number"
                 android:key="heartrate_interval"
                 android:title="Interval (seconds)"
-                android:defaultValue="270">
+                android:defaultValue="300">
             </EditTextPreference>
         </PreferenceScreen>
 

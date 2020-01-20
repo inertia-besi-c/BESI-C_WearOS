@@ -69,7 +69,7 @@ public class WatchFace extends CanvasWatchFaceService
         private boolean drawEODEMA, eodemaAlreadyExecuted;      // Sets up all the boolean to be run on the system
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
-                startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel;       // Sets up integer variables.
+                startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel, heartrateInterval;       // Sets up integer variables.
 
         /**
          * This method is called when the service of the watch face is called for the first time.
@@ -112,6 +112,28 @@ public class WatchFace extends CanvasWatchFaceService
 
             this.setUpDefaultValues();      // Calls the method
             this.setUpDefaultColors();      // Calls the method
+            this.startAllServices();        // Calls the method
+
+            this.heartrateInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("heartrate_interval", ""))) * 1000;
+            this.heartrateTimer = new Timer();      // Assigns a new timer
+            this.heartrateTimer.scheduleAtFixedRate(new TimerTask()         // Schedules the timer to run once
+            {
+                /**
+                 * The following is called to run
+                 */
+                @Override
+                public void run()
+                {
+                    if(!isRunning(HeartRate.class))     // Checks if the service is already running, if it is not
+                    {
+                        startService(heartrate);        // Starts the heart rate service class
+
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Heart Rate Class";       // Data to be logged by the system
+                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                        dataLogger.saveData("log");      // Saves the data in the mode specified
+                    }
+                }
+            }, 0, this.heartrateInterval);      // Repeats at the specified interval
 
             this.invalidate();       // Refreshes the screen.
         }
@@ -125,11 +147,6 @@ public class WatchFace extends CanvasWatchFaceService
         public void onDraw(Canvas canvas, Rect bounds)
         {
             super.onDraw(canvas, bounds);       // Calls a drawing instance.
-
-            if (!this.systemInformation.getHRTimer())        // Checks if the timers are running
-            {
-                this.startAllServices();        // Calls the method
-            }
 
             this.setUpDefaultValues();      // Sets up the values on the UI.
             this.setUpDefaultColors();      // Sets up the colors on the UI.
@@ -450,30 +467,26 @@ public class WatchFace extends CanvasWatchFaceService
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
             }
 
-            if(!isRunning(HeartRate.class))     // Checks if the service is already running, if it is not
-            {
-                this.heartrateTimer = new Timer();      // Assigns a new timer
-                this.heartrateTimer.schedule(new TimerTask()         // Schedules the timer to run once
-                {
-                    /**
-                     * The following is called to run
-                     */
-                    @Override
-                    public void run()
-                    {
-                        systemInformation.setHRtimer(true);       // Sets the timer variable
-                        startService(heartrate);        // Starts the heart rate service class
-
-                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Heart Rate Class";       // Data to be logged by the system
-                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-                        dataLogger.saveData("log");      // Saves the data in the mode specified
-
-                        heartrateTimer.cancel();        // Cancels the timer
-                        heartrateTimer.purge();     // Removes the timer from the system
-                        systemInformation.setHRtimer(false);        // Sets the timer to be false in the information class
-                    }
-                }, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("heartrate_interval", ""))) * 1000);      // Repeats at the specified interval
-            }
+//            this.heartrateInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("heartrate_interval", ""))) * 1000;
+//            this.heartrateTimer = new Timer();      // Assigns a new timer
+//            this.heartrateTimer.schedule(new TimerTask()         // Schedules the timer to run once
+//            {
+//                /**
+//                 * The following is called to run
+//                 */
+//                @Override
+//                public void run()
+//                {
+//                    if(!isRunning(HeartRate.class))     // Checks if the service is already running, if it is not
+//                    {
+//                        startService(heartrate);        // Starts the heart rate service class
+//
+//                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Heart Rate Class";       // Data to be logged by the system
+//                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+//                        dataLogger.saveData("log");      // Saves the data in the mode specified
+//                    }
+//                }
+//            }, 0, this.heartrateInterval);      // Repeats at the specified interval
         }
 
         /**
