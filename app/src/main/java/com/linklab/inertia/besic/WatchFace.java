@@ -3,6 +3,7 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+import android.app.ActivityManager;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.content.SharedPreferences;
@@ -57,7 +58,7 @@ public class WatchFace extends CanvasWatchFaceService
         private PendingIntent pendingIntent;        // Initializes the pending intents of the class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
         private DataLogger dataLogger, checkEODDate;      // Initializes a datalogger instance
-        private Intent runEndOfDay;     // Initializes the intents of the class
+        private Intent runEndOfDay, accelerometer;     // Initializes the intents of the class
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
@@ -106,6 +107,7 @@ public class WatchFace extends CanvasWatchFaceService
 
             this.setUpDefaultValues();      // Calls the method
             this.setUpDefaultColors();      // Calls the method
+            this.startAllServices();        // Calls the method
 
             this.invalidate();       // Refreshes the screen.
         }
@@ -390,6 +392,7 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                                 {getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date"},       // End of day Updater file
                                 {getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), String.valueOf(systemInformation.getSleepMode())},      // SleepMode Updater file
+                                {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.accelerometer), getResources().getString(R.string.accelerometer_header)},      // Accelerometer file
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), getResources().getString(R.string.settings_header)},        // Settings file
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), getResources().getString(R.string.system_header)},        // System response file
                                 {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painactivity), getResources().getString(R.string.painactivity_header)},        // Pain activity file
@@ -405,6 +408,22 @@ public class WatchFace extends CanvasWatchFaceService
                     this.dataLogger = new DataLogger(getApplicationContext(), file[0], file[1], file[2]);       // Make a specified data to the file
                     this.dataLogger.saveData("log");        // Save that data in log mode
                 }
+            }
+        }
+
+        /**
+         * This method starts all the sensors that is needed to run for the application
+         */
+        private void startAllServices()
+        {
+            this.accelerometer = new Intent(getBaseContext(), Accelerometer.class);     // Sets up the intent to start the service
+            if(!isRunning(Accelerometer.class))     // Checks if the service is already running, if it is not
+            {
+                startService(this.accelerometer);       // Automatically starts the service
+
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling Start to Accelerometer Class";       // Data to be logged by the system
+                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_accelerometer), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+                this.dataLogger.saveData("log");      // Saves the data in the mode specified
             }
         }
 
@@ -465,6 +484,24 @@ public class WatchFace extends CanvasWatchFaceService
             {
                 this.startPaint.setColor(Color.DKGRAY);     // Sets color to this level
             }
+        }
+
+        /**
+         * Checks if a given service is currently running or not
+         * @param serviceClass is the service class to be checked
+         * @return a boolean true or false
+         */
+        private boolean isRunning(Class<?> serviceClass)        // A general file that checks if a system is running.
+        {
+            ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);     // Starts the activity manager to check the service called.
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))        // For each service called by the running service.
+            {
+                if (serviceClass.getName().equals(service.service.getClassName()))      // It checks if it is running.
+                {
+                    return true;        // Returns true
+                }
+            }
+            return false;       // If not, it returns false.
         }
 
         /**

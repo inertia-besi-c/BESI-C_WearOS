@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.linklab.inertia.besic">
 
@@ -28,10 +29,6 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <service
-            android:name=".Accelerometer"
-            android:enabled="true"
-            android:exported="true"></service>
 
         <meta-data
             android:name="com.google.android.wearable.standalone"
@@ -65,18 +62,28 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".Accelerometer"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true"
+            android:launchMode="singleInstance">
+        </service>
+
         <receiver
             android:name=".AlarmReceiver"
             android:directBootAware="true"
             android:enabled="true"
             android:exported="true"
-            android:permission="true"></receiver>
+            android:permission="true">
+        </receiver>
 
         <activity
             android:name=".DataLogger"
             android:icon="@mipmap/besic_logo_round"
             android:label="@string/datalogger_name"
-            android:launchMode="singleInstance"></activity>
+            android:launchMode="singleInstance">
+        </activity>
         <activity
             android:name=".MainActivity"
             android:icon="@mipmap/besic_logo_round"

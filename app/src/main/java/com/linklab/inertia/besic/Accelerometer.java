@@ -25,28 +25,13 @@ public class Accelerometer extends Service implements SensorEventListener
     private SensorManager sensorManager;        // Initializes a listener
     private SharedPreferences sharedPreferences;        // Initializes a shared preference variable
     private Sensor accelerometer;       // Sets a accelerometer sensor
-    private String linearx, lineary, linearz;       // Sets up the string of the class
+    private String linearx, lineary, linearz, data;       // Sets up the string of the class
     private DataLogger dataLogger;      // Sets the datalogger variable
     private SystemInformation systemInformation;        // Sets a system preference variable
     private DecimalFormat decimalFormat;        // Initializes a decimal formatter
     private StringBuilder stringBuilder1, stringBuilder2;       // Sets up the string builder variables
     private int currentCount;       // Sets up the integers of the class
     private double[] accelerometer_data;        // Sets up a list of doubles
-
-    /**
-     * The constructor for the class.
-     * This is called when the class is run for the first time
-     */
-    public Accelerometer()
-    {
-        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Sets up the shared preference
-        this.decimalFormat = new DecimalFormat("#.####");       // Sets up the decimal formatter
-        this.systemInformation = new SystemInformation();       // Sets up the system information
-        this.stringBuilder1 = new StringBuilder();      // Sets up a string builder
-        this.stringBuilder2 = new StringBuilder();      // Sets up a string builder
-
-        this.currentCount = 0;      // Sets up a variable
-    }
 
     /**
      * This method is called as soon as the sensor is called to start
@@ -58,9 +43,21 @@ public class Accelerometer extends Service implements SensorEventListener
     @Override
     public int onStartCommand(Intent intent, int flags, int startID)
     {
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Sets up the shared preference
+        this.decimalFormat = new DecimalFormat("#.####");       // Sets up the decimal formatter
+        this.systemInformation = new SystemInformation();       // Sets up the system information
+        this.stringBuilder1 = new StringBuilder();      // Sets up a string builder
+        this.stringBuilder2 = new StringBuilder();      // Sets up a string builder
+
+        this.currentCount = 0;      // Sets up a variable
+
         this.sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);      // Sets up the sensor service
         this.accelerometer = this.sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);        // Sets up the type of sensor
         this.sensorManager.registerListener(this, this.accelerometer, SensorManager.SENSOR_DELAY_UI);       // Sets up the listener rate
+
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Accelerometer Service" + (",") + "Starting Accelerometer Service";       // Data to be logged by the system
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+        this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
         return START_STICKY;        // Returns an integer for the service schedule
     }
@@ -87,7 +84,8 @@ public class Accelerometer extends Service implements SensorEventListener
                 this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," +          // Starts a new string line.
                         this.linearx + "," +         // Acceleration value on x-axis
                         this.lineary + "," +         // Acceleration value on y-axis
-                        this.linearz;        // Acceleration value on z-axis
+                        this.linearz + "," +         // Acceleration value on z-axis
+                        this.systemInformation.getBatteryLevel(getApplicationContext());        // Adds the battery level information to the file
 
         stringBuilder1.append(accelerometerValues);      // Appends the values to the string builder
         stringBuilder1.append("\n");     // Makes a new line
@@ -120,6 +118,10 @@ public class Accelerometer extends Service implements SensorEventListener
     public void onDestroy()
     {
         this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
+
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Accelerometer Service" + (",") + "Killing Accelerometer Service";       // Data to be logged by the system
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+        this.dataLogger.saveData("log");      // Saves the data in the mode specified
     }
 
     /**
