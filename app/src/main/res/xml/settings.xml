@@ -458,11 +458,11 @@
             <!-- A text input is initialized for the waiting interval -->
             <EditTextPreference
                 android:dialogTitle="Heart Rate Interval"
-                android:dialogMessage="How often should a Heart Rate Measurement be taken (seconds)?"
+                android:dialogMessage="How long should the wait between measurements be (seconds)?"
                 android:inputType="number"
                 android:key="heartrate_interval"
                 android:title="Interval (seconds)"
-                android:defaultValue="300">
+                android:defaultValue="270">
             </EditTextPreference>
         </PreferenceScreen>
 
