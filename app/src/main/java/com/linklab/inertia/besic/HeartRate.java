@@ -80,7 +80,7 @@ public class HeartRate extends SensorTimer implements SensorEventListener
     @Override
     public void onSensorChanged(SensorEvent event)
     {
-        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + event.values[0] + (",") + event.accuracy + (",") + this.systemInformation.getBatteryLevel(getApplicationContext());       // Data to be logged
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + event.values[0] + (",") + event.accuracy + (",") + this.systemInformation.getBatteryLevel(getApplicationContext()) + (",") + this.systemInformation.isCharging(getApplicationContext());      // Data to be logged
 
         new Thread(new Runnable()       // Sets a runnable thread
         {

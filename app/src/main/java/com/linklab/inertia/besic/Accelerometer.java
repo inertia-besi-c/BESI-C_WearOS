@@ -80,11 +80,12 @@ public class Accelerometer extends SensorTimer implements SensorEventListener
         this.linearz = this.decimalFormat.format(this.accelerometer_data[2]);     // Limits the length of the z-axis value to 4 digits
 
         final String accelerometerValues =      // Shows the values in a string.
-                this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," +          // Starts a new string line.
-                        this.linearx + "," +         // Acceleration value on x-axis
-                        this.lineary + "," +         // Acceleration value on y-axis
-                        this.linearz + "," +         // Acceleration value on z-axis
-                        this.systemInformation.getBatteryLevel(getApplicationContext());        // Adds the battery level information to the file
+                this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") +          // Starts a new string line.
+                        this.linearx + (",") +         // Acceleration value on x-axis
+                        this.lineary + (",") +         // Acceleration value on y-axis
+                        this.linearz + (",") +         // Acceleration value on z-axis
+                        this.systemInformation.getBatteryLevel(getApplicationContext()) + (",") +       // Adds the battery level information to the file
+                        this.systemInformation.isCharging(getApplicationContext());     // Adds the charging status to the file
 
         stringBuilder1.append(accelerometerValues);      // Appends the values to the string builder
         stringBuilder1.append("\n");     // Makes a new line
