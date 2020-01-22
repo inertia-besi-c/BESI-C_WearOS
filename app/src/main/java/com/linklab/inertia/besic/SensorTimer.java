@@ -63,11 +63,13 @@ public class SensorTimer extends Service
 
                         data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Time Service" + (",") + "Calling to Start the HeartRate Class";       // Data to be logged by the system
                         dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                        dataLogger.saveData("log");      // Saves the data in the mode specified
                     }
                     else    // If the if statement fails
                     {
                         data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Time Service" + (",") + "Already running the HeartRate Class";       // Data to be logged by the system
                         dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                        dataLogger.saveData("log");      // Saves the data in the mode specified
                     }
                 }
             }, 0, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("heartrate_interval", ""))) * 1000);     // Repeats at the specified interval
@@ -78,9 +80,8 @@ public class SensorTimer extends Service
 
             data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Time Service" + (",") + "Calling to Stop the HeartRate Class";       // Data to be logged by the system
             dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+            dataLogger.saveData("log");      // Saves the data in the mode specified
         }
-
-        this.dataLogger.saveData("log");      // Saves the data in the mode specified
     }
 
     private void startEstimote(boolean runMode)
