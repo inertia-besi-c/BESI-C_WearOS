@@ -5,30 +5,87 @@ package com.linklab.inertia.besic;
  */
 import android.content.Context;
 import android.app.Service;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.app.ActivityManager;
 import android.content.Intent;
+import android.preference.PreferenceManager;
+
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * This class is responsible for the starting and stopping of certain sensors in the application. This class is extended from by the
- * sensors that need the integration.
+ * sensors that need the integration. All sensors in the application are responsible for stopping themselves if they are on a duty cycle,
+ * however, if needed to be ended, the individual class can be stopped.
  */
 public class SensorTimer extends Service
 {
+    private SharedPreferences sharedPreferences;        // Access the shared preferences of the system
     private Intent accelerometer, pedometer, heartrate, estimote;     // Initializes the intents of the class
     private SystemInformation systemInformation;        // Initializes the system information class
     private DataLogger dataLogger;      // Sets up the datalogger class
+    private Timer heartrateTimer;
     private String data;        // Initializes the string variables
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         this.systemInformation = new SystemInformation();       // Sets up an instance of the class
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());       // Gets the default preferences of this application
 
-        this.startPedometer(true);      // Calls the method
+        this.startPedometer();      // Calls the method
         this.startAccelerometer(true);      // Calls the method
+        this.startHeartRate(true);      // Calls the method
 
-        return START_STICKY;
+        return START_STICKY;        // Allows the service to be run outside the context of the application
+    }
+
+    private void startHeartRate(boolean runMode)
+    {
+        this.heartrate = new Intent(getBaseContext(), HeartRate.class);     // Gets an intent on the specified class
+
+        if (runMode)        // Checks if the sensor is wanted to run
+        {
+            this.heartrateTimer = new Timer();      // Sets up a timer for the heartrate sensor
+            this.heartrateTimer.schedule(new TimerTask()        // Schedules the timer
+            {
+                /**
+                 * The following is called to run
+                 */
+                @Override
+                public void run()
+                {
+                    if (!isRunning(HeartRate.class))        // If the heartrate class is not running
+                    {
+                        startService(heartrate);        // Starts the heartrate class;
+
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Time Service" + (",") + "Calling to Start the HeartRate Class";       // Data to be logged by the system
+                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                    }
+                    else    // If the if statement fails
+                    {
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Time Service" + (",") + "Already running the HeartRate Class";       // Data to be logged by the system
+                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                    }
+                }
+            }, 0, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("heartrate_interval", ""))) * 1000);     // Repeats at the specified interval
+        }
+        else        // If it is not wanted to run
+        {
+            stopService(this.heartrate);        // Stops the sensor from running
+
+            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Time Service" + (",") + "Calling to Stop the HeartRate Class";       // Data to be logged by the system
+            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+        }
+
+        this.dataLogger.saveData("log");      // Saves the data in the mode specified
+    }
+
+    private void startEstimote(boolean runMode)
+    {
+        // Not implemented yet
     }
 
     /**
@@ -50,10 +107,10 @@ public class SensorTimer extends Service
     /**
      * This method starts the pedometer sensor
      */
-    private void startPedometer(boolean runMode)
+    private void startPedometer()
     {
         this.pedometer = new Intent(getBaseContext(), Pedometer.class);     // Sets up the intent to start the service
-        if(!isRunning(Pedometer.class) && runMode)     // Checks if the service is already running, if it is not
+        if(!isRunning(Pedometer.class))     // Checks if the service is already running, if it is not
         {
             startService(this.pedometer);       // Automatically starts the service
 
@@ -63,14 +120,22 @@ public class SensorTimer extends Service
         }
     }
 
-    private void startHeartRate(boolean runMode)
+    /**
+     * This method is called if the class is to be killed for some reason
+     */
+    @Override
+    public void onDestroy()
     {
-        // Not implemented yet
-    }
+        this.heartrateTimer.cancel();       // Cancels the timer
 
-    private void startEstimote(boolean runMode)
-    {
+        if (isRunning(HeartRate.class))     // if the specified class is running
+        {
+            this.startHeartRate(false);     // Stops the sensor from running
+        }
 
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Timer Service" + (",") + "Stopped Heart Rate Timer and Service";       // Data to be logged by the system
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+        this.dataLogger.saveData("log");      // Saves the data in the mode specified
     }
 
     /**
@@ -91,9 +156,14 @@ public class SensorTimer extends Service
         return false;       // If not, it returns false.
     }
 
+    /**
+     * Unknown method implementation needed to run
+     * @param intent is the intent of the service
+     * @return unknown.
+     */
     @Override
     public IBinder onBind(Intent intent)
     {
-        return null;
+        throw new UnsupportedOperationException("Not yet implemented");     // Message about an error
     }
 }
