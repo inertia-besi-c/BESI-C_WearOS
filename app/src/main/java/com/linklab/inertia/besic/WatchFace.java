@@ -27,8 +27,6 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.Objects;
 import java.io.File;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * On Android Wear Watch Face is implemented as a service. This is being used by the application to save resources by giving them to the android system to configure.
@@ -60,8 +58,7 @@ public class WatchFace extends CanvasWatchFaceService
         private PendingIntent pendingIntent;        // Initializes the pending intents of the class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
         private DataLogger dataLogger, checkEODDate;      // Initializes a datalogger instance
-        private Intent alarmIntent, accelerometer, pedometer, heartrate;     // Initializes the intents of the class
-        private Timer heartrateTimer;        // Initializes the timer of the application
+        private Intent alarmIntent, accelerometer, pedometer, timerIntent;     // Initializes the intents of the class
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
@@ -69,7 +66,7 @@ public class WatchFace extends CanvasWatchFaceService
         private boolean drawEODEMA, eodemaAlreadyExecuted;      // Sets up all the boolean to be run on the system
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
-                startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel, heartrateInterval;       // Sets up integer variables.
+                startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel;       // Sets up integer variables.
 
         /**
          * This method is called when the service of the watch face is called for the first time.
@@ -114,7 +111,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.setUpDefaultColors();      // Calls the method
             this.startPedometer();      // Calls the method
             this.startAccelerometer();        // Calls the method
-            this.startHeartRate();      // Calls the method
+            this.startSensorTimers();      // Calls the method
 
             this.invalidate();       // Refreshes the screen.
         }
@@ -454,32 +451,19 @@ public class WatchFace extends CanvasWatchFaceService
         }
 
         /**
-         * This method starts the heartrate sensor and keeps a repeated instance
+         * This method starts the timerIntent sensor and keeps a repeated instance
          */
-        private void startHeartRate()
+        private void startSensorTimers()
         {
-            this.heartrate = new Intent(getBaseContext(), HeartRate.class);     // Sets up the intent for the service
-            this.heartrateInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("heartrate_interval", ""))) * 1000;        // Sets the value for the interval
-
-            this.heartrateTimer = new Timer();      // Assigns a new timer
-            this.heartrateTimer.scheduleAtFixedRate(new TimerTask()         // Schedules the timer to run once
+            this.timerIntent = new Intent(getBaseContext(), SensorTimer.class);     // Sets up the intent for the service
+            if(!isRunning(SensorTimer.class))     // Checks if the service is already running, if it is not
             {
-                /**
-                 * The following is called to run
-                 */
-                @Override
-                public void run()
-                {
-                    if(!isRunning(HeartRate.class))     // Checks if the service is already running, if it is not
-                    {
-                        startService(heartrate);        // Starts the heart rate service class
+                startService(this.timerIntent);       // Automatically starts the service
 
-                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Heart Rate Class";       // Data to be logged by the system
-                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-                        dataLogger.saveData("log");      // Saves the data in the mode specified
-                    }
-                }
-            }, 0, this.heartrateInterval);      // Repeats at the specified interval
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Timer Controller Class";       // Data to be logged by the system
+                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+                this.dataLogger.saveData("log");      // Saves the data in the mode specified
+            }
         }
 
         /**

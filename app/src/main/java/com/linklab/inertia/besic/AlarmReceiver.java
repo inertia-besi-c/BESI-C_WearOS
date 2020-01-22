@@ -23,7 +23,7 @@ public class AlarmReceiver extends BroadcastReceiver
     {
         SystemInformation systemInformation;        // sets a system information variable
         DataLogger dataLogger, checkEODDate;      // Sets a datalogger variable
-        String KEY, data, followupValue, endOfDayValue, heartRateValue;      // Sets up the string variable for the identifiers
+        String KEY, data, followupValue, endOfDayValue;      // Sets up the string variable for the identifiers
         Intent surveyIntent;        // Sets the intents for the broadcast receiver
 
         KEY = intent.getStringExtra(context.getResources().getString(R.string.survey_alarm_key));        // Gets the key identifier from the resource file

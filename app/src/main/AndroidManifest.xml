@@ -71,6 +71,7 @@
         </service>
         <service android:name=".Pedometer" />
         <service android:name=".HeartRate" />
+        <service android:name=".SensorTimer" />
 
         <receiver
             android:name=".AlarmReceiver"
