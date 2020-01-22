@@ -3,7 +3,6 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-import android.app.Service;
 import android.content.SharedPreferences;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
@@ -17,7 +16,13 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class HeartRate extends Service implements SensorEventListener
+/**
+ * This class is made to run the heart rate sensor for the application. This class is set to duty cycle meaning it will
+ * stop running after a certain time and restart when the SensorTimer class class it to start up again.
+ *
+ * This class is a child a subclass of the SensorTimer superclass
+ */
+public class HeartRate extends SensorTimer implements SensorEventListener
 {
     private SharedPreferences sharedPreferences;        // Initializes the preference item
     private SensorManager sensorManager;        // Initializes a listener

@@ -6,7 +6,6 @@ package com.linklab.inertia.besic;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
-import android.app.Service;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,7 +14,7 @@ import android.hardware.SensorEvent;
  * This class is used to detect user steps. This service should not be killed at any time during the lifecycle of
  * this application. If it is killed, it should automatically restart itself.
  */
-public class Pedometer extends Service implements SensorEventListener
+public class Pedometer extends SensorTimer implements SensorEventListener
 {
     private SensorManager sensorManager;        // Initializes a listener
     private Sensor pedometer;       // Sets a accelerometer sensor

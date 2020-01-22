@@ -58,7 +58,7 @@ public class WatchFace extends CanvasWatchFaceService
         private PendingIntent pendingIntent;        // Initializes the pending intents of the class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
         private DataLogger dataLogger, checkEODDate;      // Initializes a datalogger instance
-        private Intent alarmIntent, accelerometer, pedometer, timerIntent;     // Initializes the intents of the class
+        private Intent alarmIntent, timerIntent;     // Initializes the intents of the class
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
@@ -105,12 +105,9 @@ public class WatchFace extends CanvasWatchFaceService
             this.logHeaders();      // Calls the method to log the headers needed for the files
             this.logInitialSettings();      // Calls the method to log all the items in the settings file
             this.scheduleEndOfDaySurvey();      // Calls the method to perform the action
-            this.startAccelerometer();        // Calls the method
 
             this.setUpDefaultValues();      // Calls the method
             this.setUpDefaultColors();      // Calls the method
-            this.startPedometer();      // Calls the method
-            this.startAccelerometer();        // Calls the method
             this.startSensorTimers();      // Calls the method
 
             this.invalidate();       // Refreshes the screen.
@@ -419,38 +416,6 @@ public class WatchFace extends CanvasWatchFaceService
         }
 
         /**
-         * This method starts the accelerometer sensor
-         */
-        private void startAccelerometer()
-        {
-            this.accelerometer = new Intent(getBaseContext(), Accelerometer.class);     // Sets up the intent to start the service
-            if(!isRunning(Accelerometer.class))     // Checks if the service is already running, if it is not
-            {
-                startService(this.accelerometer);       // Automatically starts the service
-
-                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Accelerometer Class";       // Data to be logged by the system
-                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
-                this.dataLogger.saveData("log");      // Saves the data in the mode specified
-            }
-        }
-
-        /**
-         * This method starts the pedometer sensor
-         */
-        private void startPedometer()
-        {
-            this.pedometer = new Intent(getBaseContext(), Pedometer.class);     // Sets up the intent to start the service
-            if(!isRunning(Pedometer.class))     // Checks if the service is already running, if it is not
-            {
-                startService(this.pedometer);       // Automatically starts the service
-
-                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Pedometer Class";       // Data to be logged by the system
-                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
-                this.dataLogger.saveData("log");      // Saves the data in the mode specified
-            }
-        }
-
-        /**
          * This method starts the timerIntent sensor and keeps a repeated instance
          */
         private void startSensorTimers()
@@ -535,6 +500,7 @@ public class WatchFace extends CanvasWatchFaceService
          * @param serviceClass is the service class to be checked
          * @return a boolean true or false
          */
+        @SuppressWarnings("ALL")        // Suppresses the warnings associated with this method
         private boolean isRunning(Class<?> serviceClass)        // A general file that checks if a system is running.
         {
             ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);     // Starts the activity manager to check the service called.

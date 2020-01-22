@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
-import android.app.Service;
 import android.preference.PreferenceManager;
 import android.hardware.SensorEvent;
 import android.hardware.Sensor;
@@ -20,7 +19,7 @@ import java.util.Objects;
  * This class is responsible for the gathering and logging of the accelerometer data obtained from the wearable device.
  * This class is designed to run for the duration of the application's cycle with no sort of modulation.
  */
-public class Accelerometer extends Service implements SensorEventListener
+public class Accelerometer extends SensorTimer implements SensorEventListener
 {
     private SensorManager sensorManager;        // Initializes a listener
     private SharedPreferences sharedPreferences;        // Initializes a shared preference variable
