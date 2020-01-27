@@ -7,13 +7,13 @@ import android.content.Context;
 import android.app.Service;
 import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.app.ActivityManager;
 import android.content.Intent;
-import android.preference.PreferenceManager;
 
+import java.util.TimerTask;
 import java.util.Objects;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * This class is responsible for the starting and stopping of certain sensors in the application. This class is extended from by the
@@ -26,7 +26,7 @@ public class SensorTimer extends Service
     private Intent accelerometer, pedometer, heartrate, estimote;     // Initializes the intents of the class
     private SystemInformation systemInformation;        // Initializes the system information class
     private DataLogger dataLogger;      // Sets up the datalogger class
-    private Timer heartrateTimer;
+    private Timer heartrateTimer;       // Sets the timers for the class
     private String data;        // Initializes the string variables
 
     @Override
