@@ -6,7 +6,6 @@ package com.linklab.inertia.besic;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
-import android.app.Service;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,7 +14,7 @@ import android.hardware.SensorEvent;
  * This class is used to detect user steps. This service should not be killed at any time during the lifecycle of
  * this application. If it is killed, it should automatically restart itself.
  */
-public class Pedometer extends Service implements SensorEventListener
+public class Pedometer extends SensorTimer implements SensorEventListener
 {
     private SensorManager sensorManager;        // Initializes a listener
     private Sensor pedometer;       // Sets a accelerometer sensor
@@ -53,7 +52,7 @@ public class Pedometer extends Service implements SensorEventListener
     @Override
     public void onSensorChanged(SensorEvent event)
     {
-        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + event.values[0] + (",") + event.accuracy + (",") + this.systemInformation.getBatteryLevel(getApplicationContext());       // Data to be logged
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + event.values[0] + (",") + event.accuracy + (",") + this.systemInformation.getBatteryLevel(getApplicationContext()) + (",") + this.systemInformation.isCharging(getApplicationContext());       // Data to be logged
 
         new Thread(new Runnable()       // Sets a runnable thread
             {
@@ -76,11 +75,12 @@ public class Pedometer extends Service implements SensorEventListener
     @Override
     public void onDestroy()
     {
-        this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
-
         this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pedometer Service" + (",") + "Killing Pedometer Service";       // Data to be logged by the system
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");      // Saves the data in the mode specified
+
+        this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
+        super.onDestroy();          // Calls the higher on destroy function
     }
 
     /**

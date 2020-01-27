@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
-import android.app.Service;
 import android.preference.PreferenceManager;
 import android.hardware.SensorEvent;
 import android.hardware.Sensor;
@@ -20,7 +19,7 @@ import java.util.Objects;
  * This class is responsible for the gathering and logging of the accelerometer data obtained from the wearable device.
  * This class is designed to run for the duration of the application's cycle with no sort of modulation.
  */
-public class Accelerometer extends Service implements SensorEventListener
+public class Accelerometer extends SensorTimer implements SensorEventListener
 {
     private SensorManager sensorManager;        // Initializes a listener
     private SharedPreferences sharedPreferences;        // Initializes a shared preference variable
@@ -81,11 +80,12 @@ public class Accelerometer extends Service implements SensorEventListener
         this.linearz = this.decimalFormat.format(this.accelerometer_data[2]);     // Limits the length of the z-axis value to 4 digits
 
         final String accelerometerValues =      // Shows the values in a string.
-                this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," +          // Starts a new string line.
-                        this.linearx + "," +         // Acceleration value on x-axis
-                        this.lineary + "," +         // Acceleration value on y-axis
-                        this.linearz + "," +         // Acceleration value on z-axis
-                        this.systemInformation.getBatteryLevel(getApplicationContext());        // Adds the battery level information to the file
+                this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") +          // Starts a new string line.
+                        this.linearx + (",") +         // Acceleration value on x-axis
+                        this.lineary + (",") +         // Acceleration value on y-axis
+                        this.linearz + (",") +         // Acceleration value on z-axis
+                        this.systemInformation.getBatteryLevel(getApplicationContext()) + (",") +       // Adds the battery level information to the file
+                        this.systemInformation.isCharging(getApplicationContext());     // Adds the charging status to the file
 
         stringBuilder1.append(accelerometerValues);      // Appends the values to the string builder
         stringBuilder1.append("\n");     // Makes a new line
@@ -117,11 +117,13 @@ public class Accelerometer extends Service implements SensorEventListener
     @Override
     public void onDestroy()
     {
-        this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
-
         this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Accelerometer Service" + (",") + "Killing Accelerometer Service";       // Data to be logged by the system
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");      // Saves the data in the mode specified
+
+        this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
+
+        super.onDestroy();          // Calls the higher on destroy function
     }
 
     /**
