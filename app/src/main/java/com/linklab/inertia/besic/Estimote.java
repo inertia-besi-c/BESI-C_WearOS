@@ -4,11 +4,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.estimote.coresdk.observation.region.RegionUtils;
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
 import com.estimote.coresdk.service.BeaconManager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
@@ -24,7 +22,6 @@ public class Estimote extends SensorTimer
     private SystemInformation systemInformation;        // Sets a system preference variable
     private BeaconManager beaconManager;        // This is the beacon manager
     private BeaconRegion beaconRegion;      // The region to be observed
-    private ArrayList<Beacon> beaconArrayList;      // An array list of all the beacons
 
     /**
      * This method is called as soon as the sensor is called to start
@@ -67,8 +64,7 @@ public class Estimote extends SensorTimer
 
     public void startRanging()
     {
-        this.beaconArrayList = new ArrayList<>();
-        this.beaconManager = new BeaconManager(this);
+        this.beaconManager = new BeaconManager(getApplicationContext());
         this.beaconRegion = new BeaconRegion("ranged region", UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), null, null);
 
         this.beaconManager.connect(new BeaconManager.ServiceReadyCallback()
@@ -79,22 +75,21 @@ public class Estimote extends SensorTimer
                 beaconManager.startRanging(beaconRegion);
             }
         });
-
-        this.beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener() {
+        this.beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener()
+        {
             @Override
-            public void onBeaconsDiscovered(BeaconRegion beaconRegion, List<com.estimote.coresdk.recognition.packets.Beacon> beacons) {
-                if(!beaconArrayList.isEmpty())
-                {
-                    int beaconsFound = 0;
-                    for (Beacon beacon : beaconArrayList)
-                    {
-                        beaconArrayList.add(new Beacon(beaconsFound++, beaconArrayList.size(), beacon.getRssi(), RegionUtils.computeAccuracy(beacon)));
-                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Estimote Service" + (",");       // Data to be logged by the system
-                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-                        dataLogger.saveData("log");      // Saves the data in the mode specified
-                    }
-                }
+            public void onBeaconsDiscovered(BeaconRegion beaconRegion, List<com.estimote.coresdk.recognition.packets.Beacon> beacons)
+            {
+                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Estimote Service" + (",") + beaconRegion.getIdentifier() + (",") + beaconRegion.getMajor() + (",") + beaconRegion.getMinor() + (",") + beaconRegion.getProximityUUID();       // Data to be logged by the system
+                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.estimote), data);      // Sets a new datalogger variable
+                dataLogger.saveData("log");      // Saves the data in the mode specified
             }
         });
+    }
+    @Override
+    public void onDestroy()
+    {
+        this.beaconManager.stopRanging(beaconRegion);
+        this.stopForeground(true);
     }
 }
