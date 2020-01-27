@@ -88,7 +88,13 @@
             android:permission="true"
             android:launchMode="singleInstance">
         </service>
-        
+        <service android:name=".Estimote"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true"
+            android:launchMode="singleInstance">
+        </service>
+
         <receiver
             android:name=".AlarmReceiver"
             android:directBootAware="true"
