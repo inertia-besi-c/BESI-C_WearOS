@@ -26,7 +26,7 @@ public class SensorTimer extends Service
     private Intent accelerometer, pedometer, heartrate, estimote;     // Initializes the intents of the class
     private SystemInformation systemInformation;        // Initializes the system information class
     private DataLogger dataLogger;      // Sets up the datalogger class
-    private Timer heartrateTimer;       // Sets the timers for the class
+    private Timer heartrateTimer, estimoteTimer;       // Sets the timers for the class
     private String data;        // Initializes the string variables
 
     @Override
@@ -38,6 +38,7 @@ public class SensorTimer extends Service
         this.startPedometer();      // Calls the method
         this.startAccelerometer(true);      // Calls the method
         this.startHeartRate(true);      // Calls the method
+        this.startEstimote(true);       // Calls the method
 
         return START_STICKY;        // Allows the service to be run outside the context of the application
     }
@@ -86,7 +87,44 @@ public class SensorTimer extends Service
 
     private void startEstimote(boolean runMode)
     {
-        // Not implemented yet
+        this.estimote = new Intent(getBaseContext(), Estimote.class);     // Gets an intent on the specified class
+
+        if (runMode)        // Checks if the sensor is wanted to run
+        {
+            this.estimoteTimer = new Timer();      // Sets up a timer for the heartrate sensor
+            this.estimoteTimer.schedule(new TimerTask()        // Schedules the timer
+            {
+                /**
+                 * The following is called to run
+                 */
+                @Override
+                public void run()
+                {
+                    if (!isRunning(Estimote.class))        // If the heartrate class is not running
+                    {
+                        startService(estimote);        // Starts the heartrate class;
+
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Time Service" + (",") + "Calling to Start the Estimote Class";       // Data to be logged by the system
+                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                        dataLogger.saveData("log");      // Saves the data in the mode specified
+                    }
+                    else    // If the if statement fails
+                    {
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Time Service" + (",") + "Already running the Estimote Class";       // Data to be logged by the system
+                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                        dataLogger.saveData("log");      // Saves the data in the mode specified
+                    }
+                }
+            }, 0, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("estimote_interval", ""))) * 1000);     // Repeats at the specified interval
+        }
+        else        // If it is not wanted to run
+        {
+            stopService(this.estimote);        // Stops the sensor from running
+
+            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Time Service" + (",") + "Calling to Stop the Estimote Class";       // Data to be logged by the system
+            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+            dataLogger.saveData("log");      // Saves the data in the mode specified
+        }
     }
 
     /**
@@ -129,14 +167,35 @@ public class SensorTimer extends Service
     {
         this.heartrateTimer.cancel();       // Cancels the timer
 
-        if (isRunning(HeartRate.class))     // if the specified class is running
+        if (isRunning(Accelerometer.class))     // if the specified class is running
         {
-            this.startHeartRate(false);     // Stops the sensor from running
+            this.stopService(this.accelerometer);     // Stops the service
+            this.startAccelerometer(false);     // Stops the sensor from running
+
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Timer Service" + (",") + "Stopped Accelerometer Service";       // Data to be logged by the system
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");      // Saves the data in the mode specified
         }
 
-        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Timer Service" + (",") + "Stopped Heart Rate Timer and Service";       // Data to be logged by the system
-        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
-        this.dataLogger.saveData("log");      // Saves the data in the mode specified
+        if (isRunning(HeartRate.class))     // if the specified class is running
+        {
+            this.stopService(this.heartrate);     // Stops the service
+            this.startHeartRate(false);     // Stops the sensor from running
+
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Timer Service" + (",") + "Stopped Heart Rate Timer and Service";       // Data to be logged by the system
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");      // Saves the data in the mode specified
+        }
+
+        if (isRunning(Estimote.class))     // if the specified class is running
+        {
+            this.stopService(this.estimote);     // Stops the service
+            this.startEstimote(false);     // Stops the sensor from running
+
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Timer Service" + (",") + "Stopped Estimote Timer and Service";       // Data to be logged by the system
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");      // Saves the data in the mode specified
+        }
     }
 
     /**
