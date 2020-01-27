@@ -75,17 +75,25 @@ public class Estimote extends SensorTimer
                 beaconManager.startRanging(beaconRegion);
             }
         });
+
         this.beaconManager.setRangingListener(new BeaconManager.BeaconRangingListener()
         {
             @Override
             public void onBeaconsDiscovered(BeaconRegion beaconRegion, List<com.estimote.coresdk.recognition.packets.Beacon> beacons)
             {
-                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Estimote Service" + (",") + beaconRegion.getIdentifier() + (",") + beaconRegion.getMajor() + (",") + beaconRegion.getMinor() + (",") + beaconRegion.getProximityUUID();       // Data to be logged by the system
-                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.estimote), data);      // Sets a new datalogger variable
-                dataLogger.saveData("log");      // Saves the data in the mode specified
+                if (!beacons.isEmpty())
+                {
+                    for (com.estimote.coresdk.recognition.packets.Beacon beacon : beacons)
+                    {
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Estimote Service" + (",") + beacon.getMajor() + (",") + beacon.getMinor() + (",") + beacon.getRssi() + (",") + beacon.getMacAddress() + (",") + ("\n");       // Data to be logged by the system
+                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.estimote), data);      // Sets a new datalogger variable
+                        dataLogger.saveData("log");      // Saves the data in the mode specified
+                    }
+                }
             }
         });
     }
+
     @Override
     public void onDestroy()
     {
