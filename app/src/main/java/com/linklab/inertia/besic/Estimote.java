@@ -95,7 +95,7 @@ public class Estimote extends SensorTimer
                 {
                     for (com.estimote.coresdk.recognition.packets.Beacon beacon : beacons)      // For every beacon in the list
                     {
-                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Estimote Service" + (",") + beacon.getMajor() + (",") + beacon.getMinor() + (",") + beacon.getRssi() + (",") + beacon.getMacAddress() + (",") + ("\n");       // Data to be logged by the system
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + beacon.getMacAddress() + (",") + beacon.getMajor() + (",") + beacon.getMinor() + (",") + beacon.getRssi() + (",") + systemInformation.getBatteryLevel(getApplicationContext()) + (",") + systemInformation.isCharging(getApplicationContext()) + ("\n");       // Data to be logged by the system
                         dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.estimote), data);      // Sets a new datalogger variable
                         dataLogger.saveData("log");      // Saves the data in the mode specified
                     }
