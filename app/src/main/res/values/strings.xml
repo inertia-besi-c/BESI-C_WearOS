@@ -72,6 +72,7 @@
     <string name="accelerometer_header">Date and Time, X-Value, Y-Value, Z-Value, Battery Level, Currently Charging?</string>       <!--Header items for the accelerometer file-->
     <string name="pedometer_header">Date and Time, Value, Accuracy, Battery Level, Currently Charging?</string>      <!--Header items for the pedometer file-->
     <string name="heartrate_header">Date and Time, Value, Accuracy, Battery Level, Currently Charging?</string>      <!--Header items for the heartrate file-->
+    <string name="estimote_header">Date and Time</string>      <!--Header items for the heartrate file-->
     <string name="painactivity_header">Date and Time, Survey Type, Question Index, Verbose Answer, Answer Index</string>        <!--Header for the activity file-->
     <string name="followupactivity_header">Date and Time, Survey Type, Question Index, Verbose Answer, Answer Index</string>        <!--Header for the activity file-->
     <string name="endofdayactivity_header">Date and Time, Survey Type, Question Index, Verbose Answer, Answer Index</string>        <!--Header for the activity file-->

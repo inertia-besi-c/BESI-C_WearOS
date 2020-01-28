@@ -20,6 +20,9 @@ import java.util.Objects;
 import java.util.Locale;
 import java.util.Date;
 
+/**
+ * This class is responsible for the holding and setting of system information items such as the time, battery level and general system status among others.
+ */
 class SystemInformation
 {
     private DateFormat dateTimeFormat;      // Private date format variables
