@@ -70,17 +70,24 @@ public class Pedometer extends SensorTimer implements SensorEventListener
     }
 
     /**
+     * This method is called in the process of killing the service
+     */
+    private void killProcess()
+    {
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pedometer Service" + (",") + "Killing Pedometer Service";       // Data to be logged by the system
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+        this.dataLogger.saveData("log");      // Saves the data in the mode specified
+
+        this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
+    }
+
+    /**
      * This method is called if the class is to be killed for some reason
      */
     @Override
     public void onDestroy()
     {
-        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pedometer Service" + (",") + "Killing Pedometer Service";       // Data to be logged by the system
-        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-        dataLogger.saveData("log");      // Saves the data in the mode specified
-
-        sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
-        super.onDestroy();          // Calls the higher on destroy function
+        this.killProcess();     // Calls the method listed
     }
 
     /**

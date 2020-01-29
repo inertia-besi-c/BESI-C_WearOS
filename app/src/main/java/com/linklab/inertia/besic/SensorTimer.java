@@ -35,10 +35,10 @@ public class SensorTimer extends Service
         this.systemInformation = new SystemInformation();       // Sets up an instance of the class
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());       // Gets the default preferences of this application
 
-//        this.startPedometer();      // Calls the method
-        this.startAccelerometer(false);      // Calls the method
+        this.startPedometer();      // Calls the method
+        this.startAccelerometer(true);      // Calls the method
         this.startHeartRate(true);      // Calls the method
-        this.startEstimote(false);       // Calls the method
+        this.startEstimote(true);       // Calls the method
 
         return START_STICKY;        // Allows the service to be run outside the context of the application
     }
@@ -159,43 +159,54 @@ public class SensorTimer extends Service
         }
     }
 
+
+    /**
+     * This method is called when the service needs to be killed for some reason
+     */
+    private void killProcess()
+    {
+        this.heartrateTimer.cancel();       // Cancels the timer
+        this.estimoteTimer.cancel();        // Cancels the timer
+
+        if (isRunning(Accelerometer.class))     // if the specified class is running
+        {
+            this.stopService(this.accelerometer);     // Stops the service
+            this.startAccelerometer(false);     // Stops the sensor from running
+
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Timer Service" + (",") + "Stopped Accelerometer Service";       // Data to be logged by the system
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");      // Saves the data in the mode specified
+        }
+
+        if (isRunning(HeartRate.class))     // if the specified class is running
+        {
+            this.stopService(this.heartrate);     // Stops the service
+            this.startHeartRate(false);     // Stops the sensor from running
+
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Timer Service" + (",") + "Stopped Heart Rate Timer and Service";       // Data to be logged by the system
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");      // Saves the data in the mode specified
+        }
+
+        if (isRunning(Estimote.class))     // if the specified class is running
+        {
+            this.stopService(this.estimote);     // Stops the service
+            this.startEstimote(false);     // Stops the sensor from running
+
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Timer Service" + (",") + "Stopped Estimote Timer and Service";       // Data to be logged by the system
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");      // Saves the data in the mode specified
+        }
+    }
+
     /**
      * This method is called if the class is to be killed for some reason
      */
     @Override
     public void onDestroy()
     {
-//        this.heartrateTimer.cancel();       // Cancels the timer
-//
-//        if (isRunning(Accelerometer.class))     // if the specified class is running
-//        {
-//            this.stopService(this.accelerometer);     // Stops the service
-//            this.startAccelerometer(false);     // Stops the sensor from running
-//
-//            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Timer Service" + (",") + "Stopped Accelerometer Service";       // Data to be logged by the system
-//            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
-//            this.dataLogger.saveData("log");      // Saves the data in the mode specified
-//        }
-//
-//        if (isRunning(HeartRate.class))     // if the specified class is running
-//        {
-//            this.stopService(this.heartrate);     // Stops the service
-//            this.startHeartRate(false);     // Stops the sensor from running
-//
-//            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Timer Service" + (",") + "Stopped Heart Rate Timer and Service";       // Data to be logged by the system
-//            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
-//            this.dataLogger.saveData("log");      // Saves the data in the mode specified
-//        }
-//
-//        if (isRunning(Estimote.class))     // if the specified class is running
-//        {
-//            this.stopService(this.estimote);     // Stops the service
-//            this.startEstimote(false);     // Stops the sensor from running
-//
-//            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Timer Service" + (",") + "Stopped Estimote Timer and Service";       // Data to be logged by the system
-//            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
-//            this.dataLogger.saveData("log");      // Saves the data in the mode specified
-//        }
+        this.killProcess();     // Calls the method listed
+        super.onDestroy();      // Calls the super class method
     }
 
     /**

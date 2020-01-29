@@ -113,7 +113,6 @@ public class HeartRate extends SensorTimer implements SensorEventListener
     public void onDestroy()
     {
         this.unregisterThings();        // Calls the method
-        super.onDestroy();      // Calls the superclass method
     }
 
     /**

@@ -24,7 +24,7 @@ public class Estimote extends SensorTimer
 {
     private SharedPreferences sharedPreferences;        // Initializes the preference item
     private String data;       // Sets up the string of the class
-    private Timer timer;        // Initializes the timer variable
+    private Timer ESTimer;        // Initializes the ESTimer variable
     private DataLogger dataLogger;      // Sets the datalogger variable
     private SystemInformation systemInformation;        // Sets a system preference variable
     private BeaconManager beaconManager;        // This is the beacon manager
@@ -47,8 +47,8 @@ public class Estimote extends SensorTimer
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
-        this.timer = new Timer();       // Sets up the timer
-        this.timer.schedule(new TimerTask()         // Schedules the timer at a fixed rate
+        this.ESTimer = new Timer();       // Sets up the ESTimer
+        this.ESTimer.schedule(new TimerTask()         // Schedules the ESTimer at a fixed rate
         {
             /**
              * The following is called to run
@@ -105,15 +105,21 @@ public class Estimote extends SensorTimer
     }
 
     /**
+     * This method is called if the class is to be killed for some reason
+     */
+    public void killProcess()
+    {
+        this.beaconManager.stopRanging(this.beaconRegion);       // Calls the beacon range to stop
+        this.ESTimer.cancel();        // Cancels the ESTimer made by the class
+        stopForeground(true);      // Stops the foreground notification
+    }
+
+    /**
      * The destructor for the method
      */
     @Override
     public void onDestroy()
     {
-        beaconManager.stopRanging(beaconRegion);       // Calls the beacon range to stop
-        timer.cancel();        // Cancels the timer made by the class
-        stopForeground(true);      // Stops the foreground notification
-
-        super.onDestroy();      // Calls the superclass on destroy method
+        this.killProcess();     // Calls the method listed
     }
 }
