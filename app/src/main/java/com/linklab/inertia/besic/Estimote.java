@@ -110,9 +110,9 @@ public class Estimote extends SensorTimer
     @Override
     public void onDestroy()
     {
-        this.beaconManager.stopRanging(beaconRegion);       // Calls the beacon range to stop
-        this.timer.cancel();        // Cancels the timer made by the class
-        this.stopForeground(true);      // Stops the foreground notification
+        beaconManager.stopRanging(beaconRegion);       // Calls the beacon range to stop
+        timer.cancel();        // Cancels the timer made by the class
+        stopForeground(true);      // Stops the foreground notification
 
         super.onDestroy();      // Calls the superclass on destroy method
     }
