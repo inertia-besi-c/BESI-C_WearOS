@@ -58,7 +58,7 @@ public class WatchFace extends CanvasWatchFaceService
         private PendingIntent pendingIntent;        // Initializes the pending intents of the class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
         private DataLogger dataLogger, checkEODDate, checkSteps;      // Initializes a datalogger instance
-        private Intent alarmIntent, timerIntent;     // Initializes the intents of the class
+        private Intent alarmIntent, timerIntent, surveyIntent, estimoteIntent;     // Initializes the intents of the class
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
@@ -171,9 +171,18 @@ public class WatchFace extends CanvasWatchFaceService
                     {
                         this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
-                        Intent surveyIntent = new Intent (WatchFace.this, PainSurvey.class);        // Calls an intent to start a new activity
-                        surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
-                        startActivity(surveyIntent);        // Starts the activity specified
+                        if (!this.systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
+                        {
+                            this.surveyIntent = new Intent (WatchFace.this, PainSurvey.class);        // Calls an intent to start a new activity
+                            surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+                            startActivity(surveyIntent);        // Starts the activity specified
+                        }
+                        else        // If the system is charging
+                        {
+                            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Did NOT start Pain Survey due to SleepMode ENABLED";       // Data to be logged by the system
+                            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);        // Makes a new data logger item
+                            this.dataLogger.saveData("log");        // Logs the data
+                        }
                     }
 
                     if (x > startButtonXEnd && x < sleepEODEMAXEnd && y >= sleepEODEMAY && y <= buttonsYEnd)
@@ -442,13 +451,29 @@ public class WatchFace extends CanvasWatchFaceService
                 this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
             }
-            else if (this.systemInformation.isCharging(getApplicationContext()) && isRunning(SensorTimer.class))        // If the system is charging
+            else if (this.systemInformation.isCharging(getApplicationContext()))        // If the system is charging
             {
-                stopService(this.timerIntent);          // Stops the service from running
+                if (isRunning(SensorTimer.class))       // If the sensor timer is running
+                {
+                    stopService(this.timerIntent);          // Stops the service from running
 
-                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Stopped the Timer Controller Class";       // Data to be logged by the system
-                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
-                this.dataLogger.saveData("log");      // Saves the data in the mode specified
+                    this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Stopped the Timer Controller Class";       // Data to be logged by the system
+                    this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+                    this.dataLogger.saveData("log");      // Saves the data in the mode specified
+                }
+                else        // Any alternate things to be done
+                {
+                    this.estimoteIntent = new Intent(getBaseContext(), Estimote.class);     // Makes a new estimote intent
+
+                    if (!isRunning(Estimote.class))     // If the class is not running already
+                    {
+                        startService(this.estimoteIntent);          // Starts the service
+
+                        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Started the Estimote Service";       // Data to be logged by the system
+                        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+                        this.dataLogger.saveData("log");      // Saves the data in the mode specified
+                    }
+                }
             }
         }
 
