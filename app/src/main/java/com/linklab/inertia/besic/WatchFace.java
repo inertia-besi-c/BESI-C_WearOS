@@ -171,17 +171,19 @@ public class WatchFace extends CanvasWatchFaceService
                     {
                         this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
-                        if (!this.systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
-                        {
-                            this.surveyIntent = new Intent (WatchFace.this, PainSurvey.class);        // Calls an intent to start a new activity
-                            surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
-                            startActivity(surveyIntent);        // Starts the activity specified
-                        }
-                        else        // If the system is charging
+                        if (this.systemInformation.isCharging(getApplicationContext()) || this.systemInformation.getSleepMode())        // If the system is charging or in not sleepmode
                         {
                             this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Did NOT start Pain Survey due to SleepMode ENABLED";       // Data to be logged by the system
                             this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);        // Makes a new data logger item
                             this.dataLogger.saveData("log");        // Logs the data
+
+                            this.systemInformation.toast(getApplicationContext(), "Please Disable SleepMode");      // Toast to disable the sleepmode level
+                        }
+                        else     // Checks if the system is not charging or in sleepmode
+                        {
+                            this.surveyIntent = new Intent (WatchFace.this, PainSurvey.class);        // Calls an intent to start a new activity
+                            surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+                            startActivity(surveyIntent);        // Starts the activity specified
                         }
                     }
 
