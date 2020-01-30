@@ -106,9 +106,22 @@ public class Accelerometer extends SensorTimer implements SensorEventListener
                 {
                     dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.accelerometer), stringBuilder2.toString());       // Sets up the items to be logged
                     dataLogger.saveData("log");     // Saves the data in the format specified
+                    stringBuilder2.setLength(0);       // Removes everything from the second string builder
                 }
             }).start();     // Starts the runnable
         }
+    }
+
+    /**
+     * This method is called during the process of killing the sensor
+     */
+    private void killProcess()
+    {
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Accelerometer Service" + (",") + "Killing Accelerometer Service";       // Data to be logged by the system
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+        this.dataLogger.saveData("log");      // Saves the data in the mode specified
+
+        this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
     }
 
     /**
@@ -117,11 +130,7 @@ public class Accelerometer extends SensorTimer implements SensorEventListener
     @Override
     public void onDestroy()
     {
-        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Accelerometer Service" + (",") + "Killing Accelerometer Service";       // Data to be logged by the system
-        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-        this.dataLogger.saveData("log");      // Saves the data in the mode specified
-
-        this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
+        this.killProcess();     // Calls the method listed
     }
 
     /**

@@ -57,7 +57,7 @@ public class WatchFace extends CanvasWatchFaceService
         private AlarmManager alarmManager;      // Initializes the alarm manager of the class
         private PendingIntent pendingIntent;        // Initializes the pending intents of the class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
-        private DataLogger dataLogger, checkEODDate;      // Initializes a datalogger instance
+        private DataLogger dataLogger, checkEODDate, checkSteps;      // Initializes a datalogger instance
         private Intent alarmIntent, timerIntent;     // Initializes the intents of the class
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
@@ -101,6 +101,9 @@ public class WatchFace extends CanvasWatchFaceService
 
             this.drawEODEMA = false;     // Initializes the boolean as a false value
             this.eodemaAlreadyExecuted = false;       // Initializes the variable
+
+            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
+            this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "Checking Steps File");      // Sets a new datalogger variable
 
             this.logHeaders();      // Calls the method to log the headers needed for the files
             this.logInitialSettings();      // Calls the method to log all the items in the settings file
@@ -185,10 +188,19 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
-                            this.systemInformation.setSleepMode(!this.systemInformation.getSleepMode());     // Sets the sleepMode level to be altered
-                            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Watch Face" + "," + "SleepMode Enabled?: "+this.systemInformation.getSleepMode() + ("\n");     // Sets data to be logged by system
-                            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
-                            this.dataLogger.saveData("log");        // Saves the data
+                            if (this.systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
+                            {
+                                this.systemInformation.setSleepMode(false);     // Sets the sleepMode level to be altered
+                                this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
+                                this.checkSteps.saveData("write");      // Saves the data in the format specified
+                            }
+                            else
+                            {
+                                this.systemInformation.setSleepMode(!this.systemInformation.getSleepMode());     // Sets the sleepMode level to be altered
+                                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Watch Face" + "," + "SleepMode Enabled?: "+this.systemInformation.getSleepMode() + ("\n");     // Sets data to be logged by system
+                                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+                                this.dataLogger.saveData("log");        // Saves the data
+                            }
 
                             this.data = String.valueOf(this.systemInformation.getSleepMode());      // Sets the data to be written
                             this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), this.data);      // Sets a new datalogger variable
@@ -319,7 +331,6 @@ public class WatchFace extends CanvasWatchFaceService
         private void reconfigureButtons()
         {
             this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
-            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
 
             if (this.drawEODEMA && this.checkEODDate.readData() != null && !this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))     // If it is time to draw the end of day ema button
             {
@@ -366,7 +377,7 @@ public class WatchFace extends CanvasWatchFaceService
         {
             if (this.isScreenOn())       // Checks if the screen is on on the device
             {
-                if (this.systemInformation.getSleepMode())     // Checks if sleep mode on the system is not enabled
+                if (this.systemInformation.getSleepMode() || this.systemInformation.isCharging(getApplicationContext()))     // Checks if sleep mode on the system is not enabled
                 {
                     this.sleepEODEMAPaint.setColor(Color.GRAY);      // Sets color to this level
                 }

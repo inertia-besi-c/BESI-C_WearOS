@@ -3,9 +3,9 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+import android.content.SharedPreferences;
 import android.content.Context;
 import android.app.Service;
-import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.app.ActivityManager;

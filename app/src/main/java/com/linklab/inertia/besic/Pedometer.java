@@ -64,9 +64,11 @@ public class Pedometer extends SensorTimer implements SensorEventListener
                 {
                     dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.pedometer), data);       // Sets up the items to be logged
                     dataLogger.saveData("log");     // Saves the data in the format specified
+
+                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "yes");      // Sets a new datalogger variable
+                    dataLogger.saveData("write");      // Saves the data in the mode specified
                 }
             }).start();     // Starts the runnable
-
     }
 
     /**

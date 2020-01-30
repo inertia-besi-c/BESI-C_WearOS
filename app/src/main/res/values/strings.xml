@@ -63,6 +63,7 @@
     <string name="system">Systems.csv</string>           <!--Name of the file where actions done by the system are stored-->
     <string name="sleepmode">SleepMode.csv</string>     <!--Name of the file that updates the sleepmode level-->
     <string name="eodmode">EndOfDayMode.csv</string>    <!--Name of the file that updates the endofday button-->
+    <string name="steps">StepMode.csv</string>    <!--Name of the file that updates if there are currently steps being taken-->
 
 
     <!--The headers for the given files in the system-->

@@ -3,17 +3,17 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.content.Intent;
 
 import com.estimote.coresdk.observation.region.beacon.BeaconRegion;
 import com.estimote.coresdk.service.BeaconManager;
 
+import java.util.TimerTask;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 /**
@@ -56,10 +56,6 @@ public class Estimote extends SensorTimer
             @Override
             public void run()
             {
-                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Estimote Service" + (",") + "Stopping Estimote Sensor";       // Data to be logged by the system
-                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-                dataLogger.saveData("log");      // Saves the data in the mode specified
-
                 stopSelf();     // Kills the service
             }
         }, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("estimote_duration", ""))) * 1000);      // Repeats at the specified interval
@@ -109,9 +105,13 @@ public class Estimote extends SensorTimer
      */
     public void killProcess()
     {
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Estimote Service" + (",") + "Stopping Estimote Sensor";       // Data to be logged by the system
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+        this.dataLogger.saveData("log");      // Saves the data in the mode specified
+
         this.beaconManager.stopRanging(this.beaconRegion);       // Calls the beacon range to stop
         this.ESTimer.cancel();        // Cancels the ESTimer made by the class
-        stopForeground(true);      // Stops the foreground notification
+        this.stopForeground(true);      // Stops the foreground notification
     }
 
     /**

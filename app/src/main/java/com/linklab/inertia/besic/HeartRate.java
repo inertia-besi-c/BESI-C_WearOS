@@ -7,14 +7,14 @@ import android.content.SharedPreferences;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
-import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
 import android.preference.PreferenceManager;
+import android.hardware.SensorEvent;
+import android.hardware.Sensor;
+import android.content.Intent;
 
+import java.util.TimerTask;
 import java.util.Objects;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * This class is made to run the heart rate sensor for the application. This class is set to duty cycle meaning it will
@@ -62,10 +62,6 @@ public class HeartRate extends SensorTimer implements SensorEventListener
             @Override
             public void run()
             {
-                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Heart Rate Service" + (",") + "Stopping Heart Rate Sensor";       // Data to be logged by the system
-                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-                dataLogger.saveData("log");      // Saves the data in the mode specified
-
                 stopSelf();     // Kills the service
             }
         }, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("heartrate_duration", ""))) * 1000);      // Repeats at the specified interval
@@ -100,8 +96,12 @@ public class HeartRate extends SensorTimer implements SensorEventListener
     /**
      * This method is called if the class is to be killed for some reason
      */
-    public void unregisterThings()
+    public void killProcess()
     {
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Heart Rate Service" + (",") + "Stopping Heart Rate Sensor";       // Data to be logged by the system
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+        this.dataLogger.saveData("log");      // Saves the data in the mode specified
+
         this.HRTimer.cancel();        // Cancels the HRTimer from the system
         this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
     }
@@ -112,7 +112,7 @@ public class HeartRate extends SensorTimer implements SensorEventListener
     @Override
     public void onDestroy()
     {
-        this.unregisterThings();        // Calls the method
+        this.killProcess();        // Calls the method
     }
 
     /**
