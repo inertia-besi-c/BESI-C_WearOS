@@ -102,6 +102,8 @@ public class WatchFace extends CanvasWatchFaceService
             this.drawEODEMA = false;     // Initializes the boolean as a false value
             this.eodemaAlreadyExecuted = false;       // Initializes the variable
 
+            this.timerIntent = new Intent(getBaseContext(), SensorTimer.class);     // Sets up the intent for the service
+
             this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
             this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "Checking Steps File");      // Sets a new datalogger variable
 
@@ -111,7 +113,6 @@ public class WatchFace extends CanvasWatchFaceService
 
             this.setUpDefaultValues();      // Calls the method
             this.setUpDefaultColors();      // Calls the method
-            this.startSensorTimers();      // Calls the method
 
             this.invalidate();       // Refreshes the screen.
         }
@@ -126,6 +127,7 @@ public class WatchFace extends CanvasWatchFaceService
         {
             super.onDraw(canvas, bounds);       // Calls a drawing instance.
 
+            this.startSensorTimers();      // Calls the method
             this.setUpDefaultValues();      // Sets up the values on the UI.
             this.setUpDefaultColors();      // Sets up the colors on the UI.
             this.setUpDateAndTime();       // Sets up the time on the UI.
@@ -432,12 +434,19 @@ public class WatchFace extends CanvasWatchFaceService
          */
         private void startSensorTimers()
         {
-            this.timerIntent = new Intent(getBaseContext(), SensorTimer.class);     // Sets up the intent for the service
-            if(!isRunning(SensorTimer.class))     // Checks if the service is already running, if it is not
+            if(!isRunning(SensorTimer.class) && !this.systemInformation.isCharging(getApplicationContext()))     // Checks if the service is already running, if it is not
             {
                 startService(this.timerIntent);       // Automatically starts the service
 
                 this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Timer Controller Class";       // Data to be logged by the system
+                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+                this.dataLogger.saveData("log");      // Saves the data in the mode specified
+            }
+            else if (this.systemInformation.isCharging(getApplicationContext()) && isRunning(SensorTimer.class))        // If the system is charging
+            {
+                stopService(this.timerIntent);          // Stops the service from running
+
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Stopped the Timer Controller Class";       // Data to be logged by the system
                 this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
             }
