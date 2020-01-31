@@ -170,6 +170,12 @@ public class EndOfDaySurvey extends WearableActivity
      */
     private void deploySurvey()
     {
+        if(!isRunning(HeartRate.class) || !isRunning(Estimote.class))     // Checks if the classes are running
+        {
+            this.startService(this.heartRate);       // Starts the service
+            this.startService(this.estimote);        // Starts the service
+        }
+
         this.question.setText(this.questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
         this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
         this.responses.clear();     // Cleats the array list of any values in it
