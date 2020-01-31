@@ -11,7 +11,9 @@ import android.content.Context;
 import android.os.Vibrator;
 import android.view.Window;
 import android.preference.PreferenceManager;
+import android.app.ActivityManager;
 import android.widget.TextView;
+import android.content.Intent;
 import android.widget.Button;
 import android.os.Bundle;
 import android.view.View;
@@ -44,6 +46,7 @@ public class EndOfDaySurvey extends WearableActivity
     private String role, data, startTime, endTime, duration;        // Sets up all the string variable in the system
     private String[] userResponses, questions;     // String list variables used in the method
     private String[][] answers;     // String list in list variables used in the class
+    private Intent heartRate, estimote;     // Initializes an intent variable
     private DataLogger dataLogger, checkEODDate;      // Makes a global variable for the data logger
     private StringBuilder surveyLogs, systemLogs;       // Initializes a global string builder variable
     private SimpleDateFormat timeFormatter;     // Initiates a date time variable
@@ -138,6 +141,8 @@ public class EndOfDaySurvey extends WearableActivity
         this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
         this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
         this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
+        this.heartRate = new Intent(getBaseContext(), HeartRate.class);     // Makes an intent to the heartrate class
+        this.estimote = new Intent(getBaseContext(), Estimote.class);       // Makes an intent to the estimote class
         this.currentQuestion = 0;       // Sets the number of questioned answered by the user
 
         this.back = findViewById(R.id.back);        // Gets a reference to the back button
@@ -208,6 +213,15 @@ public class EndOfDaySurvey extends WearableActivity
                         userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
                         userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
                         logActivity();      // Calls the method to log the data
+
+                        if (currentQuestion == 0)       // Checks if this is the first question
+                        {
+                            runServices();      // Calls the method to run some services
+
+                            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "End of Day Survey" + (",") + "Started HeartRate and Estimote Class";       // Data to be logged by the system
+                            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                            dataLogger.saveData("log");      // Saves the data in the mode specified
+                        }
 
                         currentQuestion++;      // Increments the current question position
                         deploySurvey();     // Calls the method on itself to move the question forward
@@ -297,6 +311,25 @@ public class EndOfDaySurvey extends WearableActivity
         }
 
         return this.duration;     // Returns the duration time as a string
+    }
+
+    /**
+     * This method automatically starts the heartrate and the localization sensor if the user decides to go along with performing the survey.
+     */
+    private void runServices()
+    {
+        if(isRunning(HeartRate.class) || isRunning(Estimote.class))     // Checks if the classes are running
+        {
+            this.stopService(this.heartRate);       // Stops the service
+            this.stopService(this.estimote);        // Stops the service
+        }
+
+        this.startService(this.heartRate);      // Starts the service
+        this.startService(this.estimote);       // Starts the service
+
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Starting HeartRate and Estimote Class";       // Data to be logged by the system
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+        this.dataLogger.saveData("log");      // Saves the data in the mode specified
     }
 
     /**
@@ -393,6 +426,35 @@ public class EndOfDaySurvey extends WearableActivity
 
         this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), this.systemInformation.getDateTime("yyyy/MM/dd"));        // Makes a new data logger item
         this.checkEODDate.saveData("write");        // Saves the data in the format specified
+
+        if(isRunning(HeartRate.class) || isRunning(Estimote.class))     // Checks if the classes are running
+        {
+            this.stopService(this.heartRate);       // Stops the service
+            this.stopService(this.estimote);        // Stops the service
+
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "End of Day Survey" + (",") + "Stopped HeartRate and Estimote Class";       // Data to be logged by the system
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");      // Saves the data in the mode specified
+        }
+    }
+
+    /**
+     * Checks if a given service is currently running or not
+     * @param serviceClass is the service class to be checked
+     * @return a boolean true or false
+     */
+    @SuppressWarnings("ALL")        // Suppresses the warnings associated with this method
+    private boolean isRunning(Class<?> serviceClass)        // A general file that checks if a system is running.
+    {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);     // Starts the activity manager to check the service called.
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))        // For each service called by the running service.
+        {
+            if (serviceClass.getName().equals(service.service.getClassName()))      // It checks if it is running.
+            {
+                return true;        // Returns true
+            }
+        }
+        return false;       // If not, it returns false.
     }
 
     /**
