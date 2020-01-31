@@ -235,6 +235,10 @@ public class FollowupSurvey extends WearableActivity
                         if (currentQuestion == 0)       // Checks if this is the first question
                         {
                             runServices();      // Calls the method to run some services
+
+                            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Followup Survey" + (",") + "Started HeartRate and Estimote Class";       // Data to be logged by the system
+                            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                            dataLogger.saveData("log");      // Saves the data in the mode specified
                         }
 
                         currentQuestion++;      // Increments the current question position
@@ -468,7 +472,7 @@ public class FollowupSurvey extends WearableActivity
             this.stopService(this.heartRate);       // Stops the service
             this.stopService(this.estimote);        // Stops the service
 
-            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Stopped HeartRate and Estimote Class";       // Data to be logged by the system
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Followup Survey" + (",") + "Stopped HeartRate and Estimote Class";       // Data to be logged by the system
             this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
             this.dataLogger.saveData("log");      // Saves the data in the mode specified
         }

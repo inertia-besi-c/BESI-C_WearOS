@@ -236,6 +236,10 @@ public class PainSurvey extends WearableActivity
                         if (currentQuestion == 0)       // Checks if this is the first question
                         {
                             runServices();      // Calls the method to run some services
+
+                            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Started HeartRate and Estimote Class";       // Data to be logged by the system
+                            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                            dataLogger.saveData("log");      // Saves the data in the mode specified
                         }
 
                         currentQuestion++;      // Increments the current question position
