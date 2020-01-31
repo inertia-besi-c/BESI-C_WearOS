@@ -5,26 +5,32 @@ package com.linklab.inertia.besic;
  */
 import android.content.Context;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.os.BatteryManager;
+import android.widget.TextView;
+import android.graphics.Color;
 import android.content.Intent;
+import android.widget.Toast;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.DateFormat;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Objects;
+import java.util.Locale;
+import java.util.Date;
 
+/**
+ * This class is responsible for the holding and setting of system information items such as the time, battery level and general system status among others.
+ */
 class SystemInformation
 {
     private DateFormat dateTimeFormat;      // Private date format variables
     private Date current;       // Private date variables
+    private IntentFilter battery;       // Private intent filter variables
+    private Intent batteryStatus;       // Private intent variables
     private boolean sleepMode;      // Private boolean variable for the sleep level of the application
-    private int level, scale, batteryPercent;       // private integer variables
+    private int level, scale, batteryPercent, batteryLevel;       // private integer variables
 
     /**
      * Constructor for the class. Initializes the variables
@@ -45,7 +51,7 @@ class SystemInformation
     {
         this.setCurrent(new Date());        // The current date and time is set
         this.setDateTimeFormat(new SimpleDateFormat(pattern, Locale.getDefault()));       // The date and time is processed in the format requested
-        return this.getDateTimeFormat().format(getCurrent());       // The information is returned to the requester
+        return this.getDateTimeFormat().format(this.getCurrent());       // The information is returned to the requester
     }
 
     /**
@@ -70,13 +76,28 @@ class SystemInformation
      */
     int getBatteryLevel(Context context)
     {
-        IntentFilter battery = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);     // Starts an intent that calls the battery level service.
-        Intent batteryStatus = context.registerReceiver(null, battery);     // This gets the battery status from that service.
-        this.setLevel(Objects.requireNonNull(batteryStatus).getIntExtra(BatteryManager.EXTRA_LEVEL, -1));      // Initializes an integer value for the battery level
-        this.setScale(batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1));      // Scales the battery level to 100 from whatever default value it is.
-        this.setBatteryPercent((getLevel()*100)/getScale());     // Sets the battery level to a percentage of what it needs to be.
+        this.battery = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);     // Starts an intent that calls the battery level service.
+        this.batteryStatus = context.registerReceiver(null, battery);     // This gets the battery status from that service.
+        this.setLevel(Objects.requireNonNull(this.batteryStatus).getIntExtra(BatteryManager.EXTRA_LEVEL, -1));      // Initializes an integer value for the battery level
+        this.setScale(this.batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1));      // Scales the battery level to 100 from whatever default value it is.
+        this.setBatteryPercent((this.getLevel()*100)/this.getScale());     // Sets the battery level to a percentage of what it needs to be.
 
         return this.getBatteryPercent();      // This is the battery level as a string
+    }
+
+    /**
+     * Gets the charging context of the device
+     * @param context is the application context needed
+     * @return true or false based on if the device is currently charging, is fully charged, or not
+     */
+    boolean isCharging(Context context)
+    {
+        this.battery = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);     // Starts an intent that calls the battery level service.
+        this.batteryStatus = context.registerReceiver(null, battery);     // This gets the battery status from that service.
+        this.batteryLevel = (Objects.requireNonNull(this.batteryStatus).getIntExtra(BatteryManager.EXTRA_STATUS, -1));      // Initializes an integer value for the battery level
+        AtomicBoolean isCharging = new AtomicBoolean(this.batteryLevel == (BatteryManager.BATTERY_STATUS_CHARGING) || this.batteryLevel == (BatteryManager.BATTERY_STATUS_FULL) || this.batteryLevel == (BatteryManager.BATTERY_PLUGGED_AC));       // Checks if the system is charging or has charged
+
+        return isCharging.get();        // Returns the true or false based on charge status
     }
 
     /**
