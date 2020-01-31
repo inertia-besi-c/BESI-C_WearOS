@@ -4,6 +4,7 @@ package com.linklab.inertia.besic;
  * Imports needed by the system to function appropriately
  */
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.os.SystemClock;
 import android.support.wearable.activity.WearableActivity;
 import android.content.SharedPreferences;
@@ -50,7 +51,7 @@ public class PainSurvey extends WearableActivity
     private String[][] answers;     // String list in list variables used in the class
     private AlarmManager alarmManager;      // Initializes an alarm manager variable
     private PendingIntent pendingIntent;        // Initializes a pending intent variable
-    private Intent runFollowup;     // Initializes an intent variable
+    private Intent runFollowup, heartRate, estimote;     // Initializes an intent variable
     private DataLogger dataLogger;      // Makes a global variable for the data logger
     private StringBuilder surveyLogs, systemLogs;       // Initializes a global string builder variable
     private SimpleDateFormat timeFormatter;     // Initiates a date time variable
@@ -119,15 +120,15 @@ public class PainSurvey extends WearableActivity
         this.systemLogs = new StringBuilder(this.startTime).append(",").append("Pain Survey").append(",").append("Starting Pain Survey").append("\n");       // Logs to the string builder variable
 
         this.unlockScreen();        // Calls the method to unlock the screen in a specified manner
-
         this.setContentView(R.layout.activity_ema);      // Sets the view of the watch to be the specified activity
-
         this.decideRoleQuestions();      // Decides the role the device is playing
 
         this.userResponses = new String[questions.length];      // Sets up the responses needed by the user to be the length of the number given
         this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
         this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
         this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
+        this.heartRate = new Intent(getBaseContext(), HeartRate.class);     // Makes an intent to the heartrate class
+        this.estimote = new Intent(getBaseContext(), Estimote.class);       // Makes an intent to the estimote class
         this.currentQuestion = 0;       // Sets the number of questioned answered by the user
 
         this.back = findViewById(R.id.back);        // Gets a reference to the back button
@@ -231,6 +232,11 @@ public class PainSurvey extends WearableActivity
                         userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
                         userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
                         logActivity();      // Calls the method to log the data
+
+                        if (currentQuestion == 0)       // Checks if this is the first question
+                        {
+                            runServices();      // Calls the method to run some services
+                        }
 
                         currentQuestion++;      // Increments the current question position
                         deploySurvey();     // Calls the method on itself to move the question forward
@@ -348,6 +354,25 @@ public class PainSurvey extends WearableActivity
     }
 
     /**
+     * This method automatically starts the heartrate and the localization sensor if the user decides to go along with performing the survey.
+     */
+    private void runServices()
+    {
+        if(isRunning(HeartRate.class) || isRunning(Estimote.class))     // Checks if the classes are running
+        {
+            this.stopService(this.heartRate);       // Stops the service
+            this.stopService(this.estimote);        // Stops the service
+        }
+
+        this.startService(this.heartRate);      // Starts the service
+        this.startService(this.estimote);       // Starts the service
+
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Starting HeartRate and Estimote Class";       // Data to be logged by the system
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+        this.dataLogger.saveData("log");      // Saves the data in the mode specified
+    }
+
+    /**
      * This method aggregates all the values of the responses into a single variable and logs them all into a file with a specific format.
      * Upon completing the logs, it finishes the survey and initiates a timer for a followup if it is needed.
      */
@@ -372,12 +397,22 @@ public class PainSurvey extends WearableActivity
             this.runFollowup.putExtra(getResources().getString(R.string.survey_alarm_key), getResources().getString(R.string.followup_identifier));     // Puts some extra information into the intent service
             this.pendingIntent = PendingIntent.getBroadcast(this, 0, this.runFollowup, 0);     // Initializes a pending intent to be run by the alarm manager
 
-            this.alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + this.followupTime, this.pendingIntent);        // Sets the alarm to run in some specified future time
+            this.alarmManager.set(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime() + this.followupTime, this.pendingIntent);        // Sets the alarm to run in some specified future time
             this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA Scheduled by AlarmManager").append("\n");       // Logs to the system logs
         }
         else        // If the requirement was failed
         {
             this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA NOT Scheduled by AlarmManager").append("\n");       // Logs to the system logs
+        }
+
+        if(isRunning(HeartRate.class) || isRunning(Estimote.class))     // Checks if the classes are running
+        {
+            this.stopService(this.heartRate);       // Stops the service
+            this.stopService(this.estimote);        // Stops the service
+
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Stopped HeartRate and Estimote Class";       // Data to be logged by the system
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");      // Saves the data in the mode specified
         }
     }
 
@@ -463,13 +498,32 @@ public class PainSurvey extends WearableActivity
     }
 
     /**
+     * Checks if a given service is currently running or not
+     * @param serviceClass is the service class to be checked
+     * @return a boolean true or false
+     */
+    @SuppressWarnings("ALL")        // Suppresses the warnings associated with this method
+    private boolean isRunning(Class<?> serviceClass)        // A general file that checks if a system is running.
+    {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);     // Starts the activity manager to check the service called.
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))        // For each service called by the running service.
+        {
+            if (serviceClass.getName().equals(service.service.getClassName()))      // It checks if it is running.
+            {
+                return true;        // Returns true
+            }
+        }
+        return false;       // If not, it returns false.
+    }
+
+    /**
      * Sets up the information to be saved by the activity and actions happening in the activity
      */
     private void logActivity()
     {
         this.data =  this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + getResources().getString(R.string.painsurvey_name) + "," +       // Data to be saved by the device
                 this.currentQuestion + "," + userResponses[currentQuestion] + "," + this.index;       // Data to save
-        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painctivity), this.data);      // Sets up data save path and information.
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painactivity), this.data);      // Sets up data save path and information.
         this.dataLogger.saveData("log");      // Logs the data into the directory specified.
     }
 

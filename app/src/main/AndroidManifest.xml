@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.linklab.inertia.besic">
 
@@ -58,8 +59,40 @@
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
+
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
+        </service>
+        <service
+            android:name=".Accelerometer"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true"
+            android:launchMode="singleInstance">
+        </service>
+        <service android:name=".Pedometer"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true"
+            android:launchMode="singleInstance">
+        </service>
+        <service android:name=".HeartRate"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true"
+            android:launchMode="singleInstance">
+        </service>
+        <service android:name=".SensorTimer"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true"
+            android:launchMode="singleInstance">
+        </service>
+        <service android:name=".Estimote"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true"
+            android:launchMode="singleInstance">
         </service>
 
         <receiver
@@ -76,7 +109,6 @@
             android:label="@string/datalogger_name"
             android:launchMode="singleInstance">
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:icon="@mipmap/besic_logo_round"
@@ -84,10 +116,10 @@
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".Settings"
             android:icon="@mipmap/besic_logo_round"
@@ -95,10 +127,10 @@
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".PainSurvey"
             android:icon="@mipmap/besic_logo_round"
@@ -106,10 +138,10 @@
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".FollowupSurvey"
             android:icon="@mipmap/besic_logo_round"
@@ -117,6 +149,18 @@
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".EndOfDaySurvey"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/endofdaysurvey_name"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
