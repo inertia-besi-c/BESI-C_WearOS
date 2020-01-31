@@ -23,6 +23,9 @@ import android.view.View;
 import android.os.Handler;
 import android.os.Looper;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.TimerTask;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -353,8 +356,8 @@ public class EndOfDaySurvey extends WearableActivity
     {
         this.endTime = this.getEstablishedTime();     // Sets the end time of the survey
         this.logResponse();     // Calls the method to perform an action
-        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_you));     // Makes a special thank you toast
-        finish();       // Finishes the survey and cleans up the system
+        this.imageToast(this.randomNumber());       // Shows a specially made toast to the screen
+        this.finish();       // Finishes the survey and cleans up the system
     }
 
     /**
@@ -423,46 +426,46 @@ public class EndOfDaySurvey extends WearableActivity
      {
          this.layoutInflater = this.getLayoutInflater();      // Calls a layout
 
-             if (imageNumber == 1)      // If this is the specified image number
-             {
-                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_1, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
-             }
-             else if (imageNumber == 2)      // If this is the specified image number
-             {
-                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_2, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
-             }
-             else if (imageNumber == 3)      // If this is the specified image number
-             {
-                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_3, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
-             }
-             else if (imageNumber == 4)      // If this is the specified image number
-             {
-                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_4, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
-             }
-             else if (imageNumber == 5)      // If this is the specified image number
-             {
-                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_5, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
-             }
-             else if (imageNumber == 6)      // If this is the specified image number
-             {
-                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_6, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
-             }
-             else if (imageNumber == 7)      // If this is the specified image number
-             {
-                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_7, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
-             }
-             else if (imageNumber == 8)      // If this is the specified image number
-             {
-                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_8, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
-             }
-             else if (imageNumber == 9)      // If this is the specified image number
-             {
-                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_9, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
-             }
+         if (imageNumber == 1)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_1, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 2)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_2, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 3)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_3, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 4)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_4, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 5)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_5, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 6)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_6, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 7)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_7, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 8)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_8, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 9)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_9, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+
          this.toast.setDuration(Toast.LENGTH_LONG);       // Makes the toast longer
          this.toast.setView(this.view);        // Sets the view
          this.toast.show();       // Shows the toast
-         this.finish();       // Finishes the activity
      }
 
     /**
@@ -518,6 +521,17 @@ public class EndOfDaySurvey extends WearableActivity
             }
         }
         return false;       // If not, it returns false.
+    }
+
+    /**
+     * This method picks a random number from a list of given numbers
+     * @return and integer value of a random number
+     */
+    public int randomNumber()       // This is the method that return a random number triggering an image toast.
+    {
+        List<Integer> imageToast = new ArrayList<>(Arrays.asList(1,2,3,4,5,6,7,8,9));       // This is the list of all the possible images
+        Random random = new Random();     // Gets the random module
+        return imageToast.get(random.nextInt(imageToast.size()));     // Returns a random item from the list
     }
 
     /**
