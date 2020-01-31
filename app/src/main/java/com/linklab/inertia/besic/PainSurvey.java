@@ -233,7 +233,10 @@ public class PainSurvey extends WearableActivity
                         userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
                         logActivity();      // Calls the method to log the data
 
-                        runServices();      // Calls the method to run some services
+                        if (currentQuestion == 0)       // Checks if this is the first question
+                        {
+                            runServices();      // Calls the method to run some services
+                        }
 
                         currentQuestion++;      // Increments the current question position
                         deploySurvey();     // Calls the method on itself to move the question forward
