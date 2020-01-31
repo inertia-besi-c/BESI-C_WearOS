@@ -162,7 +162,7 @@ public class PainSurvey extends WearableActivity
             this.startService(this.heartRate);       // Starts the service
             this.startService(this.estimote);        // Starts the service
         }
-        
+
         this.question.setText(questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
         this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
         this.responses.clear();     // Cleats the array list of any values in it
@@ -391,7 +391,7 @@ public class PainSurvey extends WearableActivity
         this.endTime = this.getEstablishedTime();     // Sets the end time of the survey
         this.scheduleFollowupSurvey();      // Calls the method to perform the actions specified
         this.logResponse();     // Calls the method to perform an action
-        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_toast));     // Makes a special thank you toast
+        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_you));     // Makes a special thank you toast
         finish();       // Finishes the survey and cleans up the system
     }
 

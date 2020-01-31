@@ -6,8 +6,10 @@ package com.linklab.inertia.besic;
 import android.annotation.SuppressLint;
 import android.support.wearable.activity.WearableActivity;
 import android.content.SharedPreferences;
+import android.view.LayoutInflater;
 import android.view.WindowManager;
 import android.content.Context;
+import android.view.ViewGroup;
 import android.os.Vibrator;
 import android.view.Window;
 import android.preference.PreferenceManager;
@@ -15,6 +17,7 @@ import android.app.ActivityManager;
 import android.widget.TextView;
 import android.content.Intent;
 import android.widget.Button;
+import android.widget.Toast;
 import android.os.Bundle;
 import android.view.View;
 import android.os.Handler;
@@ -36,12 +39,15 @@ import java.util.Date;
 public class EndOfDaySurvey extends WearableActivity
 {
     private SharedPreferences sharedPreferences;        // Gets a reference to the shared preferences of the wearable activity
+    private LayoutInflater layoutInflater;      // Layout inflater for the activity
     private Vibrator vibrator;      // Gets a link to the system vibrator
     private Window window;      // Gets access to the touch screen of the device
     private int currentQuestion, answersTapped, index, hapticLevel, activityStartLevel, activityRemindLevel, emaReminderInterval, emaDelayInterval, maxReminder;       // Initializes various integers to be used by the system
     private int[] userResponseIndex;        // This is the user response index that keeps track of the index response of the user.
     private Button back, next, answer;      // The buttons on the screen
     private Timer reminderTimer;        // Sets up the timers for the survey
+    private View view;      // Makes the view variable
+    private Toast toast;        // Makes the toast variable
     private TextView question;      // Links to the text shown on the survey screen
     private String role, data, startTime, endTime, duration;        // Sets up all the string variable in the system
     private String[] userResponses, questions;     // String list variables used in the method
@@ -141,6 +147,7 @@ public class EndOfDaySurvey extends WearableActivity
         this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
         this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
         this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
+        this.toast = new Toast(getApplicationContext());      // Sets up the toast in term of this context
         this.heartRate = new Intent(getBaseContext(), HeartRate.class);     // Makes an intent to the heartrate class
         this.estimote = new Intent(getBaseContext(), Estimote.class);       // Makes an intent to the estimote class
         this.currentQuestion = 0;       // Sets the number of questioned answered by the user
@@ -346,7 +353,7 @@ public class EndOfDaySurvey extends WearableActivity
     {
         this.endTime = this.getEstablishedTime();     // Sets the end time of the survey
         this.logResponse();     // Calls the method to perform an action
-        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_toast));     // Makes a special thank you toast
+        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_you));     // Makes a special thank you toast
         finish();       // Finishes the survey and cleans up the system
     }
 
@@ -407,6 +414,56 @@ public class EndOfDaySurvey extends WearableActivity
             }
         }, this.emaDelayInterval, this.emaReminderInterval);        // Sets up the delay offset and how often to run the logic in the timer
     }
+
+    /**
+     * This method sets up the image toast that is to be run
+     * @param imageNumber is the image number wanted to be run
+     */
+     private void imageToast(int imageNumber)       // This is the image toast
+     {
+         this.layoutInflater = this.getLayoutInflater();      // Calls a layout
+
+             if (imageNumber == 1)      // If this is the specified image number
+             {
+                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_1, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+             }
+             else if (imageNumber == 2)      // If this is the specified image number
+             {
+                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_2, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+             }
+             else if (imageNumber == 3)      // If this is the specified image number
+             {
+                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_3, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+             }
+             else if (imageNumber == 4)      // If this is the specified image number
+             {
+                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_4, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+             }
+             else if (imageNumber == 5)      // If this is the specified image number
+             {
+                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_5, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+             }
+             else if (imageNumber == 6)      // If this is the specified image number
+             {
+                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_6, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+             }
+             else if (imageNumber == 7)      // If this is the specified image number
+             {
+                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_7, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+             }
+             else if (imageNumber == 8)      // If this is the specified image number
+             {
+                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_8, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+             }
+             else if (imageNumber == 9)      // If this is the specified image number
+             {
+                 this.view = layoutInflater.inflate(R.layout.activity_image_toast_9, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+             }
+         this.toast.setDuration(Toast.LENGTH_LONG);       // Makes the toast longer
+         this.toast.setView(this.view);        // Sets the view
+         this.toast.show();       // Shows the toast
+         this.finish();       // Finishes the activity
+     }
 
     /**
      * Sets up the only the responses to the answers and logs them to a specified file given

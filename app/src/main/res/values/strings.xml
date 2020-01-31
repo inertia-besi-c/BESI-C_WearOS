@@ -15,7 +15,8 @@
     <string name="back_button">Back</string>        <!--The id for the back button-->
     <string name="next_button">Next</string>        <!--The id for the next button-->
     <string name="answer_button">Answer</string>        <!--The id for the answer button-->
-    <string name="thank_toast">Thank You!</string>      <!--The thank you toast for completing a survey-->
+    <string name="thank_you">Thank You!</string>      <!--The thank you toast for completing a survey-->
+    <string name="todo">TODO</string>        <!--TODO string resource-->
 
     <!--Alarm Key and Value Information-->
     <string name="survey_alarm_key">Survey Alarm</string>       <!--The key for the survey alarm-->
@@ -79,5 +80,5 @@
     <string name="endofdayactivity_header">Date and Time, Survey Type, Question Index, Verbose Answer, Answer Index</string>        <!--Header for the activity file-->
     <string name="painresponse_header">Date and Time, Survey Type, Question 1 Answer, Question 2 Answer, Question 3 Answer, Question 4 Answer, Question 5 Answer, Question 6 Answer, Question 7 Answer, Survey Duration</string>        <!--Header for the activity file-->
     <string name="followupresponse_header">Date and Time, Survey Type, Question 1 Answer, Question 2 Answer, Question 3 Answer, Question 4 Answer, Question 5 Answer, Question 6 Answer, Question 7 Answer, Survey Duration</string>        <!--Header for the activity file-->
-    <string name="endofdayresponse_header">Date and Time, Survey Type, Question 1 Answer, Question 2 Answer, Question 3 Answer, Question 4 Answer, Question 5 Answer, Question 6 Answer, Question 7 Answer, Survey Duration</string>        <!--Header for the activity file-->
+    <string name="endofdayresponse_header">Date and Time, Survey Type, Question 1 Answer, Question 2 Answer, Question 3 Answer, Question 4 Answer, Question 5 Answer, Question 6 Answer, Question 7 Answer, Survey Duration</string>       <!--Header for the activity file-->
 </resources>
