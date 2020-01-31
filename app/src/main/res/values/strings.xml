@@ -43,9 +43,7 @@
     <string name="subdirectory_information">Information</string>     <!--This is the sub folder where some system information will be stored-->
     <string name="subdirectory_survey_activities">Activities</string>     <!--This is the sub folder where the survey activities will be stored-->
     <string name="subdirectory_survey_responses">Responses</string>     <!--This is the sub folder where the survey results will be stored-->
-    <string name="subdirectory_heartrate">HeartRate</string>        <!--This is the sub folder where heartrate data will be saved-->
-    <string name="subdirectory_accelerometer">Accelerometer</string>     <!--This is the sub folder where accelerometer data will be saved-->
-    <string name="subdirectory_estimote">Estimote</string>       <!--This is the sub folder where information concerning the estimote beacons will be saved-->
+    <string name="subdirectory_sensors">Sensors</string>        <!--This is the sub folder where heartrate data will be saved-->
     <string name="subdirectory_logs">Logs</string>       <!--This is the sub folder where logs about activities and actions on the device will be saved-->
 
     <!--The general name of the files where items will be stored-->
@@ -60,15 +58,22 @@
     <string name="accelerometer">Accelerometer.csv</string>     <!--Name of the file where the accelerometer data is stored-->
     <string name="estimote">Estimote.csv</string>       <!--Name of the file where the estimote data is stored-->
     <string name="pedometer">Pedometer.csv</string>     <!--Name of the file where the pedometer data is stored-->
+    <string name="heartrate">HeartRate.csv</string>     <!--Name of the heartrate file for the data-->
     <string name="sensors">Sensors.csv</string>         <!--Name of the file where actions performed by sensor activity is stored-->
     <string name="system">Systems.csv</string>           <!--Name of the file where actions done by the system are stored-->
     <string name="sleepmode">SleepMode.csv</string>     <!--Name of the file that updates the sleepmode level-->
     <string name="eodmode">EndOfDayMode.csv</string>    <!--Name of the file that updates the endofday button-->
+    <string name="steps">StepMode.csv</string>    <!--Name of the file that updates if there are currently steps being taken-->
 
 
     <!--The headers for the given files in the system-->
     <string name="settings_header">Date and Time, Key, Value</string>       <!--Header item for the settings file-->
     <string name="system_header">Date and Time, System Location, Action Performed</string>      <!--Header items for the systems file-->
+    <string name="sensor_header">Date and Time, Sensor Location, Action Performed</string>      <!--Header items for the sensor file-->
+    <string name="accelerometer_header">Date and Time, X-Value, Y-Value, Z-Value, Battery Level, Currently Charging?</string>       <!--Header items for the accelerometer file-->
+    <string name="pedometer_header">Date and Time, Value, Accuracy, Battery Level, Currently Charging?</string>      <!--Header items for the pedometer file-->
+    <string name="heartrate_header">Date and Time, Value, Accuracy, Battery Level, Currently Charging?</string>      <!--Header items for the heartrate file-->
+    <string name="estimote_header">Date and Time, MAC Address, Major Value, Minor Value, RSSI Value, Battery Level, Currently Charging?</string>      <!--Header items for the heartrate file-->
     <string name="painactivity_header">Date and Time, Survey Type, Question Index, Verbose Answer, Answer Index</string>        <!--Header for the activity file-->
     <string name="followupactivity_header">Date and Time, Survey Type, Question Index, Verbose Answer, Answer Index</string>        <!--Header for the activity file-->
     <string name="endofdayactivity_header">Date and Time, Survey Type, Question Index, Verbose Answer, Answer Index</string>        <!--Header for the activity file-->

@@ -12,6 +12,7 @@ import android.os.Vibrator;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.preference.PreferenceManager;
 import android.graphics.PorterDuff;
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.os.Environment;
@@ -56,13 +57,13 @@ public class WatchFace extends CanvasWatchFaceService
         private AlarmManager alarmManager;      // Initializes the alarm manager of the class
         private PendingIntent pendingIntent;        // Initializes the pending intents of the class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
-        private DataLogger dataLogger, checkEODDate;      // Initializes a datalogger instance
-        private Intent runEndOfDay;     // Initializes the intents of the class
+        private DataLogger dataLogger, checkEODDate, checkSteps;      // Initializes a datalogger instance
+        private Intent alarmIntent, timerIntent, surveyIntent, estimoteIntent;     // Initializes the intents of the class
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas
-        private boolean drawEODEMA;      // Sets up all the boolean to be run on the system
+        private boolean drawEODEMA, eodemaAlreadyExecuted;      // Sets up all the boolean to be run on the system
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
                 startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel;       // Sets up integer variables.
@@ -99,6 +100,12 @@ public class WatchFace extends CanvasWatchFaceService
             this.currentDateTextBounds = new Rect();        // Makes a text rectangle
 
             this.drawEODEMA = false;     // Initializes the boolean as a false value
+            this.eodemaAlreadyExecuted = false;       // Initializes the variable
+
+            this.timerIntent = new Intent(getBaseContext(), SensorTimer.class);     // Sets up the intent for the service
+
+            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
+            this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "Checking Steps File");      // Sets a new datalogger variable
 
             this.logHeaders();      // Calls the method to log the headers needed for the files
             this.logInitialSettings();      // Calls the method to log all the items in the settings file
@@ -120,6 +127,7 @@ public class WatchFace extends CanvasWatchFaceService
         {
             super.onDraw(canvas, bounds);       // Calls a drawing instance.
 
+            this.startSensorTimers();      // Calls the method
             this.setUpDefaultValues();      // Sets up the values on the UI.
             this.setUpDefaultColors();      // Sets up the colors on the UI.
             this.setUpDateAndTime();       // Sets up the time on the UI.
@@ -163,9 +171,20 @@ public class WatchFace extends CanvasWatchFaceService
                     {
                         this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
-                        Intent surveyIntent = new Intent (WatchFace.this, PainSurvey.class);        // Calls an intent to start a new activity
-                        surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
-                        startActivity(surveyIntent);        // Starts the activity specified
+                        if (this.systemInformation.isCharging(getApplicationContext()) || this.systemInformation.getSleepMode())        // If the system is charging or in not sleepmode
+                        {
+                            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Did NOT start Pain Survey due to SleepMode ENABLED";       // Data to be logged by the system
+                            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);        // Makes a new data logger item
+                            this.dataLogger.saveData("log");        // Logs the data
+
+                            this.systemInformation.toast(getApplicationContext(), "Please Disable SleepMode");      // Toast to disable the sleepmode level
+                        }
+                        else     // Checks if the system is not charging or in sleepmode
+                        {
+                            this.surveyIntent = new Intent (WatchFace.this, PainSurvey.class);        // Calls an intent to start a new activity
+                            surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+                            startActivity(surveyIntent);        // Starts the activity specified
+                        }
                     }
 
                     if (x > startButtonXEnd && x < sleepEODEMAXEnd && y >= sleepEODEMAY && y <= buttonsYEnd)
@@ -174,7 +193,7 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
-                            Intent surveyIntent = new Intent (WatchFace.this, EndOfDay.class);        // Calls an intent to start a new activity
+                            Intent surveyIntent = new Intent (WatchFace.this, EndOfDaySurvey.class);        // Calls an intent to start a new activity
                             surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
                             startActivity(surveyIntent);        // Starts the activity specified
                         }
@@ -182,10 +201,19 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
-                            this.systemInformation.setSleepMode(!this.systemInformation.getSleepMode());     // Sets the sleepMode level to be altered
-                            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Watch Face" + "," + "SleepMode Enabled?: "+this.systemInformation.getSleepMode() + ("\n");     // Sets data to be logged by system
-                            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
-                            this.dataLogger.saveData("log");        // Saves the data
+                            if (this.systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
+                            {
+                                this.systemInformation.setSleepMode(false);     // Sets the sleepMode level to be altered
+                                this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
+                                this.checkSteps.saveData("write");      // Saves the data in the format specified
+                            }
+                            else
+                            {
+                                this.systemInformation.setSleepMode(!this.systemInformation.getSleepMode());     // Sets the sleepMode level to be altered
+                                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Watch Face" + "," + "SleepMode Enabled?: "+this.systemInformation.getSleepMode() + ("\n");     // Sets data to be logged by system
+                                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+                                this.dataLogger.saveData("log");        // Saves the data
+                            }
 
                             this.data = String.valueOf(this.systemInformation.getSleepMode());      // Sets the data to be written
                             this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), this.data);      // Sets a new datalogger variable
@@ -316,7 +344,6 @@ public class WatchFace extends CanvasWatchFaceService
         private void reconfigureButtons()
         {
             this.startPaint.setTextSize(Integer.valueOf(getResources().getString(R.string.ui_start_button_size)));      // Sets the text size
-            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
 
             if (this.drawEODEMA && this.checkEODDate.readData() != null && !this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))     // If it is time to draw the end of day ema button
             {
@@ -363,7 +390,7 @@ public class WatchFace extends CanvasWatchFaceService
         {
             if (this.isScreenOn())       // Checks if the screen is on on the device
             {
-                if (this.systemInformation.getSleepMode())     // Checks if sleep mode on the system is not enabled
+                if (this.systemInformation.getSleepMode() || this.systemInformation.isCharging(getApplicationContext()))     // Checks if sleep mode on the system is not enabled
                 {
                     this.sleepEODEMAPaint.setColor(Color.GRAY);      // Sets color to this level
                 }
@@ -390,8 +417,13 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                                 {getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date"},       // End of day Updater file
                                 {getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), String.valueOf(systemInformation.getSleepMode())},      // SleepMode Updater file
+                                {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.pedometer), getResources().getString(R.string.pedometer_header)},       // Pedometer file
+                                {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.accelerometer), getResources().getString(R.string.accelerometer_header)},      // Accelerometer file
+                                {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.heartrate), getResources().getString(R.string.heartrate_header)},       // Heart Rate File
+                                {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.estimote), getResources().getString(R.string.estimote_header)},       // Estimote File
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), getResources().getString(R.string.settings_header)},        // Settings file
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), getResources().getString(R.string.system_header)},        // System response file
+                                {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), getResources().getString(R.string.sensor_header)},        // Sensor response file
                                 {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painactivity), getResources().getString(R.string.painactivity_header)},        // Pain activity file
                                 {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.followupactivity), getResources().getString(R.string.followupactivity_header)},        // Followup activity file
                                 {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.endofdayactivity), getResources().getString(R.string.endofdayactivity_header)},        // Followup activity file
@@ -409,32 +441,76 @@ public class WatchFace extends CanvasWatchFaceService
         }
 
         /**
+         * This method starts the timerIntent sensor and keeps a repeated instance
+         */
+        private void startSensorTimers()
+        {
+            if(!isRunning(SensorTimer.class) && !this.systemInformation.isCharging(getApplicationContext()))     // Checks if the service is already running, if it is not
+            {
+                startService(this.timerIntent);       // Automatically starts the service
+
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Calling to Start the Timer Controller Class";       // Data to be logged by the system
+                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+                this.dataLogger.saveData("log");      // Saves the data in the mode specified
+            }
+            else if (this.systemInformation.isCharging(getApplicationContext()))        // If the system is charging
+            {
+                if (isRunning(SensorTimer.class))       // If the sensor timer is running
+                {
+                    stopService(this.timerIntent);          // Stops the service from running
+
+                    this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Stopped the Timer Controller Class";       // Data to be logged by the system
+                    this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+                    this.dataLogger.saveData("log");      // Saves the data in the mode specified
+                }
+                else        // Any alternate things to be done
+                {
+                    this.estimoteIntent = new Intent(getBaseContext(), Estimote.class);     // Makes a new estimote intent
+
+                    if (!isRunning(Estimote.class))     // If the class is not running already
+                    {
+                        startService(this.estimoteIntent);          // Starts the service
+
+                        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Started the Estimote Service";       // Data to be logged by the system
+                        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+                        this.dataLogger.saveData("log");      // Saves the data in the mode specified
+                    }
+                }
+            }
+        }
+
+        /**
          * Schedules the timer that runs the end of day survey at the intended time. This method sends a broadcast after the specified time to the
          * AlarmReceiver class allowing the class to decide what to do with the receiver.
          */
         private void scheduleEndOfDaySurvey()
         {
-            this.runEndOfDay = new Intent(getApplicationContext(), AlarmReceiver.class);       // Initializes an intent to be run by the system
-            this.runEndOfDay.putExtra(getResources().getString(R.string.survey_alarm_key), getResources().getString(R.string.endofday_identifier));     // Puts some extra information into the intent service
-            this.pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, this.runEndOfDay, 0);     // Initializes a pending intent to be run by the alarm manager
-
-            this.calendar = Calendar.getInstance();     // Makes an instance of the calendar
-            this.calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_hour", ""))));     // Assigns the hour
-            this.calendar.set(Calendar.MINUTE, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_minute", ""))));        // Assigns the minute
-            this.calendar.set(Calendar.SECOND, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_second", ""))));        // Assigns the seconds
-
-            long startTime = this.calendar.getTimeInMillis();       // Gets the time in milliseconds
-
-            if (System.currentTimeMillis() > startTime)     // If the time we want is passed
+            if (!this.eodemaAlreadyExecuted)       // If this has not run yet
             {
-                startTime = startTime + 24*60*60*1000;      // Move it to the next day
+                this.alarmIntent = new Intent(getApplicationContext(), AlarmReceiver.class);       // Initializes an intent to be run by the system
+                this.alarmIntent.putExtra(getResources().getString(R.string.survey_alarm_key), getResources().getString(R.string.endofday_identifier));     // Puts some extra information into the intent service
+                this.pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, this.alarmIntent, 0);     // Initializes a pending intent to be run by the alarm manager
+
+                this.calendar = Calendar.getInstance();     // Makes an instance of the calendar
+                this.calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_hour", ""))));     // Assigns the hour
+                this.calendar.set(Calendar.MINUTE, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_minute", ""))));        // Assigns the minute
+                this.calendar.set(Calendar.SECOND, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_second", ""))));        // Assigns the seconds
+
+                long startTime = this.calendar.getTimeInMillis();       // Gets the time in milliseconds
+
+                if (System.currentTimeMillis() > startTime)     // If the time we want is passed
+                {
+                    startTime = startTime + 24*60*60*1000;      // Move it to the next day
+                }
+
+                this.alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, startTime, AlarmManager.INTERVAL_DAY, this.pendingIntent);        // Sets the alarm to run in some specified future time
+
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Successfully set up Alarm for End of Day Survey";       // Data to be logged by the system
+                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+                this.dataLogger.saveData("log");      // Saves the data in the mode specified
+
+                this.eodemaAlreadyExecuted = true;      // Assigns a value that the method has been executed
             }
-
-            this.alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, startTime, AlarmManager.INTERVAL_DAY, this.pendingIntent);        // Sets the alarm to run in some specified future time
-
-            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Successfully set up Alarm for End of Day Survey";       // Data to be logged by the system
-            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
-            this.dataLogger.saveData("log");      // Saves the data in the mode specified
         }
 
         /**
@@ -465,6 +541,25 @@ public class WatchFace extends CanvasWatchFaceService
             {
                 this.startPaint.setColor(Color.DKGRAY);     // Sets color to this level
             }
+        }
+
+        /**
+         * Checks if a given service is currently running or not
+         * @param serviceClass is the service class to be checked
+         * @return a boolean true or false
+         */
+        @SuppressWarnings("ALL")        // Suppresses the warnings associated with this method
+        private boolean isRunning(Class<?> serviceClass)        // A general file that checks if a system is running.
+        {
+            ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);     // Starts the activity manager to check the service called.
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))        // For each service called by the running service.
+            {
+                if (serviceClass.getName().equals(service.service.getClassName()))      // It checks if it is running.
+                {
+                    return true;        // Returns true
+                }
+            }
+            return false;       // If not, it returns false.
         }
 
         /**

@@ -31,7 +31,7 @@ import java.util.Date;
  * The logic for the survey in regards to immediate pain. This activity is launched as soon as the start button in the watchface is pressed.
  * This survey only comes up with a button press and is not initiated by any timer or notification.
  */
-public class EndOfDay extends WearableActivity
+public class EndOfDaySurvey extends WearableActivity
 {
     private SharedPreferences sharedPreferences;        // Gets a reference to the shared preferences of the wearable activity
     private Vibrator vibrator;      // Gets a link to the system vibrator
@@ -131,9 +131,7 @@ public class EndOfDay extends WearableActivity
         this.systemLogs = new StringBuilder(this.startTime).append(",").append("End of Day Survey").append(",").append("Starting End of Day Survey").append("\n");       // Logs to the string builder variable
 
         this.unlockScreen();        // Calls the method to unlock the screen in a specified manner
-
         this.setContentView(R.layout.activity_ema);      // Sets the view of the watch to be the specified activity
-
         this.decideRoleQuestions();      // Decides the role the device is playing
 
         this.userResponses = new String[questions.length];      // Sets up the responses needed by the user to be the length of the number given
@@ -167,7 +165,7 @@ public class EndOfDay extends WearableActivity
      */
     private void deploySurvey()
     {
-        this.question.setText(questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
+        this.question.setText(this.questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
         this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
         this.responses.clear();     // Cleats the array list of any values in it
         this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind_max", "")));        // Maximum reminders allowed for the survey
@@ -225,7 +223,14 @@ public class EndOfDay extends WearableActivity
                     systemLogs.append(getEstablishedTime()).append(",").append("End of Day Survey").append(",").append(back.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
-                    if (currentQuestion == questions.length-1)     // If this is the last question
+                    if (currentQuestion == 0)       // If this is the first question in the survey
+                    {
+                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
+                        logActivity();      // Calls the method to log the data
+
+                        submitSurvey();     // Automatically submit the survey
+                    }
+                    else if (currentQuestion == questions.length-1)     // If this is the last question
                     {
                         userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
                         logActivity();      // Calls the method to log the data

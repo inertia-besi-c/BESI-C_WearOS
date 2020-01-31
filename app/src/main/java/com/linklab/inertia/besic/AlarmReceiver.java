@@ -64,7 +64,7 @@ public class AlarmReceiver extends BroadcastReceiver
             {
                 data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Alarm Manager Broadcaster" + (",") + "Starting End of Day Survey" + ("\n");       // Data to be logged by the system
 
-                surveyIntent = new Intent (context, EndOfDay.class);        // Calls an intent for a new activity
+                surveyIntent = new Intent (context, EndOfDaySurvey.class);        // Calls an intent for a new activity
                 surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
                 context.startActivity(surveyIntent);        // Starts the activity specified
             }
@@ -76,7 +76,7 @@ public class AlarmReceiver extends BroadcastReceiver
             dataLogger = new DataLogger(context, context.getResources().getString(R.string.subdirectory_logs), context.getResources().getString(R.string.system), data);        // Makes a new data logger item
             dataLogger.saveData("log");        // Logs the data
         }
-        else
+        else        // If it fails the end of day check
         {
             data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Alarm Manager Broadcaster" + (",") + "Dismissing Automatic End of Day Survey due to already completed" + ("\n");       // Data to be logged by the system
             dataLogger = new DataLogger(context, context.getResources().getString(R.string.subdirectory_logs), context.getResources().getString(R.string.system), data);        // Makes a new data logger item
