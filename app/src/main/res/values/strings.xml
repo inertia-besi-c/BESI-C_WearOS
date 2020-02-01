@@ -72,7 +72,7 @@
     <string name="settings_header">Date and Time, Key, Value</string>       <!--Header item for the settings file-->
     <string name="system_header">Date and Time, System Location, Action Performed</string>      <!--Header items for the systems file-->
     <string name="sensor_header">Date and Time, Sensor Location, Action Performed</string>      <!--Header items for the sensor file-->
-    <string name="battery_header">Date and Time, Information, Battery Level, Currently Charging?</string>      <!--Header items for the heartrate file-->
+    <string name="battery_header">Date and Time, Battery Level, Currently Charging?</string>      <!--Header items for the heartrate file-->
     <string name="accelerometer_header">Date and Time, X-Value, Y-Value, Z-Value, Battery Level, Currently Charging?</string>       <!--Header items for the accelerometer file-->
     <string name="pedometer_header">Date and Time, Value, Accuracy, Battery Level, Currently Charging?</string>      <!--Header items for the pedometer file-->
     <string name="heartrate_header">Date and Time, Value, Accuracy, Battery Level, Currently Charging?</string>      <!--Header items for the heartrate file-->
