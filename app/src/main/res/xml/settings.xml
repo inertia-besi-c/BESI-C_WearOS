@@ -91,10 +91,10 @@
                 <!-- A text input parameter is initialized for reminder buzz parameters-->
                 <ListPreference
                     android:key="battery_remind"
-                    android:title="Battery Level Reminder (minutes)"
+                    android:title="Battery Level Alert (Refresh Rate)"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
-                    android:defaultValue="10">
+                    android:defaultValue="30">
                 </ListPreference>
             </PreferenceCategory>
 
