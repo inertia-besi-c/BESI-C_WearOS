@@ -321,7 +321,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.batteryLevelPositionY = Math.abs(getResources().getDisplayMetrics().heightPixels) - (this.batteryLevelTextBounds.height()/2 + 10);     // Sets the y location of the battery level
 
             this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + this.systemInformation.getBatteryLevel(getApplicationContext()) + "," + this.systemInformation.isCharging(getApplicationContext());      // Sets the data to be written
-            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.battery), this.data);      // Sets a new datalogger variable
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.battery), this.data);      // Sets a new datalogger variable
             this.dataLogger.saveData("log");      // Saves the data in the mode specified
         }
 
