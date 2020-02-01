@@ -275,6 +275,17 @@ public class WatchFace extends CanvasWatchFaceService
 
             this.currentTimePositionY = Math.abs((getResources().getDisplayMetrics().heightPixels / 2) - 15);     // Sets the y location of the time.
             this.currentDatePositionY = Math.abs((getResources().getDisplayMetrics().heightPixels / 2) - ((this.currentDateTextBounds.height()*2) + 20) - 15);     // Sets the y location of the date.
+
+            if (isScreenOn())
+            {
+                this.timePaint.setStyle(Paint.Style.FILL_AND_STROKE);        // Resets fill mode
+                this.timePaint.setStrokeWidth(Integer.valueOf(getResources().getString(R.string.ui_button_not_ambient)));        // Resets the text size
+            }
+            else
+            {
+                this.timePaint.setStyle(Paint.Style.STROKE);        // Resets fill mode
+                this.timePaint.setStrokeWidth(Integer.valueOf(getResources().getString(R.string.ui_button_ambient)));        // Resets the text size
+            }
         }
 
         /**
@@ -357,8 +368,9 @@ public class WatchFace extends CanvasWatchFaceService
             }
             else
             {
-                this.startPaint.setColor(Color.TRANSPARENT);      // Sets the color
-                this.sleepEODEMAPaint.setColor(Color.DKGRAY);        // Sets the color
+                this.drawSleepButton();
+                this.drawEODEMAButton();
+                this.drawStartButton();
             }
         }
 
@@ -377,28 +389,6 @@ public class WatchFace extends CanvasWatchFaceService
             int endSecond = Integer.valueOf(this.sharedPreferences.getString("eod_manual_end_second", ""));     // Gets the end second from preferences
 
             this.drawEODEMA = systemInformation.isTimeBetweenTimes(systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
-        }
-
-        /**
-         * Draws the sleep button based on the system conditions
-         */
-        private void drawSleepButton()
-        {
-            if (this.isScreenOn())       // Checks if the screen is on on the device
-            {
-                if (this.systemInformation.getSleepMode() || this.systemInformation.isCharging(getApplicationContext()))     // Checks if sleep mode on the system is not enabled
-                {
-                    this.sleepEODEMAPaint.setColor(Color.GRAY);      // Sets color to this level
-                }
-                else        // if sleep mode is enabled
-                {
-                    this.sleepEODEMAPaint.setColor(Color.BLUE);      // Sets color to this level
-                }
-            }
-            else        // If the screen is off on the device
-            {
-                this.sleepEODEMAPaint.setColor(Color.BLACK);      // Sets color to this level
-            }
         }
 
         /**
@@ -507,17 +497,48 @@ public class WatchFace extends CanvasWatchFaceService
         }
 
         /**
+         * Draws the sleep button based on the system conditions
+         */
+        private void drawSleepButton()
+        {
+            if (this.isScreenOn())       // Checks if the screen is on on the device
+            {
+                if (this.systemInformation.getSleepMode() || this.systemInformation.isCharging(getApplicationContext()))     // Checks if sleep mode on the system is not enabled
+                {
+                    this.sleepEODEMAPaint.setColor(Color.GRAY);      // Sets color to this level
+                }
+                else        // if sleep mode is enabled
+                {
+                    this.sleepEODEMAPaint.setColor(Color.BLUE);      // Sets color to this level
+                }
+
+                this.sleepEODEMAPaint.setStyle(Paint.Style.FILL_AND_STROKE);        // Resets fill mode
+                this.sleepEODEMAPaint.setStrokeWidth(Integer.valueOf(getResources().getString(R.string.ui_button_not_ambient)));        // Resets the text size
+            }
+            else        // If the screen is off on the device
+            {
+                this.sleepEODEMAPaint.setStyle(Paint.Style.STROKE);     // Resets fill mode
+                this.sleepEODEMAPaint.setStrokeWidth(Integer.valueOf(getResources().getString(R.string.ui_button_ambient)));        // Resets the text size
+                this.sleepEODEMAPaint.setColor(Color.DKGRAY);      // Sets color to this level
+            }
+        }
+
+        /**
          * Draws the end of day ema button based on the system attributes
          */
         private void drawEODEMAButton()
         {
             if (this.isScreenOn())       // Checks if the screen is on on the device
             {
+                this.sleepEODEMAPaint.setStyle(Paint.Style.FILL_AND_STROKE);        // Resets fill mode
+                this.sleepEODEMAPaint.setStrokeWidth(Integer.valueOf(getResources().getString(R.string.ui_button_not_ambient)));        // Resets the text size
                 this.sleepEODEMAPaint.setColor(Color.RED);      // Sets color to this level
             }
             else        // If not, sets the following
             {
-                this.sleepEODEMAPaint.setColor(Color.BLACK);      // Sets color to this level
+                this.sleepEODEMAPaint.setStyle(Paint.Style.STROKE);     // Resets fill mode
+                this.sleepEODEMAPaint.setStrokeWidth(Integer.valueOf(getResources().getString(R.string.ui_button_ambient)));        // Resets the text size
+                this.sleepEODEMAPaint.setColor(Color.DKGRAY);      // Sets color to this level
             }
         }
 
@@ -528,11 +549,15 @@ public class WatchFace extends CanvasWatchFaceService
         {
             if (this.isScreenOn())       // If the screen is on
             {
+                this.startPaint.setStyle(Paint.Style.FILL_AND_STROKE);        // Resets fill mode
+                this.startPaint.setStrokeWidth(Integer.valueOf(getResources().getString(R.string.ui_button_not_ambient)));        // Resets the text size
                 this.startPaint.setColor(Color.GREEN);      // Sets color to this level
             }
             else        // If screen is off
             {
-                this.startPaint.setColor(Color.TRANSPARENT);     // Sets color to this level
+                this.startPaint.setStyle(Paint.Style.STROKE);        // Resets fill mode
+                this.startPaint.setStrokeWidth(Integer.valueOf(getResources().getString(R.string.ui_button_ambient)));        // Resets the text size
+                this.startPaint.setColor(Color.DKGRAY);     // Sets color to this level
             }
         }
 

@@ -25,6 +25,8 @@
     <string name="ui_start_button_size">65</string>     <!--Size of the start button-->
     <string name="ui_sleep_button_size">50</string>     <!--Size of the sleep button-->
     <string name="ui_survey_button_size">40</string>        <!--Size of the survey button-->
+    <string name="ui_button_ambient">2</string>            <!--Size of the survey button while in ambient mode-->
+    <string name="ui_button_not_ambient">1</string>       <!--Size of the survey button when out of ambient mode-->
 
     <!--Name of Unique Device Screens-->
     <string name="watchface_name">BESI-C</string>  <!--This is the string that is shown as the watchface name-->
