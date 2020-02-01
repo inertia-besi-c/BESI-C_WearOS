@@ -332,7 +332,7 @@ public class PainSurvey extends WearableActivity
         {
             this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Submitting Survey").append("\n");       // Logs to the system logs
 
-            submitSurvey();     // Automatically submits the survey
+            this.submitSurvey();     // Automatically submits the survey
         }
     }
 
@@ -392,7 +392,7 @@ public class PainSurvey extends WearableActivity
         this.scheduleFollowupSurvey();      // Calls the method to perform the actions specified
         this.logResponse();     // Calls the method to perform an action
         this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_you));     // Makes a special thank you toast
-        finish();       // Finishes the survey and cleans up the system
+        this.finish();       // Finishes the survey and cleans up the system
     }
 
     /**
@@ -543,9 +543,9 @@ public class PainSurvey extends WearableActivity
     private void unlockScreen()
     {
         this.window = this.getWindow();     // Gets access to the screen of the device
-        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);        // Makes sure the screen is on if off
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        // Makes sure the screen stays on for the duration of the activity
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);        // Makes sure the screen is on if off
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        // Makes sure the screen stays on for the duration of the activity
     }
 
     /**
@@ -556,7 +556,7 @@ public class PainSurvey extends WearableActivity
     {
         this.index = this.answersTapped%this.responses.size();      // Sets up the index that the user is currently on
         this.answer.setText(this.responses.get(this.index));        // Sets the answer choice seen by the user to be that of the index in the answer choice
-        return index;       // Returns the index to where the method was called
+        return this.index;       // Returns the index to where the method was called
     }
 
     /**
