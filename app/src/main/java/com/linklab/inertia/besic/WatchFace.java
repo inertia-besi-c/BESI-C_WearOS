@@ -489,7 +489,7 @@ public class WatchFace extends CanvasWatchFaceService
 
             long startTime = this.calendar.getTimeInMillis();       // Gets the time in milliseconds
 
-            if (!this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")) && !this.systemInformation.getSleepMode() && System.currentTimeMillis()>startTime)     // Checks for a certain condition
+            if (!this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")) && !this.systemInformation.getSleepMode() && !this.systemInformation.isCharging(getApplicationContext()) && System.currentTimeMillis()>startTime)     // Checks for a certain condition
             {
                 this.eodEMAProcessIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
                 startActivity(this.eodEMAProcessIntent);        // Calls the start of the activity
