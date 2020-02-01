@@ -29,6 +29,13 @@ public class SensorTimer extends Service
     private Timer heartrateTimer, estimoteTimer;       // Sets the timers for the class
     private String data;        // Initializes the string variables
 
+    /**
+     * This is the method that is called to run as soon as this service is called to run
+     * @param intent is the intent service of the application
+     * @param flags is any flags added to the service item
+     * @param startId is the starting identification
+     * @return an integer allowing for the continual running of the service or not
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
@@ -43,6 +50,10 @@ public class SensorTimer extends Service
         return START_STICKY;        // Allows the service to be run outside the context of the application
     }
 
+    /**
+     * This class is set to run the accelerometer sensor at a specified duty cycle rate
+     * @param runMode is the mode that decides if the sensor should run or not
+     */
     private void startHeartRate(boolean runMode)
     {
         this.heartrate = new Intent(getBaseContext(), HeartRate.class);     // Gets an intent on the specified class
@@ -85,6 +96,10 @@ public class SensorTimer extends Service
         }
     }
 
+    /**
+     * This method is called to run the estimote service at a certain duty cycle
+     * @param runMode is set to decide if the system should run or not
+     */
     private void startEstimote(boolean runMode)
     {
         this.estimote = new Intent(getBaseContext(), Estimote.class);     // Gets an intent on the specified class
@@ -196,6 +211,7 @@ public class SensorTimer extends Service
      * @param serviceClass is the service class to be checked
      * @return a boolean true or false
      */
+    @SuppressWarnings("ALL")        // Ignores the warning from this method
     private boolean isRunning(Class<?> serviceClass)        // A general file that checks if a system is running.
     {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);     // Starts the activity manager to check the service called.
