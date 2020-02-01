@@ -276,12 +276,12 @@ public class WatchFace extends CanvasWatchFaceService
             this.currentTimePositionY = Math.abs((getResources().getDisplayMetrics().heightPixels / 2) - 15);     // Sets the y location of the time.
             this.currentDatePositionY = Math.abs((getResources().getDisplayMetrics().heightPixels / 2) - ((this.currentDateTextBounds.height()*2) + 20) - 15);     // Sets the y location of the date.
 
-            if (isScreenOn())
+            if (isScreenOn())       // Checks if the screen is on
             {
                 this.timePaint.setStyle(Paint.Style.FILL_AND_STROKE);        // Resets fill mode
                 this.timePaint.setStrokeWidth(Integer.valueOf(getResources().getString(R.string.ui_button_not_ambient)));        // Resets the text size
             }
-            else
+            else        // If it is not on
             {
                 this.timePaint.setStyle(Paint.Style.STROKE);        // Resets fill mode
                 this.timePaint.setStrokeWidth(Integer.valueOf(getResources().getString(R.string.ui_button_ambient)));        // Resets the text size
