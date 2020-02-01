@@ -62,7 +62,8 @@ public class MainActivity extends AppCompatActivity
                 Manifest.permission.ACCESS_FINE_LOCATION,       // This is to access the location in a more specific manner
                 Manifest.permission.BLUETOOTH,      // This is to access th bluetooth
                 Manifest.permission.BLUETOOTH_ADMIN ,    // This is access the bluetooth and allow changes
-                Manifest.permission.WAKE_LOCK       // This is access to control the screen and cpu thinking power
+                Manifest.permission.WAKE_LOCK,       // This is access to control the screen and cpu thinking power
+                Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS        // Asks the user to ignore the battery optimization doze mode setting
         };
 
         boolean needPermissions = false;        // To begin the permission is set to false.
