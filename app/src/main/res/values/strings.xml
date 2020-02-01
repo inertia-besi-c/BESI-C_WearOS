@@ -18,11 +18,6 @@
     <string name="thank_you">Thank You!</string>      <!--The thank you toast for completing a survey-->
     <string name="todo">TODO</string>        <!--TODO string resource-->
 
-    <!--Alarm Key and Value Information-->
-    <string name="survey_alarm_key">Survey Alarm</string>       <!--The key for the survey alarm-->
-    <string name="followup_identifier">Followup Survey</string>     <!--The identifier value for the followup survey-->
-    <string name="endofday_identifier">End of Day Survey</string>     <!--The identifier value for the end of day survey-->
-
     <!--User Interface Size Information-->
     <string name="ui_time_size">85</string>     <!--Size of the time-->
     <string name="ui_date_size">38</string>     <!--Size of the date-->

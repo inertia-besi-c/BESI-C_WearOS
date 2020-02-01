@@ -4,8 +4,6 @@ package com.linklab.inertia.besic;
  * Imports needed by the system to function appropriately
  */
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
-import android.os.SystemClock;
 import android.support.wearable.activity.WearableActivity;
 import android.content.SharedPreferences;
 import android.view.WindowManager;
@@ -13,8 +11,7 @@ import android.content.Context;
 import android.os.Vibrator;
 import android.view.Window;
 import android.preference.PreferenceManager;
-import android.app.PendingIntent;
-import android.app.AlarmManager;
+import android.app.ActivityManager;
 import android.widget.TextView;
 import android.content.Intent;
 import android.widget.Button;
@@ -44,14 +41,12 @@ public class PainSurvey extends WearableActivity
     private int currentQuestion, answersTapped, index, hapticLevel, activityStartLevel, activityRemindLevel, emaReminderInterval, emaDelayInterval, maxReminder, followupTime;       // Initializes various integers to be used by the system
     private int[] userResponseIndex;        // This is the user response index that keeps track of the index response of the user.
     private Button back, next, answer;      // The buttons on the screen
-    private Timer reminderTimer;        // Sets up the timers for the survey
+    private Timer reminderTimer, followupTimer;        // Sets up the timers for the survey
     private TextView question;      // Links to the text shown on the survey screen
     private String role, data, startTime, endTime, duration;        // Sets up all the string variable in the system
     private String[] userResponses, questions;     // String list variables used in the method
     private String[][] answers;     // String list in list variables used in the class
-    private AlarmManager alarmManager;      // Initializes an alarm manager variable
-    private PendingIntent pendingIntent;        // Initializes a pending intent variable
-    private Intent runFollowup, heartRate, estimote;     // Initializes an intent variable
+    private Intent followUpEMA, heartRate, estimote;     // Initializes an intent variable
     private DataLogger dataLogger;      // Makes a global variable for the data logger
     private StringBuilder surveyLogs, systemLogs;       // Initializes a global string builder variable
     private SimpleDateFormat timeFormatter;     // Initiates a date time variable
@@ -114,7 +109,6 @@ public class PainSurvey extends WearableActivity
         this.systemInformation = new SystemInformation();       // Gets a reference to the system information of the wearable activity
 
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Initializes the vibrator variable
-        this.alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);     // Initializes the alarm variable
 
         this.startTime = this.getEstablishedTime();    // Sets the start time of the survey
         this.systemLogs = new StringBuilder(this.startTime).append(",").append("Pain Survey").append(",").append("Starting Pain Survey").append("\n");       // Logs to the string builder variable
@@ -127,8 +121,10 @@ public class PainSurvey extends WearableActivity
         this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
         this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
         this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
-        this.heartRate = new Intent(getBaseContext(), HeartRate.class);     // Makes an intent to the heartrate class
-        this.estimote = new Intent(getBaseContext(), Estimote.class);       // Makes an intent to the estimote class
+        this.followupTimer = new Timer();       // Sets up the HRTimer
+        this.heartRate = new Intent(getApplicationContext(), HeartRate.class);     // Makes an intent to the heartrate class
+        this.estimote = new Intent(getApplicationContext(), Estimote.class);       // Makes an intent to the estimote class
+        this.followUpEMA = new Intent(getApplicationContext(), FollowupSurvey.class);       // Makes an intent to the estimote class
         this.currentQuestion = 0;       // Sets the number of questioned answered by the user
 
         this.back = findViewById(R.id.back);        // Gets a reference to the back button
@@ -403,16 +399,27 @@ public class PainSurvey extends WearableActivity
     {
         if(this.userResponses[this.questions.length-3] != null && this.userResponses[this.questions.length-3].equalsIgnoreCase(this.answers[this.questions.length-3][0]))     // Checks for a specific requirement
         {
-            this.runFollowup = new Intent(this, AlarmReceiver.class);       // Initializes an intent to be run by the system
-            this.runFollowup.putExtra(getResources().getString(R.string.survey_alarm_key), getResources().getString(R.string.followup_identifier));     // Puts some extra information into the intent service
-            this.pendingIntent = PendingIntent.getBroadcast(this, 0, this.runFollowup, 0);     // Initializes a pending intent to be run by the alarm manager
+            this.followupTimer.schedule(new TimerTask()         // Schedules the HRTimer at a fixed rate
+            {
+                /**
+                 * The following is called to run
+                 */
+                @Override
+                public void run()
+                {
+                    startActivity(followUpEMA);     // Calls to start the followup EMA
 
-            this.alarmManager.set(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime() + this.followupTime, this.pendingIntent);        // Sets the alarm to run in some specified future time
-            this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA Scheduled by AlarmManager").append("\n");       // Logs to the system logs
+                    data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Starting Followup EMA";       // Data to be logged by the system
+                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                    dataLogger.saveData("log");      // Saves the data in the mode specified
+                }
+            }, this.followupTime);      // Repeats at the specified interval
+
+            this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA Scheduled").append("\n");       // Logs to the system logs
         }
         else        // If the requirement was failed
         {
-            this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA NOT Scheduled by AlarmManager").append("\n");       // Logs to the system logs
+            this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA NOT Scheduled").append("\n");       // Logs to the system logs
         }
 
         if(isRunning(HeartRate.class) || isRunning(Estimote.class))     // Checks if the classes are running

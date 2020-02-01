@@ -96,14 +96,6 @@
             android:launchMode="singleInstance">
         </service>
 
-        <receiver
-            android:name=".AlarmReceiver"
-            android:directBootAware="true"
-            android:enabled="true"
-            android:exported="true"
-            android:permission="true">
-        </receiver>
-
         <activity
             android:name=".DataLogger"
             android:icon="@mipmap/besic_logo_round"
