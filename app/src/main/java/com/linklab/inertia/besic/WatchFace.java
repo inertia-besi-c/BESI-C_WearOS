@@ -59,7 +59,8 @@ public class WatchFace extends CanvasWatchFaceService
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas
-        private boolean drawEODEMA;      // Sets up all the boolean to be run on the system
+        private boolean drawEODEMA, dailySurveyRan;      // Sets up all the boolean to be run on the system
+        private long startTime;     // Initializes the long variables in this application
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
                 startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel;       // Sets up integer variables.
@@ -95,6 +96,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.currentDateTextBounds = new Rect();        // Makes a text rectangle
 
             this.drawEODEMA = false;     // Initializes the boolean as a false value
+            this.dailySurveyRan = false;        // Initializes the boolean as a false value to begin with
 
             this.timerIntent = new Intent(getApplicationContext(), SensorTimer.class);     // Sets up the intent for the service
             this.eodEMAProcessIntent = new Intent(getApplicationContext(), EndOfDaySurvey.class);       // Initializes an intent to be run by the system
@@ -477,16 +479,31 @@ public class WatchFace extends CanvasWatchFaceService
             this.calendar.set(Calendar.MINUTE, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_minute", ""))));        // Assigns the minute
             this.calendar.set(Calendar.SECOND, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_second", ""))));        // Assigns the seconds
 
-            long startTime = this.calendar.getTimeInMillis();       // Gets the time in milliseconds
+            startTime = this.calendar.getTimeInMillis();       // Gets the time in milliseconds
 
-            if (!this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")) && !this.systemInformation.getSleepMode() && !this.systemInformation.isCharging(getApplicationContext()) && System.currentTimeMillis()>startTime)     // Checks for a certain condition
+            if (!this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")) && !this.systemInformation.getSleepMode() && !this.systemInformation.isCharging(getApplicationContext()) && System.currentTimeMillis()>startTime && !this.dailySurveyRan)     // Checks for a certain condition
             {
                 this.eodEMAProcessIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
                 startActivity(this.eodEMAProcessIntent);        // Calls the start of the activity
 
+                this.dailySurveyRan = true;
+
                 this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Starting End of Day Survey";       // Data to be logged by the system
                 this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
+            }
+            else        // Checks if the previous parameter failed
+            {
+                this.calendar.set(Calendar.HOUR_OF_DAY, 0);     // Assigns the hour
+                this.calendar.set(Calendar.MINUTE, 0);        // Assigns the minute
+                this.calendar.set(Calendar.SECOND, 0);        // Assigns the seconds
+
+                startTime = this.calendar.getTimeInMillis();       // Gets the time in milliseconds
+
+                if (System.currentTimeMillis() > startTime)     // Compares the current time to the survey start time
+                {
+                    this.dailySurveyRan = false;        // Resets the ema variable
+                }
             }
         }
 
