@@ -488,12 +488,6 @@ public class WatchFace extends CanvasWatchFaceService
                 this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
             }
-            else        // If any of the conditions above apply
-            {
-                this.data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Automatically Dismissing End of Day Survey Process";       // Data to be logged by the system
-                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);        // Makes a new data logger item
-                this.dataLogger.saveData("log");        // Logs the data
-            }
         }
 
         /**
