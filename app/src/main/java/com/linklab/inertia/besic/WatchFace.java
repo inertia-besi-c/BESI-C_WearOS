@@ -13,8 +13,6 @@ import android.support.wearable.watchface.WatchFaceStyle;
 import android.preference.PreferenceManager;
 import android.graphics.PorterDuff;
 import android.app.ActivityManager;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.os.Environment;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -54,16 +52,14 @@ public class WatchFace extends CanvasWatchFaceService
         private Vibrator vibrator;      // This is the variable that access the vibrator in the device
         private Calendar calendar;      // The calendar for the time
         private SystemInformation systemInformation;        // Gets a context to the system information class
-        private AlarmManager alarmManager;      // Initializes the alarm manager of the class
-        private PendingIntent pendingIntent;        // Initializes the pending intents of the class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
         private DataLogger dataLogger, checkEODDate, checkSteps;      // Initializes a datalogger instance
-        private Intent alarmIntent, timerIntent, surveyIntent, estimoteIntent;     // Initializes the intents of the class
+        private Intent eodEMAProcessIntent, timerIntent, surveyIntent, estimoteIntent;     // Initializes the intents of the class
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas
-        private boolean drawEODEMA, eodemaAlreadyExecuted;      // Sets up all the boolean to be run on the system
+        private boolean drawEODEMA;      // Sets up all the boolean to be run on the system
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
                 startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel;       // Sets up integer variables.
@@ -84,7 +80,6 @@ public class WatchFace extends CanvasWatchFaceService
             this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
             this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
             this.systemInformation = new SystemInformation();       // Binds the variable to the calls in the class
-            this.alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);     // Sets up the alarm manger
 
             this.startBackground = new Paint.FontMetrics();     // Sets the background of the button
             this.sleepEODEMABackground = new Paint.FontMetrics();       // Sets the background of the sleep/EODEMA button
@@ -100,9 +95,9 @@ public class WatchFace extends CanvasWatchFaceService
             this.currentDateTextBounds = new Rect();        // Makes a text rectangle
 
             this.drawEODEMA = false;     // Initializes the boolean as a false value
-            this.eodemaAlreadyExecuted = false;       // Initializes the variable
 
-            this.timerIntent = new Intent(getBaseContext(), SensorTimer.class);     // Sets up the intent for the service
+            this.timerIntent = new Intent(getApplicationContext(), SensorTimer.class);     // Sets up the intent for the service
+            this.eodEMAProcessIntent = new Intent(getApplicationContext(), EndOfDaySurvey.class);       // Initializes an intent to be run by the system
 
             this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
             this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "Checking Steps File");      // Sets a new datalogger variable
@@ -127,7 +122,8 @@ public class WatchFace extends CanvasWatchFaceService
         {
             super.onDraw(canvas, bounds);       // Calls a drawing instance.
 
-            this.startSensorTimers();      // Calls the method
+            this.scheduleEndOfDaySurvey();      // Calls the method to run
+            this.startSensorTimers();      // Calls the method to run
             this.setUpDefaultValues();      // Sets up the values on the UI.
             this.setUpDefaultColors();      // Sets up the colors on the UI.
             this.setUpDateAndTime();       // Sets up the time on the UI.
@@ -181,8 +177,8 @@ public class WatchFace extends CanvasWatchFaceService
                         }
                         else     // Checks if the system is not charging or in sleepmode
                         {
-                            this.surveyIntent = new Intent (WatchFace.this, PainSurvey.class);        // Calls an intent to start a new activity
-                            surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+                            this.surveyIntent = new Intent (getApplicationContext(), PainSurvey.class);        // Calls an intent to start a new activity
+                            this.surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
                             startActivity(surveyIntent);        // Starts the activity specified
                         }
                     }
@@ -193,8 +189,8 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
-                            Intent surveyIntent = new Intent (WatchFace.this, EndOfDaySurvey.class);        // Calls an intent to start a new activity
-                            surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+                            this.surveyIntent = new Intent (getApplicationContext(), EndOfDaySurvey.class);        // Calls an intent to start a new activity
+                            this.surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
                             startActivity(surveyIntent);        // Starts the activity specified
                         }
                         else        // If the daily EMA button is not needed to show
@@ -480,36 +476,27 @@ public class WatchFace extends CanvasWatchFaceService
         }
 
         /**
-         * Schedules the timer that runs the end of day survey at the intended time. This method sends a broadcast after the specified time to the
-         * AlarmReceiver class allowing the class to decide what to do with the receiver.
+         * This method is responsible for starting the process that would eventually lead to the running of the end of day ema.
+         * It checks the current time to the system time and decides if it is time to start the process or not. If the time has passed
+         * a certain threshold for the ema, it sets it up for the following day
          */
         private void scheduleEndOfDaySurvey()
         {
-            if (!this.eodemaAlreadyExecuted)       // If this has not run yet
+            this.calendar = Calendar.getInstance();     // Makes an instance of the calendar
+            this.calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_hour", ""))));     // Assigns the hour
+            this.calendar.set(Calendar.MINUTE, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_minute", ""))));        // Assigns the minute
+            this.calendar.set(Calendar.SECOND, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_second", ""))));        // Assigns the seconds
+
+            long startTime = this.calendar.getTimeInMillis();       // Gets the time in milliseconds
+
+            if (!this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")) && !this.systemInformation.getSleepMode() && System.currentTimeMillis()>startTime)     // Checks for a certain condition
             {
-                this.alarmIntent = new Intent(getApplicationContext(), AlarmReceiver.class);       // Initializes an intent to be run by the system
-                this.alarmIntent.putExtra(getResources().getString(R.string.survey_alarm_key), getResources().getString(R.string.endofday_identifier));     // Puts some extra information into the intent service
-                this.pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, this.alarmIntent, 0);     // Initializes a pending intent to be run by the alarm manager
+                this.eodEMAProcessIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+                startActivity(this.eodEMAProcessIntent);        // Calls the start of the activity
 
-                this.calendar = Calendar.getInstance();     // Makes an instance of the calendar
-                this.calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_hour", ""))));     // Assigns the hour
-                this.calendar.set(Calendar.MINUTE, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_minute", ""))));        // Assigns the minute
-                this.calendar.set(Calendar.SECOND, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_second", ""))));        // Assigns the seconds
-
-                long startTime = this.calendar.getTimeInMillis();       // Gets the time in milliseconds
-
-                if (System.currentTimeMillis() > startTime)     // If the time we want is passed
-                {
-                    startTime = startTime + 24*60*60*1000;      // Move it to the next day
-                }
-
-                this.alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, startTime, AlarmManager.INTERVAL_DAY, this.pendingIntent);        // Sets the alarm to run in some specified future time
-
-                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Successfully set up Alarm for End of Day Survey";       // Data to be logged by the system
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Starting End of Day Survey";       // Data to be logged by the system
                 this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
-
-                this.eodemaAlreadyExecuted = true;      // Assigns a value that the method has been executed
             }
         }
 
