@@ -89,14 +89,13 @@
                 </EditTextPreference>
 
                 <!-- A text input parameter is initialized for reminder buzz parameters-->
-                <EditTextPreference
-                    android:dialogTitle="Reminder Buzz"
-                    android:dialogMessage="Buzz interval (seconds) for low battery reminder?"
-                    android:inputType="number"
+                <ListPreference
                     android:key="battery_remind"
-                    android:title="Battery Reminder (seconds)"
-                    android:defaultValue="600">
-                </EditTextPreference>
+                    android:title="Battery Level Reminder (minutes)"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:defaultValue="10">
+                </ListPreference>
             </PreferenceCategory>
 
             <!-- A new category is made for disabling notification of low battery -->

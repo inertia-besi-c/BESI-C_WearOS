@@ -16,7 +16,7 @@
         <!--Back button attributes-->
 
         <TextView
-            android:id="@+id/question"
+            android:id="@+id/request"
             android:layout_width="98dp"
             android:layout_height="119dp"
             android:layout_marginTop="4dp"
@@ -62,7 +62,7 @@
 
         <!--Answer button attributes-->
         <Button
-            android:id="@+id/answer"
+            android:id="@+id/dismiss"
             android:layout_width="96dp"
             android:layout_height="62dp"
             android:background="@color/dark_blue"
@@ -73,7 +73,7 @@
             app:layout_constraintEnd_toStartOf="@+id/next"
             app:layout_constraintHorizontal_bias="0.55"
             app:layout_constraintStart_toEndOf="@+id/back"
-            app:layout_constraintTop_toBottomOf="@+id/question"
+            app:layout_constraintTop_toBottomOf="@+id/request"
             app:layout_constraintVertical_bias="1.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

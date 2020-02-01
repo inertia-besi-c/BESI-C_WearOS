@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Layout to define the face-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--Constraints for the element in the layout-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!--Text view for the questions-->
+
+        <!--Back button attributes-->
+
+        <!--Next button attributes-->
+
+        <!--Answer button attributes-->
+
+        <TextView
+            android:id="@+id/request"
+            android:layout_width="195dp"
+            android:layout_height="83dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="@string/survey_string"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.232" />
+
+        <Button
+            android:id="@+id/dismiss"
+            android:layout_width="199dp"
+            android:layout_height="41dp"
+            android:background="#FF9800"
+            android:text="@string/dismiss_button"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/request"
+            app:layout_constraintVertical_bias="0.205" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

@@ -157,6 +157,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".Battery"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/batteryactivity_name"
+            android:launchMode="singleInstance">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
     </application>
 
 </manifest>

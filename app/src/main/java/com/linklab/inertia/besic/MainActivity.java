@@ -32,14 +32,14 @@ public class MainActivity extends AppCompatActivity
 
         Intent changeWatchFace = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,        // Gets a watchface picker to show
                 new ComponentName(getPackageName(), WatchFace.class.getName()));        // Shows the components of the watchface
-        startActivity(changeWatchFace);     // Starts the intent for the watchface picker
+        this.startActivity(changeWatchFace);     // Starts the intent for the watchface picker
 
         Intent startSettings = new Intent(MainActivity.this, Settings.class);       // Starts a new intent for the settings class
-        startActivity(startSettings);       // Starts the intent for the settings
+        this.startActivity(startSettings);       // Starts the intent for the settings
 
         this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
 
-        finish();       // Finishes the activity and quits it.
+        this.finish();       // Finishes the activity and quits it.
     }
 
     /**
@@ -61,7 +61,8 @@ public class MainActivity extends AppCompatActivity
                 Manifest.permission.ACCESS_COARSE_LOCATION,     // This is to access the location in a general sense
                 Manifest.permission.ACCESS_FINE_LOCATION,       // This is to access the location in a more specific manner
                 Manifest.permission.BLUETOOTH,      // This is to access th bluetooth
-                Manifest.permission.BLUETOOTH_ADMIN     // This is access the bluetooth and allow changes
+                Manifest.permission.BLUETOOTH_ADMIN ,    // This is access the bluetooth and allow changes
+                Manifest.permission.WAKE_LOCK       // This is access to control the screen and cpu thinking power
         };
 
         boolean needPermissions = false;        // To begin the permission is set to false.

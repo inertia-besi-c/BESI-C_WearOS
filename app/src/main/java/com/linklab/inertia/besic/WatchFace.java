@@ -54,16 +54,16 @@ public class WatchFace extends CanvasWatchFaceService
         private SystemInformation systemInformation;        // Gets a context to the system information class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
         private DataLogger dataLogger, checkEODDate, checkSteps;      // Initializes a datalogger instance
-        private Intent eodEMAProcessIntent, timerIntent, surveyIntent, estimoteIntent;     // Initializes the intents of the class
+        private Intent eodEMAProcessIntent, timerIntent, surveyIntent, estimoteIntent, lowBatteryIntent;     // Initializes the intents of the class
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
         private Rect batteryLevelTextBounds, currentTimeTextBounds, currentDateTextBounds;        // Sets up bounds for items on canvas
-        private boolean drawEODEMA, dailySurveyRan;      // Sets up all the boolean to be run on the system
+        private boolean drawEODEMA, dailySurveyRan, runLowBattery;      // Sets up all the boolean to be run on the system
         private long startTime;     // Initializes the long variables in this application
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
-                startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel;       // Sets up integer variables.
+                startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel, lowBatteryCounter;       // Sets up integer variables.
 
         /**
          * This method is called when the service of the watch face is called for the first time.
@@ -97,6 +97,9 @@ public class WatchFace extends CanvasWatchFaceService
 
             this.drawEODEMA = false;     // Initializes the boolean as a false value
             this.dailySurveyRan = false;        // Initializes the boolean as a false value to begin with
+            this.runLowBattery = false;     // Initializes the boolean to run the battery information
+
+            this.lowBatteryCounter = 0;     // Sets up a counter for the battery
 
             this.timerIntent = new Intent(getApplicationContext(), SensorTimer.class);     // Sets up the intent for the service
             this.eodEMAProcessIntent = new Intent(getApplicationContext(), EndOfDaySurvey.class);       // Initializes an intent to be run by the system
@@ -343,7 +346,33 @@ public class WatchFace extends CanvasWatchFaceService
 
             if (this.getBatteryLevelInteger() <= Integer.valueOf(this.sharedPreferences.getString("low_battery_alert", "")))        // Checks the battery level
             {
+                if (this.lowBatteryCounter >= Integer.valueOf(this.sharedPreferences.getString("battery_remind", "")) && !this.systemInformation.isCharging(getApplicationContext()) && !this.systemInformation.getSleepMode())     // If the following parameters are met
+                {
+                    int startHour = Integer.valueOf(this.sharedPreferences.getString("battery_hour_alert_start", ""));     // Gets the start hour from preferences
+                    int startMinute = Integer.valueOf(this.sharedPreferences.getString("battery_hour_alert_start", ""));     // Gets the start minute from preferences
+                    int startSecond = Integer.valueOf(this.sharedPreferences.getString("battery_hour_alert_start", ""));     // Gets the start second from preferences
+
+                    int endHour = Integer.parseInt(this.sharedPreferences.getString("battery_hour_alert_end", ""));         // Gets the end hour from preferences
+                    int endMinute = Integer.valueOf(this.sharedPreferences.getString("battery_hour_alert_end", ""));     // Gets the end minute from preferences
+                    int endSecond = Integer.valueOf(this.sharedPreferences.getString("battery_hour_alert_end", ""));     // Gets the end second from preferences
+
+                    this.runLowBattery = this.systemInformation.isTimeBetweenTimes(this.systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
+
+                    if(this.runLowBattery)      // If we need to run the battery file
+                    {
+                        this.lowBatteryIntent = new Intent (getApplicationContext(), Battery.class);        // Calls an intent to start a new activity
+                        this.lowBatteryIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+                        startActivity(this.lowBatteryIntent);        // Starts the activity specified
+                    }
+                }
+
+                if(this.lowBatteryCounter >= Integer.valueOf(this.sharedPreferences.getString("battery_remind", "")))       // If the counter is more than the limit we want
+                {
+                    this.lowBatteryCounter = 0;     // Resets the counter
+                }
+
                 this.batteryPaint.setColor(Color.RED);        // Sets the color of the battery level.
+                this.lowBatteryCounter++;       // Increments the counter
             }
         }
 
@@ -368,11 +397,11 @@ public class WatchFace extends CanvasWatchFaceService
                 this.startPaint.setColor(Color.WHITE);      // Sets the color
                 this.sleepEODEMAPaint.setColor(Color.WHITE);        // Sets the color
             }
-            else
+            else        // If all the others fail;
             {
-                this.drawSleepButton();
-                this.drawEODEMAButton();
-                this.drawStartButton();
+                this.drawSleepButton();     // Calls the method listed
+                this.drawEODEMAButton();        // Calls the method listed
+                this.drawStartButton();     // Calls the method listed
             }
         }
 
@@ -409,6 +438,7 @@ public class WatchFace extends CanvasWatchFaceService
                                 {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.accelerometer), getResources().getString(R.string.accelerometer_header)},      // Accelerometer file
                                 {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.heartrate), getResources().getString(R.string.heartrate_header)},       // Heart Rate File
                                 {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.estimote), getResources().getString(R.string.estimote_header)},       // Estimote File
+                                {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.battery), getResources().getString(R.string.battery_header)},      // Battery file
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), getResources().getString(R.string.settings_header)},        // Settings file
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), getResources().getString(R.string.system_header)},        // System response file
                                 {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), getResources().getString(R.string.sensor_header)},        // Sensor response file
