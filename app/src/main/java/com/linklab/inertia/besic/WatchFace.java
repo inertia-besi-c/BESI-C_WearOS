@@ -127,6 +127,8 @@ public class WatchFace extends CanvasWatchFaceService
         {
             super.onDraw(canvas, bounds);       // Calls a drawing instance.
 
+            if(this.checkSteps.readData().equalsIgnoreCase("yes"))
+
             this.scheduleEndOfDaySurvey();      // Calls the method to run
             this.startSensorTimers();      // Calls the method to run
             this.setUpDefaultValues();      // Sets up the values on the UI.
@@ -362,7 +364,7 @@ public class WatchFace extends CanvasWatchFaceService
 
                     this.runLowBattery = this.systemInformation.isTimeBetweenTimes(this.systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
 
-                    if(this.runLowBattery)      // If we need to run the battery file
+                    if(!this.runLowBattery)      // If we need to run the battery file
                     {
                         this.lowBatteryIntent = new Intent (getApplicationContext(), Battery.class);        // Calls an intent to start a new activity
                         this.lowBatteryIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
