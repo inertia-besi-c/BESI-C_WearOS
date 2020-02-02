@@ -91,6 +91,8 @@ public class Settings extends PreferenceActivity
             setUpSummaryValue(findPreference("estimote_duration"));     // Key of an item in the settings screen
             setUpSummaryValue(findPreference("estimote_interval"));     // Key of an item in the settings screen
             setUpSummaryValue(findPreference("estimote_maximum_activity"));     // Key of an item in the settings screen
+            setUpSummaryValue(findPreference("sleepmode_setup"));     // Key of an item in the settings screen
+            setUpSummaryValue(findPreference("battery_remind"));    // Key of an item in the settings screen
         }
     }
 
