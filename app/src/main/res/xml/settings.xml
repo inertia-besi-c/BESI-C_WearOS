@@ -67,7 +67,17 @@
                     android:dialogTitle="Haptic Feedback"
                     android:inputType="number"
                     android:key="haptic_level"
-                    android:title="Haptic Level (milliseconds)"></EditTextPreference>
+                    android:title="Haptic Level (milliseconds)">
+                </EditTextPreference>
+
+                <!-- A text input parameter is initialized for the max sleepmode parameters-->
+                <ListPreference
+                    android:key="sleepmode_setup"
+                    android:title="Sleep Mode Automatic Setup (Refresh Rate)"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:defaultValue="5">
+                </ListPreference>
 
                 <!-- A text input is initialized for the buzz associated with the start of an activity -->
                 <EditTextPreference
@@ -76,7 +86,8 @@
                     android:dialogTitle="Starting Buzz"
                     android:inputType="number"
                     android:key="activity_start"
-                    android:title="Starting Activity (seconds)"></EditTextPreference>
+                    android:title="Starting Activity (seconds)">
+                </EditTextPreference>
 
                 <!-- A text input is initialized for the buzz associated with a reminder to complete an activity -->
                 <EditTextPreference
@@ -85,7 +96,8 @@
                     android:dialogTitle="Reminder Buzz"
                     android:inputType="number"
                     android:key="activity_remind"
-                    android:title="Reminding Activity (seconds)"></EditTextPreference>
+                    android:title="Reminding Activity (seconds)">
+                </EditTextPreference>
             </PreferenceScreen>
         </PreferenceScreen>
 

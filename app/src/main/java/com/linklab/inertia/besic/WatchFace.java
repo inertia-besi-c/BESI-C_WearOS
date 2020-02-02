@@ -63,7 +63,7 @@ public class WatchFace extends CanvasWatchFaceService
         private long startTime;     // Initializes the long variables in this application
         private int batteryLevelPositionX, batteryLevelPositionY,
                 currentTimePositionX, currentTimePositionY, currentDatePositionX, currentDatePositionY,
-                startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel, lowBatteryCounter;       // Sets up integer variables.
+                startX, startY, sleepEODEMAX, sleepEODEMAY, hapticLevel, lowBatteryCounter, sleepTime;       // Sets up integer variables.
 
         /**
          * This method is called when the service of the watch face is called for the first time.
@@ -105,7 +105,8 @@ public class WatchFace extends CanvasWatchFaceService
             this.eodEMAProcessIntent = new Intent(getApplicationContext(), EndOfDayPrompt1.class);       // Initializes an intent to be run by the system
 
             this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
-            this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "Checking Steps File");      // Sets a new datalogger variable
+            this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
+            this.sleepTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));      // Sets up the sleep time level
 
             this.logHeaders();      // Calls the method to log the headers needed for the files
             this.logInitialSettings();      // Calls the method to log all the items in the settings file
@@ -127,8 +128,7 @@ public class WatchFace extends CanvasWatchFaceService
         {
             super.onDraw(canvas, bounds);       // Calls a drawing instance.
 
-            if(this.checkSteps.readData().equalsIgnoreCase("yes"))
-
+            this.setUpSystemSleepMode();        // Calls the method to run
             this.scheduleEndOfDaySurvey();      // Calls the method to run
             this.startSensorTimers();      // Calls the method to run
             this.setUpDefaultValues();      // Sets up the values on the UI.
@@ -206,13 +206,23 @@ public class WatchFace extends CanvasWatchFaceService
 
                             if (this.systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
                             {
-                                this.systemInformation.setSleepMode(false);     // Sets the sleepMode level to be altered
+                                this.systemInformation.setSleepMode(true);     // Sets the sleepMode level to be altered
                                 this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
                                 this.checkSteps.saveData("write");      // Saves the data in the format specified
                             }
                             else
                             {
                                 this.systemInformation.setSleepMode(!this.systemInformation.getSleepMode());     // Sets the sleepMode level to be altered
+//                                if(this.systemInformation.getSleepMode())       // If sleep  mode is enabled
+//                                {
+//                                    this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "yes");      // Sets a new datalogger variable
+//                                    this.checkSteps.saveData("write");      // Saves the data in the format specified
+//                                }
+//                                else        // If sleepmode is not enabled
+//                                {
+//                                    this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
+//                                    this.checkSteps.saveData("write");      // Saves the data in the format specified
+//                                }
                                 this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Watch Face" + "," + "SleepMode Enabled?: "+this.systemInformation.getSleepMode() + ("\n");     // Sets data to be logged by system
                                 this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                                 this.dataLogger.saveData("log");        // Saves the data
@@ -228,6 +238,25 @@ public class WatchFace extends CanvasWatchFaceService
 
                 case WatchFaceService.TAP_TYPE_TOUCH_CANCEL:        // Checks if the user dismissed the touch
                     break;      // Breaks the tap action
+            }
+        }
+
+        /**
+         * This method runs and decides what mode the system should be in
+         */
+        private void setUpSystemSleepMode()
+        {
+            if(this.checkSteps.readData().contains("yes"))      // Checks if the file contains the word yes
+            {
+                this.sleepTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));      // Resets the sleep time level
+                this.checkSteps.saveData("write");      // Overwrites the data
+                this.systemInformation.setSleepMode(false);     // Sets the sleepmode of the system
+            }
+            else        // If this fails
+            {
+                this.sleepTime--;       // Decrements the sleep time
+                this.checkSteps.saveData("write");      // Saves the data again
+                this.systemInformation.setSleepMode(true);      // Sets the sleepmode to be true
             }
         }
 
