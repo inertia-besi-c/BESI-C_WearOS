@@ -102,7 +102,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.lowBatteryCounter = 0;     // Sets up a counter for the battery
 
             this.timerIntent = new Intent(getApplicationContext(), SensorTimer.class);     // Sets up the intent for the service
-            this.eodEMAProcessIntent = new Intent(getApplicationContext(), EndOfDaySurvey.class);       // Initializes an intent to be run by the system
+            this.eodEMAProcessIntent = new Intent(getApplicationContext(), EndOfDayPrompt1.class);       // Initializes an intent to be run by the system
 
             this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
             this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "Checking Steps File");      // Sets a new datalogger variable
@@ -525,6 +525,9 @@ public class WatchFace extends CanvasWatchFaceService
                 this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "WatchFace Service" + (",") + "Starting End of Day Survey";       // Data to be logged by the system
                 this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
+
+                this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), systemInformation.getDateTime("yyyy/MM/dd"));        // Makes a new data logger item
+                this.checkEODDate.saveData("write");        // Saves the data in the format specified
             }
             else        // Checks if the previous parameter failed
             {

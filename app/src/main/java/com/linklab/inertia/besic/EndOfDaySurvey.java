@@ -157,7 +157,7 @@ public class EndOfDaySurvey extends WearableActivity
 
         this.back = findViewById(R.id.back);        // Gets a reference to the back button
         this.next = findViewById(R.id.next);        // Gets a reference to the next button
-        this.answer = findViewById(R.id.dismiss);        // Gets a reference to the answer button
+        this.answer = findViewById(R.id.responses);        // Gets a reference to the answer button
         this.question = findViewById(R.id.request);        // Gets a reference to the question text view
 
         this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback

@@ -20,6 +20,8 @@
     <string name="snooze_button">Snooze</string>        <!--The id for the snooze button-->
     <string name="thank_you">Thank You!</string>      <!--The thank you toast for completing a survey-->
     <string name="todo">TODO</string>        <!--TODO string resource-->
+    <string name="low_battery_request">Low Battery! Please proceed to charge the device</string>       <!--Question for the low battery file-->
+    <string name="endofday_request">Please answer the following questions over the past day…</string>       <!--Question for the prompt file-->
 
     <!--User Interface Size Information-->
     <string name="ui_time_size">85</string>     <!--Size of the time-->
@@ -40,6 +42,8 @@
     <string name="painsurvey_name">BESI-C: Pain Survey</string>  <!--This is the string that is shown as the pain survey name-->
     <string name="followupsurvey_name">BESI-C: Followup Survey</string>  <!--This is the string that is shown as the followup survey name-->
     <string name="endofdaysurvey_name">BESI-C: End Of Day Survey</string>   <!--This is the string that is shown as the endofday survey name-->
+    <string name="endofdaypromptone_name">BESI-C: End Of Day Prompt 1</string>   <!--This is the string that is shown as the endofday survey prompt name-->
+    <string name="endofdayprompttwo_name">BESI-C: End Of Day Prompt 2</string>   <!--This is the string that is shown as the endofday survey prompt name-->
 
     <!--The name of the Sub Folders for information to be stored-->
     <string name="subdirectory_information">Information</string>     <!--This is the sub folder where some system information will be stored-->
@@ -82,6 +86,5 @@
     <string name="endofdayactivity_header">Date and Time, Survey Type, Question Index, Verbose Answer, Answer Index</string>        <!--Header for the activity file-->
     <string name="painresponse_header">Date and Time, Survey Type, Question 1 Answer, Question 2 Answer, Question 3 Answer, Question 4 Answer, Question 5 Answer, Question 6 Answer, Question 7 Answer, Survey Duration</string>        <!--Header for the activity file-->
     <string name="followupresponse_header">Date and Time, Survey Type, Question 1 Answer, Question 2 Answer, Question 3 Answer, Question 4 Answer, Question 5 Answer, Question 6 Answer, Question 7 Answer, Survey Duration</string>        <!--Header for the activity file-->
-    <string name="endofdayresponse_header">Date and Time, Survey Type, Question 1 Answer, Question 2 Answer, Question 3 Answer, Question 4 Answer, Question 5 Answer, Question 6 Answer, Question 7 Answer, Survey Duration</string>
-    <string name="low_battery_request">Low Battery! Please proceed to charge the device</string>       <!--Header for the activity file-->
+    <string name="endofdayresponse_header">Date and Time, Survey Type, Question 1 Answer, Question 2 Answer, Question 3 Answer, Question 4 Answer, Question 5 Answer, Question 6 Answer, Question 7 Answer, Survey Duration</string>        <!--Header for the activity file-->
 </resources>
