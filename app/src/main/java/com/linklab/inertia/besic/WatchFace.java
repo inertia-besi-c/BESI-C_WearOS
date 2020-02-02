@@ -204,6 +204,8 @@ public class WatchFace extends CanvasWatchFaceService
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
+                            this.sleepTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));      // Resets the sleep time level
+
                             if (this.systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
                             {
                                 this.systemInformation.setSleepMode(true);     // Sets the sleepMode level to be altered
@@ -213,16 +215,6 @@ public class WatchFace extends CanvasWatchFaceService
                             else
                             {
                                 this.systemInformation.setSleepMode(!this.systemInformation.getSleepMode());     // Sets the sleepMode level to be altered
-//                                if(this.systemInformation.getSleepMode())       // If sleep  mode is enabled
-//                                {
-//                                    this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "yes");      // Sets a new datalogger variable
-//                                    this.checkSteps.saveData("write");      // Saves the data in the format specified
-//                                }
-//                                else        // If sleepmode is not enabled
-//                                {
-//                                    this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
-//                                    this.checkSteps.saveData("write");      // Saves the data in the format specified
-//                                }
                                 this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Watch Face" + "," + "SleepMode Enabled?: "+this.systemInformation.getSleepMode() + ("\n");     // Sets data to be logged by system
                                 this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                                 this.dataLogger.saveData("log");        // Saves the data
@@ -248,15 +240,36 @@ public class WatchFace extends CanvasWatchFaceService
         {
             if(this.checkSteps.readData().contains("yes"))      // Checks if the file contains the word yes
             {
+                if (!isRunning(SensorTimer.class))      // Checks if the sensor class is running
+                {
+                    startService(this.timerIntent);     // Starts the sensors
+                }
+
                 this.sleepTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));      // Resets the sleep time level
                 this.checkSteps.saveData("write");      // Overwrites the data
                 this.systemInformation.setSleepMode(false);     // Sets the sleepmode of the system
+
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Watch Face" + "," + "Turning Off SleepMode and Restarting Sensors";     // Sets data to be logged by system
+                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+                this.dataLogger.saveData("log");        // Saves the data
             }
-            else        // If this fails
+            else if (this.checkSteps.readData().contains("no") && this.sleepTime >= 0)        // If this fails
             {
                 this.sleepTime--;       // Decrements the sleep time
                 this.checkSteps.saveData("write");      // Saves the data again
-                this.systemInformation.setSleepMode(true);      // Sets the sleepmode to be true
+            }
+            else        // If the above fails
+            {
+                this.systemInformation.setSleepMode(true);        // Calls the method to run
+
+                if (isRunning(SensorTimer.class))       // Checks if the sensor class is running
+                {
+                    stopService(this.timerIntent);      // Stops the service
+                }
+
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Watch Face" + "," + "Turning on SleepMode and Turning off Sensors";     // Sets data to be logged by system
+                this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+                this.dataLogger.saveData("log");        // Saves the data
             }
         }
 
