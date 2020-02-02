@@ -6,20 +6,31 @@ package com.linklab.inertia.besic;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
+import android.widget.TextView;
+import android.graphics.Color;
 import android.content.Intent;
+import android.widget.Toast;
+import android.view.Gravity;
+import android.view.View;
 
 import java.text.DateFormat;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Objects;
+import java.util.Locale;
+import java.util.Date;
 
+/**
+ * This class is responsible for the holding and setting of system information items such as the time, battery level and general system status among others.
+ */
 class SystemInformation
 {
-    private DateFormat timeFormat, dateFormat;      // Private date format variables
+    private DateFormat dateTimeFormat;      // Private date format variables
     private Date current;       // Private date variables
+    private IntentFilter battery;       // Private intent filter variables
+    private Intent batteryStatus;       // Private intent variables
     private boolean sleepMode;      // Private boolean variable for the sleep level of the application
-    private int level, scale, batteryPercent;       // private integer variables
+    private int level, scale, batteryPercent, batteryLevel;       // private integer variables
 
     /**
      * Constructor for the class. Initializes the variables
@@ -33,36 +44,29 @@ class SystemInformation
     }
 
     /**
-     * This gets only the current time from the system
-     * @return a time format designed for the UI.
+     * Gets the current date and time for the survey to be stamped with
+     * @return a string format of the date and time
      */
-    String getTimeForUI()
+    String getDateTime(String pattern)
     {
-        this.setCurrent(new Date());     // Resets te current variable to be a new date
-        this.setTimeFormat(new SimpleDateFormat("h:mm a", Locale.getDefault()));      // The time format is called in default format
-        return this.getTimeFormat().format(getCurrent());       // The current time is set to show on the time text view.
+        this.setCurrent(new Date());        // The current date and time is set
+        this.setDateTimeFormat(new SimpleDateFormat(pattern, Locale.getDefault()));       // The date and time is processed in the format requested
+        return this.getDateTimeFormat().format(this.getCurrent());       // The information is returned to the requester
     }
 
     /**
-     * This gets only the current date from the system
-     * @return a date format for the UI.
+     * This method makes a toast on the screen with the given requirements
+     * @param context the application context of the activity
+     * @param message the message to be displayed by the toast
      */
-    String getDateForUI()
+    void toast(Context context, String message)
     {
-        this.setCurrent(new Date());     // Resets te current variable to be a new date
-        this.setDateFormat(new SimpleDateFormat("MMM d, yyyy", Locale.getDefault()));     // The date is called in US format.
-        return this.getDateFormat().format(getCurrent());       // The current date is set to show on the date text view.
-    }
-
-    /**
-     * Gets the current time in military format
-     * @return a string of the current time in military format
-     */
-    String getTimeMilitary()
-    {
-        this.setCurrent(new Date());      // The current date and timer is set.
-        this.setDateFormat(new SimpleDateFormat("HH:mm:ss", Locale.getDefault()));      // The time format military wise is called in US format.
-        return this.getDateFormat().format(getCurrent());       // The current time in military format is returned
+        Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);          // A short message at the end to say thank you.
+        View view = toast.getView();        // Gets the view from the toast maker
+        TextView textSeen = view.findViewById(android.R.id.message);        // Finds the text being used
+        toast.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);        // Sets the toast to show up at the center of the screen
+        textSeen.setTextColor(Color.WHITE);     // Changes the color of the text
+        toast.show();       // Shows the toast.
     }
 
     /**
@@ -72,13 +76,28 @@ class SystemInformation
      */
     int getBatteryLevel(Context context)
     {
-        IntentFilter battery = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);     // Starts an intent that calls the battery level service.
-        Intent batteryStatus = context.registerReceiver(null, battery);     // This gets the battery status from that service.
-        this.setLevel(Objects.requireNonNull(batteryStatus).getIntExtra(BatteryManager.EXTRA_LEVEL, -1));      // Initializes an integer value for the battery level
-        this.setScale(batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1));      // Scales the battery level to 100 from whatever default value it is.
-        this.setBatteryPercent((getLevel()*100)/getScale());     // Sets the battery level to a percentage of what it needs to be.
+        this.battery = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);     // Starts an intent that calls the battery level service.
+        this.batteryStatus = context.registerReceiver(null, battery);     // This gets the battery status from that service.
+        this.setLevel(Objects.requireNonNull(this.batteryStatus).getIntExtra(BatteryManager.EXTRA_LEVEL, -1));      // Initializes an integer value for the battery level
+        this.setScale(this.batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1));      // Scales the battery level to 100 from whatever default value it is.
+        this.setBatteryPercent((this.getLevel()*100)/this.getScale());     // Sets the battery level to a percentage of what it needs to be.
 
         return this.getBatteryPercent();      // This is the battery level as a string
+    }
+
+    /**
+     * Gets the charging context of the device
+     * @param context is the application context needed
+     * @return true or false based on if the device is currently charging, is fully charged, or not
+     */
+    boolean isCharging(Context context)
+    {
+        this.battery = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);     // Starts an intent that calls the battery level service.
+        this.batteryStatus = context.registerReceiver(null, battery);     // This gets the battery status from that service.
+        this.batteryLevel = (Objects.requireNonNull(this.batteryStatus).getIntExtra(BatteryManager.EXTRA_STATUS, -1));      // Initializes an integer value for the battery level
+        AtomicBoolean isCharging = new AtomicBoolean(this.batteryLevel == (BatteryManager.BATTERY_STATUS_CHARGING) || this.batteryLevel == (BatteryManager.BATTERY_STATUS_FULL) || this.batteryLevel == (BatteryManager.BATTERY_PLUGGED_AC));       // Checks if the system is charging or has charged
+
+        return isCharging.get();        // Returns the true or false based on charge status
     }
 
     /**
@@ -155,21 +174,12 @@ class SystemInformation
     }
 
     /**
-     * Sets the time format of the input
-     * @param timeFormat the time format argument
-     */
-    private void setTimeFormat(SimpleDateFormat timeFormat)
-    {
-        this.timeFormat = timeFormat;        // Sets the variable appropriately
-    }
-
-    /**
      * Sets the date format of the input
-     * @param dateFormat the date format argument
+     * @param dateTimeFormat the date format argument
      */
-    private void setDateFormat(SimpleDateFormat dateFormat)
+    private void setDateTimeFormat(SimpleDateFormat dateTimeFormat)
     {
-        this.dateFormat = dateFormat;        // Sets the variable appropriately
+        this.dateTimeFormat = dateTimeFormat;        // Sets the variable appropriately
     }
 
     /**
@@ -218,21 +228,12 @@ class SystemInformation
     }
 
     /**
-     * Gets the time format
-     * @return the time format variable value
-     */
-    private DateFormat getTimeFormat()
-    {
-        return this.timeFormat;      // Returns the variable
-    }
-
-    /**
      * Gets the date format
      * @return the date format variable
      */
-    private DateFormat getDateFormat()
+    private DateFormat getDateTimeFormat()
     {
-        return this.dateFormat;      // Returns the variable
+        return this.dateTimeFormat;      // Returns the variable
     }
 
     /**

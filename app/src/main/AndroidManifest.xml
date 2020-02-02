@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.linklab.inertia.besic">
 
@@ -9,9 +10,11 @@
 
     <!-- Defines what permissions are need by the application to run -->
     <uses-permission android:name="com.google.android.wearable.permission.RECEIVE_COMPLICATION_DATA" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
@@ -58,10 +61,48 @@
 
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
+
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
+        <service
+            android:name=".Accelerometer"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true"
+            android:launchMode="singleInstance">
+        </service>
+        <service android:name=".Pedometer"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true"
+            android:launchMode="singleInstance">
+        </service>
+        <service android:name=".HeartRate"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true"
+            android:launchMode="singleInstance">
+        </service>
+        <service android:name=".SensorTimer"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true"
+            android:launchMode="singleInstance">
+        </service>
+        <service android:name=".Estimote"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="true"
+            android:launchMode="singleInstance">
+        </service>
 
+        <activity
+            android:name=".DataLogger"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/datalogger_name"
+            android:launchMode="singleInstance">
+        </activity>
         <activity
             android:name=".MainActivity"
             android:icon="@mipmap/besic_logo_round"
@@ -69,10 +110,10 @@
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".Settings"
             android:icon="@mipmap/besic_logo_round"
@@ -80,15 +121,75 @@
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name=".DataLogger"
+            android:name=".PainSurvey"
             android:icon="@mipmap/besic_logo_round"
-            android:label="@string/datalogger_name"
+            android:label="@string/painsurvey_name"
             android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".FollowupSurvey"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/followupsurvey_name"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".EndOfDaySurvey"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/endofdaysurvey_name"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Battery"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/batteryactivity_name"
+            android:launchMode="singleInstance">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
+        <activity
+            android:name=".EndOfDayPrompt1"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/endofdaypromptone_name"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".EndOfDayPrompt2"
+            android:icon="@mipmap/besic_logo_round"
+            android:label="@string/endofdayprompttwo_name"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

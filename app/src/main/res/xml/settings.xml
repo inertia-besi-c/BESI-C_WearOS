@@ -56,6 +56,49 @@
                 android:title="Deployment Identification"
                 android:defaultValue="P0D0">
             </EditTextPreference>
+            <PreferenceScreen
+                android:key="notifications"
+                android:title="Alerts">
+
+                <!-- A text input is initialized for the haptic feedback information -->
+                <EditTextPreference
+                    android:defaultValue="20"
+                    android:dialogMessage="Haptic Feedback Level? Please try to keep it to less than 30"
+                    android:dialogTitle="Haptic Feedback"
+                    android:inputType="number"
+                    android:key="haptic_level"
+                    android:title="Haptic Level (milliseconds)">
+                </EditTextPreference>
+
+                <!-- A text input parameter is initialized for the max sleepmode parameters-->
+                <ListPreference
+                    android:key="sleepmode_setup"
+                    android:title="Sleep Mode Automatic Setup (Refresh Rate)"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:defaultValue="5">
+                </ListPreference>
+
+                <!-- A text input is initialized for the buzz associated with the start of an activity -->
+                <EditTextPreference
+                    android:defaultValue="1"
+                    android:dialogMessage="Buzz time (seconds) for starting activities?"
+                    android:dialogTitle="Starting Buzz"
+                    android:inputType="number"
+                    android:key="activity_start"
+                    android:title="Starting Activity (seconds)">
+                </EditTextPreference>
+
+                <!-- A text input is initialized for the buzz associated with a reminder to complete an activity -->
+                <EditTextPreference
+                    android:defaultValue="1"
+                    android:dialogMessage="Buzz time (seconds) for activity reminder?"
+                    android:dialogTitle="Reminder Buzz"
+                    android:inputType="number"
+                    android:key="activity_remind"
+                    android:title="Reminding Activity (seconds)">
+                </EditTextPreference>
+            </PreferenceScreen>
         </PreferenceScreen>
 
         <!-- A new screen is made for the battery setting of the device -->
@@ -89,14 +132,13 @@
                 </EditTextPreference>
 
                 <!-- A text input parameter is initialized for reminder buzz parameters-->
-                <EditTextPreference
-                    android:dialogTitle="Reminder Buzz"
-                    android:dialogMessage="Buzz interval (seconds) for low battery reminder?"
-                    android:inputType="number"
+                <ListPreference
                     android:key="battery_remind"
-                    android:title="Battery Reminder (seconds)"
-                    android:defaultValue="600">
-                </EditTextPreference>
+                    android:title="Battery Level Alert (Refresh Rate)"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:defaultValue="30">
+                </ListPreference>
             </PreferenceCategory>
 
             <!-- A new category is made for disabling notification of low battery -->
@@ -168,40 +210,6 @@
         </PreferenceScreen>
 
         <!-- A new preference screen is made for the alerts section-->
-        <PreferenceScreen
-            android:key="notifications"
-            android:title="Alerts">
-
-            <!-- A text input is initialized for the haptic feedback information -->
-            <EditTextPreference
-                android:dialogTitle="Haptic Feedback"
-                android:dialogMessage="Haptic Feedback Level? Please try to keep it to less than 30"
-                android:inputType="number"
-                android:key="haptic_level"
-                android:title="Haptic Level (milliseconds)"
-                android:defaultValue="20">
-            </EditTextPreference>
-
-            <!-- A text input is initialized for the buzz associated with the start of an activity -->
-            <EditTextPreference
-                android:dialogTitle="Starting Buzz"
-                android:dialogMessage="Buzz time (seconds) for starting activities?"
-                android:inputType="number"
-                android:key="activity_start"
-                android:title="Starting Activity (seconds)"
-                android:defaultValue="1">
-            </EditTextPreference>
-
-            <!-- A text input is initialized for the buzz associated with a reminder to complete an activity -->
-            <EditTextPreference
-                android:dialogTitle="Reminder Buzz"
-                android:dialogMessage="Buzz time (seconds) for activity reminder?"
-                android:inputType="number"
-                android:key="activity_remind"
-                android:title="Reminding Activity (seconds)"
-                android:defaultValue="1">
-            </EditTextPreference>
-        </PreferenceScreen>
     </PreferenceCategory>
 
     <!-- A new category is made for survey settings -->
@@ -231,7 +239,7 @@
                 android:inputType="number"
                 android:key="pain_remind_max"
                 android:title="Maximum Reminders"
-                android:defaultValue="2">
+                android:defaultValue="3">
             </EditTextPreference>
 
             <!-- A text input is initialized for the delay associated with starting the reminders -->
@@ -317,7 +325,7 @@
                     android:inputType="number"
                     android:key="eod_remind_max"
                     android:title="Maximum Reminders"
-                    android:defaultValue="2">
+                    android:defaultValue="3">
                 </EditTextPreference>
 
                 <!-- A text input is initialized for the delay associated with starting the reminders -->
@@ -362,6 +370,15 @@
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
                     android:defaultValue="00">
+                </ListPreference>
+
+                <!-- A preference list is made for the snooze time -->
+                <ListPreference
+                    android:key="eod_automatic_snooze_time"
+                    android:title="Automatic EMA Snooze Time"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:defaultValue="10">
                 </ListPreference>
             </PreferenceCategory>
 
@@ -408,7 +425,7 @@
             <!-- A preference list is made for the hour time -->
                 <ListPreference
                     android:key="eod_manual_end_hour"
-                    android:title="Manual Start Hour"
+                    android:title="Manual End Hour"
                     android:entries="@array/hourList"
                     android:entryValues="@array/hourList"
                     android:defaultValue="23">
@@ -417,7 +434,7 @@
                 <!-- A preference list is made for the minute time -->
                 <ListPreference
                     android:key="eod_manual_end_minute"
-                    android:title="Manual Start Minute"
+                    android:title="Manual End Minute"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
                     android:defaultValue="59">
@@ -426,7 +443,7 @@
                 <!-- A preference list is made for the seconds time -->
                 <ListPreference
                     android:key="eod_manual_end_second"
-                    android:title="Manual Start Second"
+                    android:title="Manual End Second"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
                     android:defaultValue="59">
@@ -458,7 +475,7 @@
             <!-- A text input is initialized for the waiting interval -->
             <EditTextPreference
                 android:dialogTitle="Heart Rate Interval"
-                android:dialogMessage="How often should a Heart Rate Measurement be taken (seconds)?"
+                android:dialogMessage="How long should the wait between measurements be (seconds)?"
                 android:inputType="number"
                 android:key="heartrate_interval"
                 android:title="Interval (seconds)"
