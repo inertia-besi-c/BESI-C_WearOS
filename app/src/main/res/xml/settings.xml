@@ -337,6 +337,15 @@
                     android:title="Delay Timer"
                     android:defaultValue="0">
                 </EditTextPreference>
+
+                <!-- A preference list is made for the snooze time -->
+                <ListPreference
+                    android:key="eod_automatic_snooze_time"
+                    android:title="Automatic EMA Snooze Time (Minutes)"
+                    android:entries="@array/minutesecondList"
+                    android:entryValues="@array/minutesecondList"
+                    android:defaultValue="10">
+                </ListPreference>
             </PreferenceCategory>
 
             <!-- A category is made for items associated with the automatic start time -->
@@ -370,15 +379,6 @@
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
                     android:defaultValue="00">
-                </ListPreference>
-
-                <!-- A preference list is made for the snooze time -->
-                <ListPreference
-                    android:key="eod_automatic_snooze_time"
-                    android:title="Automatic EMA Snooze Time"
-                    android:entries="@array/minutesecondList"
-                    android:entryValues="@array/minutesecondList"
-                    android:defaultValue="10">
                 </ListPreference>
             </PreferenceCategory>
 
@@ -522,16 +522,6 @@
                 android:key="estimote_interval"
                 android:title="Interval (seconds)"
                 android:defaultValue="90">
-            </EditTextPreference>
-
-            <!-- A text input is initialized for the number of reminders needed -->
-            <EditTextPreference
-                android:dialogTitle="Estimote Activity"
-                android:dialogMessage="Maximum Number of Cycles to enabling SleepMode?"
-                android:inputType="number"
-                android:key="estimote_maximum_activity"
-                android:title="Maximum Cycles"
-                android:defaultValue="5">
             </EditTextPreference>
         </PreferenceScreen>
     </PreferenceCategory>

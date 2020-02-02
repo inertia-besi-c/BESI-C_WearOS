@@ -190,15 +190,18 @@ public class WatchFace extends CanvasWatchFaceService
                         }
                     }
 
-                    if (x > startButtonXEnd && x < sleepEODEMAXEnd && y >= sleepEODEMAY && y <= buttonsYEnd)
+                    if (x > startButtonXEnd && x < sleepEODEMAXEnd && y >= sleepEODEMAY && y <= buttonsYEnd)        // If the button falls between this section around the sleep or end of day
                     {
                         if (drawEODEMA && !this.checkEODDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))     // Checks if the daily ema button needs is available
                         {
                             this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
 
-                            this.surveyIntent = new Intent (getApplicationContext(), EndOfDaySurvey.class);        // Calls an intent to start a new activity
-                            this.surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
-                            startActivity(surveyIntent);        // Starts the activity specified
+                            if (!this.systemInformation.isCharging(getApplicationContext()))        // If it is not charging at the moment
+                            {
+                                this.surveyIntent = new Intent (getApplicationContext(), EndOfDaySurvey.class);        // Calls an intent to start a new activity
+                                this.surveyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+                                startActivity(surveyIntent);        // Starts the activity specified
+                            }
                         }
                         else        // If the daily EMA button is not needed to show
                         {
@@ -242,7 +245,7 @@ public class WatchFace extends CanvasWatchFaceService
             {
                 if (!isRunning(SensorTimer.class))      // Checks if the sensor class is running
                 {
-                    startService(this.timerIntent);     // Starts the sensors
+                    startSensorTimers();     // Starts the sensors
                 }
 
                 this.sleepTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));      // Resets the sleep time level
