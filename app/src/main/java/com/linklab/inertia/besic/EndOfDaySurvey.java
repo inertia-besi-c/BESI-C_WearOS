@@ -4,6 +4,7 @@ package com.linklab.inertia.besic;
  * Imports needed by the system to function appropriately
  */
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.support.wearable.activity.WearableActivity;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
@@ -189,13 +190,22 @@ public class EndOfDaySurvey extends WearableActivity
         this.question.setText(this.questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
         this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
         this.responses.clear();     // Cleats the array list of any values in it
-        this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind_max", "")));        // Maximum reminders allowed for the survey
+        this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_remind_max", "")));        // Maximum reminders allowed for the survey
 
         Collections.addAll(this.responses, this.answers[this.currentQuestion]);     // Calls on the collections object to add all the values in the array list so it can remember them
         this.nextAnswer();      // Calls on the method to update the answer view
 
         if (this.currentQuestion < questions.length)        // Checks to make sure there is still questions to be asked
         {
+            if (this.currentQuestion == 0)      // Checks if this is the first question
+            {
+                this.back.setBackgroundColor(Color.GRAY);       // Grays out the color
+            }
+            else        // If it is any other
+            {
+                this.back.setBackgroundColor(Color.RED);        // Resets the color to red
+            }
+
             if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
             {
                 this.next.setText(this.answers[questions.length-1][0]);     // Sets the next button accordingly
@@ -257,8 +267,6 @@ public class EndOfDaySurvey extends WearableActivity
                     {
                         userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
                         logActivity();      // Calls the method to log the data
-
-                        submitSurvey();     // Automatically submit the survey
                     }
                     else if (currentQuestion == questions.length-1)     // If this is the last question
                     {

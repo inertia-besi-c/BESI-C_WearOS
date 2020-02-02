@@ -35,7 +35,7 @@
             android:id="@+id/back"
             android:layout_width="44dp"
             android:layout_height="230dp"
-            android:background="@color/dark_red"
+            android:background="@color/red_a200"
             android:text="@string/back_button"
             android:textColor="@color/white"
             android:textSize="16sp"
