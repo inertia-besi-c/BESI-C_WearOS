@@ -76,7 +76,7 @@
                     android:title="Sleep Mode Automatic Setup (Refresh Rate)"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
-                    android:defaultValue="5">
+                    android:defaultValue="45">
                 </ListPreference>
 
                 <!-- A text input is initialized for the buzz associated with the start of an activity -->
@@ -360,7 +360,7 @@
                     android:title="Automatic Start Hour"
                     android:entries="@array/hourList"
                     android:entryValues="@array/hourList"
-                    android:defaultValue="21">
+                    android:defaultValue="20">
                 </ListPreference>
 
                 <!-- A preference list is made for the minute time -->
@@ -369,7 +369,7 @@
                     android:title="Automatic Start Minute"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
-                    android:defaultValue="30">
+                    android:defaultValue="00">
                 </ListPreference>
 
                 <!-- A preference list is made for the seconds time -->
