@@ -3,22 +3,26 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-import android.support.wearable.activity.WearableActivity;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
+
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.preference.PreferenceManager;
-import android.content.IntentFilter;
-import android.os.Environment;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.Manifest;
+import android.os.Environment;
+import android.preference.PreferenceManager;
+import android.support.wearable.activity.WearableActivity;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * This is the main process that is fired upon the application being initiated on the device.
@@ -29,11 +33,16 @@ public class MainActivity extends WearableActivity
 {
     private BroadcastReceiver minuteUpdateReceiver;
     private SharedPreferences sharedPreferences;        // Initializes the shared preferences
+    private Map<String, ?> preferenceKeys;      // Creates a map to store key values
     private SystemInformation systemInformation;        // Initializes the system information
     private Intent startSettings;      // Initializes intents for the class
     private IntentFilter intentFilter;
     private File directory;     // Initializes the files of the class
     private DataLogger dataLogger;      // initializes the datalogger of the class
+    private StringBuilder stringBuilder;
+    private Button start, sleep;
+    private TextView date, time, battery;
+    private String batteryInformation;
     private boolean loggedHeaders;      // Initializes the boolean of the class
 
     /**
@@ -46,19 +55,24 @@ public class MainActivity extends WearableActivity
         super.onCreate(savedInstanceState);     // Creates an instance of the application
 
         this.startSettings = new Intent(getApplicationContext(), Settings.class);       // Starts a new intent for the settings class
-
-        this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
         this.startActivity(this.startSettings);       // Starts the intent for the settings
 
+        this.setContentView(R.layout.activity_main);        // Sets the view of the system
 
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
         this.systemInformation = new SystemInformation();       // Initializes the system information
         this.intentFilter = new IntentFilter();     // Initializes the intent filter
+        this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
 
         this.intentFilter.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
-//        this.logHeaders();      // Calls the method to log the files
 
-        this.setContentView(R.layout.activity_main);        // Sets the view of the system
+        this.start = findViewById(R.id.start);
+        this.sleep = findViewById(R.id.sleep);
+        this.date = findViewById(R.id.date);
+        this.time = findViewById(R.id.time);
+        this.battery = findViewById(R.id.battery);
+
+        this.setUpUIElements();
     }
 
     /**
@@ -134,12 +148,35 @@ public class MainActivity extends WearableActivity
                 this.dataLogger = new DataLogger(getApplicationContext(), file[0], file[1], file[2]);       // Make a specified data to the file
                 this.dataLogger.saveData("log");        // Save that data in log mode
             }
+
+            this.logInitialSettings();
         }
     }
 
     private void setUpUIElements()
     {
-        
+        this.batteryInformation = getResources().getString(R.string.battery_level_string) + " " + this.systemInformation.getBatteryLevel(getApplicationContext()) + "%";
+
+        this.time.setText(this.systemInformation.getDateTime("h:mm a"));
+        this.date.setText(this.systemInformation.getDateTime("MMM d, YYYY"));
+        this.battery.setText(this.batteryInformation);
+    }
+
+    /**
+     * This method is called to log the data that is set in the shared preferences to the device.
+     */
+    private void logInitialSettings()
+    {
+        this.stringBuilder = new StringBuilder();       // Initializes the string builder variable
+
+        for(Map.Entry<String,?> preferenceItem : preferenceKeys.entrySet())     // For every key in the map
+        {
+            this.stringBuilder.append(this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS")).append(",").append(preferenceItem.getKey()).append(",").append(preferenceItem.getValue());     // Appends the data to be logged
+            this.stringBuilder.append("\n");        // Appends a new line to the data
+        }
+
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), String.valueOf(this.stringBuilder));        // Make a new datalogger inference
+        this.dataLogger.saveData("log");        // Type of save to do
     }
 
     /**
@@ -157,7 +194,9 @@ public class MainActivity extends WearableActivity
             @Override
             public void onReceive(Context context, Intent intent)
             {
-                systemInformation.toast(getApplicationContext(), "TOASTING AT THE MINUTE!!!");
+                CheckPermissions();        // Calls the method to check for the required permissions for the device.
+                logHeaders();
+                setUpUIElements();
             }
         };
 
