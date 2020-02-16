@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Vibrator;
@@ -40,7 +41,7 @@ public class MainActivity extends WearableActivity
     private Map<String, ?> preferenceKeys;      // Creates a map to store key values
     private SystemInformation systemInformation;        // Initializes the system information
     private Intent startSettings, startEMA;      // Initializes intents for the class
-    private IntentFilter intentFilter;      // Makes the intent filter of the system
+    private IntentFilter minuteTimeTick;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
     private DataLogger dataLogger;      // initializes the datalogger of the class
     private StringBuilder stringBuilder;        // Initializes string builder of the system
@@ -48,6 +49,7 @@ public class MainActivity extends WearableActivity
     private TextView date, time, battery;        // Makes all text views on the system
     private String batteryInformation;      // Sets up the string in the class
     private int hapticLevel;        // Initializes the integers of the class
+    private boolean sleepMode;      // Initializes the boolean variables of the class
 
     /**
      * This method is run when the application is called at anytime.
@@ -60,7 +62,9 @@ public class MainActivity extends WearableActivity
 
         this.startSettings = new Intent(getApplicationContext(), Settings.class);       // Starts a new intent for the settings class
         this.systemInformation = new SystemInformation();       // Initializes the system information
-        this.intentFilter = new IntentFilter();     // Initializes the intent filter
+        this.minuteTimeTick = new IntentFilter();     // Initializes the intent filter
+
+        this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
 
         this.setContentView(R.layout.activity_main);        // Sets the view of the system
 
@@ -69,7 +73,7 @@ public class MainActivity extends WearableActivity
 
         this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
         this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));
-        this.intentFilter.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
+        this.minuteTimeTick.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
 
         this.start = findViewById(R.id.start);      // Sets up the start button in the view
         this.sleep = findViewById(R.id.sleep);      // Sets up the sleep button in the view
@@ -77,19 +81,61 @@ public class MainActivity extends WearableActivity
         this.time = findViewById(R.id.time);        // Sets up the time view
         this.battery = findViewById(R.id.battery);      // Sets up the battery view
 
-        this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
+        this.sleepMode = false;     // Initializes the sleepmode variable
+
         this.setUpUIElements();     // Calls the specified method to run
 
-        this.start.setOnClickListener(new View.OnClickListener()
+        this.start.setOnClickListener(new View.OnClickListener()        // Sets up the start button
         {
+            /**
+             * The following is run when the button is clicked
+             * @param v is the view in which it is clicked in
+             */
             @Override
             public void onClick(View v)
             {
-                vibrator.vibrate(hapticLevel);
-                logHeaders();
+                vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
+                logHeaders();       // Logs the headers
 
-                startEMA = new Intent(getApplicationContext(), PainSurvey.class);
-                startActivity(startEMA);
+                startEMA = new Intent(getApplicationContext(), PainSurvey.class);       // Makes a new intent
+                startActivity(startEMA);        // Starts the activity
+            }
+        });
+
+        this.sleep.setOnClickListener(new View.OnClickListener()        // Sets up the sleep button
+        {
+            /**
+             * The following is run when the button is clicked
+             * @param v is the view in which the button is in
+             */
+            @Override
+            public void onClick(View v)
+            {
+                vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
+                logHeaders();       // Logs the header files
+
+                if (!systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
+                {
+                    if (sleepMode)      // Checks if sleepmode is enabled, if it is
+                    {
+                        sleep.setBackgroundColor(Color.BLUE);       // Changes the background
+                        systemInformation.toast(getApplicationContext(), "Do not disturb is off");      // Shows a toast
+                    }
+                    else        // If sleepmode is not enabled
+                    {
+                        sleep.setBackgroundColor(Color.GRAY);       // Changes the background
+                        systemInformation.toast(getApplicationContext(), "Do not disturb is on");       // Shows a toast
+                    }
+
+                    sleepMode = !sleepMode;     // Updates the variable to reflect the changes wanted
+                }
+                else        // If the system is charging
+                {
+                    sleep.setBackgroundColor(Color.GRAY);       // Sets the background color
+                    systemInformation.toast(getApplicationContext(), "Charging Device");        // Shows a toast
+
+                    sleepMode = true;       // Explicitly sets the sleepmode to be true
+                }
             }
         });
     }
@@ -165,7 +211,7 @@ public class MainActivity extends WearableActivity
                             {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.endofdayresponse), getResources().getString(R.string.endofdayresponse_header)},        // End of Day response file
                     };
 
-            for (String[] file : Files)     // Foe every file in the files
+            for (String[] file : Files)     // For every file in the files
             {
                 this.dataLogger = new DataLogger(getApplicationContext(), file[0], file[1], file[2]);       // Make a specified data to the file
                 this.dataLogger.saveData("log");        // Save that data in log mode
@@ -175,13 +221,16 @@ public class MainActivity extends WearableActivity
         }
     }
 
+    /**
+     * Method to set up the items on the user interface and update them
+     */
     private void setUpUIElements()
     {
-        this.batteryInformation = getResources().getString(R.string.battery_level_string) + " " + this.systemInformation.getBatteryLevel(getApplicationContext()) + "%";
+        this.batteryInformation = getResources().getString(R.string.battery_level_string) + " " + this.systemInformation.getBatteryLevel(getApplicationContext()) + "%";        // Sets up the text for the battery
 
-        this.time.setText(this.systemInformation.getDateTime("h:mm a"));
-        this.date.setText(this.systemInformation.getDateTime("MMM d, YYYY"));
-        this.battery.setText(this.batteryInformation);
+        this.time.setText(this.systemInformation.getDateTime("h:mm a"));        // Sets up the time text
+        this.date.setText(this.systemInformation.getDateTime("MMM d, YYYY"));       // Sets up the date text
+        this.battery.setText(this.batteryInformation);      // Sets up the battery text
     }
 
     /**
@@ -217,11 +266,17 @@ public class MainActivity extends WearableActivity
             public void onReceive(Context context, Intent intent)
             {
                 logHeaders();      // Calls the method to log the header files
+
+                if(systemInformation.isCharging(getApplicationContext()))       // Checks if the system is charging
+                {
+                    sleep.performClick();       // Clicks the sleep button
+                }
+
                 setUpUIElements();      // Calls the method to set up UI elements
             }
         };
 
-        registerReceiver(this.minuteUpdateReceiver, this.intentFilter);     // Registers the receiver with the system to make sure it runs
+        registerReceiver(this.minuteUpdateReceiver, this.minuteTimeTick);     // Registers the receiver with the system to make sure it runs
     }
 
     /**
