@@ -72,6 +72,10 @@ public class WatchFace extends CanvasWatchFaceService
         {
             super.onCreate(holder);     // Calls a creation instance
 
+            this.mainActivity = new Intent(getBaseContext(), MainActivity.class);        // Makes an intent
+            this.mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+            startActivity(this.mainActivity);       // Starts the activity
+
             this.setWatchFaceStyle(new WatchFaceStyle.Builder(WatchFace.this).setAcceptsTapEvents(true).build());        // Sets the watchface to accept user tap event inputs.
             this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Get instance of Vibrator from current Context
 
@@ -109,8 +113,8 @@ public class WatchFace extends CanvasWatchFaceService
 //            this.logInitialSettings();      // Calls the method to log all the items in the settings file
 //            this.scheduleEndOfDaySurvey();      // Calls the method to perform the action
 
-            this.setUpDefaultValues();      // Calls the method
-            this.setUpDefaultColors();      // Calls the method
+//            this.setUpDefaultValues();      // Calls the method
+//            this.setUpDefaultColors();      // Calls the method
 
             this.invalidate();       // Refreshes the screen.
         }
@@ -125,28 +129,32 @@ public class WatchFace extends CanvasWatchFaceService
         {
             super.onDraw(canvas, bounds);       // Calls a drawing instance.
 
-            this.setUpSystemSleepMode();        // Calls the method to run
+            this.mainActivity = new Intent(getBaseContext(), MainActivity.class);        // Makes an intent
+            this.mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+            startActivity(this.mainActivity);       // Starts the activity
+
+//            this.setUpSystemSleepMode();        // Calls the method to run
 //            this.scheduleEndOfDaySurvey();      // Calls the method to run
 //            this.startSensorTimers();      // Calls the method to run
-            this.setUpDefaultValues();      // Sets up the values on the UI.
-            this.setUpDefaultColors();      // Sets up the colors on the UI.
-            this.setUpDateAndTime();       // Sets up the time on the UI.
-            this.setUpBatteryLevel();      // Sets up the battery values on the UI.
-            this.setUpButtons();        // Sets up the buttons on the UI.
+//            this.setUpDefaultValues();      // Sets up the values on the UI.
+//            this.setUpDefaultColors();      // Sets up the colors on the UI.
+//            this.setUpDateAndTime();       // Sets up the time on the UI.
+//            this.setUpBatteryLevel();      // Sets up the battery values on the UI.
+//            this.setUpButtons();        // Sets up the buttons on the UI.
 
             this.clearCanvas(canvas);       // Clears the screen so new values can be drawn.
 
-            canvas.drawText(this.currentDate, this.currentDatePositionX, this.currentDatePositionY, this.datePaint);       // Calls the canvas to draw the date information
-            canvas.drawText(this.currentTime, this.currentTimePositionX, this.currentTimePositionY, this.timePaint);       // Calls the canvas to draw the time information
-            canvas.drawText(this.batteryLevel, this.batteryLevelPositionX, this.batteryLevelPositionY, this.batteryPaint);      // Calls the canvas to draw the battery information.
-
-            canvas.drawRect(this.startX, this.startY, this.sleepEODEMAX,    // Draws the specified rectangle
-                    this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15, this.startPaint);       // Continued from previous line
-            canvas.drawRect(this.sleepEODEMAX, this.sleepEODEMAY, getResources().getDisplayMetrics().widthPixels,       // Draws the specified rectangle
-                    this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15, this.sleepEODEMAPaint);       // Continued from previous line
-            this.reconfigureButtons();      // Calls the method
-            canvas.drawText(this.startMessage, this.startX+20, this.startY + (this.startY/3) + 12, this.startPaint);      // Calls the canvas to draw the message information
-            canvas.drawText(this.sleepEODEMAMessage, this.sleepEODEMAX+8, this.sleepEODEMAY+(this.sleepEODEMAY/3)+8, this.sleepEODEMAPaint);        // Calls the canvas to draw the message
+//            canvas.drawText(this.currentDate, this.currentDatePositionX, this.currentDatePositionY, this.datePaint);       // Calls the canvas to draw the date information
+//            canvas.drawText(this.currentTime, this.currentTimePositionX, this.currentTimePositionY, this.timePaint);       // Calls the canvas to draw the time information
+//            canvas.drawText(this.batteryLevel, this.batteryLevelPositionX, this.batteryLevelPositionY, this.batteryPaint);      // Calls the canvas to draw the battery information.
+//
+//            canvas.drawRect(this.startX, this.startY, this.sleepEODEMAX,    // Draws the specified rectangle
+//                    this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15, this.startPaint);       // Continued from previous line
+//            canvas.drawRect(this.sleepEODEMAX, this.sleepEODEMAY, getResources().getDisplayMetrics().widthPixels,       // Draws the specified rectangle
+//                    this.batteryLevelPositionY-this.batteryLevelTextBounds.height()-15, this.sleepEODEMAPaint);       // Continued from previous line
+//            this.reconfigureButtons();      // Calls the method
+//            canvas.drawText(this.startMessage, this.startX+20, this.startY + (this.startY/3) + 12, this.startPaint);      // Calls the canvas to draw the message information
+//            canvas.drawText(this.sleepEODEMAMessage, this.sleepEODEMAX+8, this.sleepEODEMAY+(this.sleepEODEMAY/3)+8, this.sleepEODEMAPaint);        // Calls the canvas to draw the message
         }
 
         /**
@@ -167,6 +175,11 @@ public class WatchFace extends CanvasWatchFaceService
             switch (tapType)        // Switch case for the tap type
             {
                 case WatchFaceService.TAP_TYPE_TOUCH:       // Checks if the tap type was a touch
+
+                    this.mainActivity = new Intent(getBaseContext(), MainActivity.class);        // Makes an intent
+                    this.mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+                    startActivity(this.mainActivity);       // Starts the activity
+
                     if (x >= startX && x < startButtonXEnd && y >= startY && y <= buttonsYEnd)     // Determines if this was around the start button
                     {
                         this.vibrator.vibrate(hapticLevel);     // Vibrates the system for the specified time
@@ -680,7 +693,7 @@ public class WatchFace extends CanvasWatchFaceService
             this.currentDate = this.systemInformation.getDateTime("MMM d, yyyy");        // Sets up the date from the specific method.
             this.currentTime = this.systemInformation.getDateTime("h:mm a");        // Sets up the time from the specific method.
             this.batteryLevel = this.getBatteryLevelString();      // Sets up the battery level by calling the specified method.
-            this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
+//            this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
         }
 
         /**
@@ -691,8 +704,9 @@ public class WatchFace extends CanvasWatchFaceService
         {
             super.onTimeTick();     // Calls to superclass
 
-//            this.mainActivity = new Intent(getApplicationContext(), MainActivity.class);
-//            startActivity(this.mainActivity);
+            this.mainActivity = new Intent(getBaseContext(), MainActivity.class);        // Makes an intent
+            this.mainActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);       // Adds a new task for the service to start the activity
+            startActivity(this.mainActivity);       // Starts the activity
 
             this.invalidate();       // Redraws the screen
         }

@@ -43,7 +43,7 @@ public class MainActivity extends WearableActivity
     private Button start, sleep;        // Makes all button on the system
     private TextView date, time, battery;        // Makes all text views on the system
     private String batteryInformation;      // Sets up the string in the class
-    
+
     /**
      * This method is run when the application is called at anytime.
      * @param savedInstanceState is a parameter passed into the super class
@@ -54,7 +54,6 @@ public class MainActivity extends WearableActivity
         super.onCreate(savedInstanceState);     // Creates an instance of the application
 
         this.startSettings = new Intent(getApplicationContext(), Settings.class);       // Starts a new intent for the settings class
-        this.startActivity(this.startSettings);       // Starts the intent for the settings
 
         this.setContentView(R.layout.activity_main);        // Sets the view of the system
 
@@ -71,6 +70,7 @@ public class MainActivity extends WearableActivity
         this.time = findViewById(R.id.time);        // Sets up the time view
         this.battery = findViewById(R.id.battery);      // Sets up the battery view
 
+        this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
         this.setUpUIElements();     // Calls the specified method to run
     }
 
@@ -111,6 +111,9 @@ public class MainActivity extends WearableActivity
         if (needPermissions)        // When they have permission
         {
             ActivityCompat.requestPermissions(this, Required_Permissions,0);     // Allow them to work on device.
+
+            this.startActivity(this.startSettings);       // Starts the intent for the settings
+            this.logHeaders();      // Calls the method to log the header files
         }
     }
 
@@ -159,6 +162,8 @@ public class MainActivity extends WearableActivity
         this.time.setText(this.systemInformation.getDateTime("h:mm a"));
         this.date.setText(this.systemInformation.getDateTime("MMM d, YYYY"));
         this.battery.setText(this.batteryInformation);
+
+        this.logHeaders();      // Calls the method listed
     }
 
     /**
@@ -193,8 +198,6 @@ public class MainActivity extends WearableActivity
             @Override
             public void onReceive(Context context, Intent intent)
             {
-                CheckPermissions();        // Calls the method to check for the required permissions for the device.
-                logHeaders();
                 setUpUIElements();
             }
         };
