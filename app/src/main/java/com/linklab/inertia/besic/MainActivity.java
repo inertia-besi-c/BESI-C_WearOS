@@ -51,27 +51,15 @@ public class MainActivity extends WearableActivity
         this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
         this.startActivity(this.startSettings);       // Starts the intent for the settings
 
+
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
-        this.systemInformation = new SystemInformation();
+        this.systemInformation = new SystemInformation();       // Initializes the system information
+        this.intentFilter = new IntentFilter();     // Initializes the intent filter
+
+        this.intentFilter.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
 //        this.logHeaders();      // Calls the method to log the files
 
         this.setContentView(R.layout.activity_main);        // Sets the view of the system
-    }
-
-    public void startMinuteUpdater()
-    {
-        this.intentFilter = new IntentFilter();
-        this.intentFilter.addAction(Intent.ACTION_TIME_TICK);
-        this.minuteUpdateReceiver = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-                systemInformation.toast(getApplicationContext(), "TOASTING AT THE MINUTE!!!");
-            }
-        };
-
-        registerReceiver(this.minuteUpdateReceiver, this.intentFilter);
     }
 
     /**
@@ -150,17 +138,45 @@ public class MainActivity extends WearableActivity
         }
     }
 
+    /**
+     * This method is here to run specified items at every watch minute update on the system time change
+     */
+    private void startMinuteUpdater()
+    {
+        this.minuteUpdateReceiver = new BroadcastReceiver()     // Makes a broadcast receiver from the system
+        {
+            /**
+             * This method receives information from the system when the time changes
+             * @param context is the application context around the system
+             * @param intent is the intent to be used
+             */
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                systemInformation.toast(getApplicationContext(), "TOASTING AT THE MINUTE!!!");
+            }
+        };
+
+        registerReceiver(this.minuteUpdateReceiver, this.intentFilter);     // Registers the receiver with the system to make sure it runs
+    }
+
+    /**
+     * This method is called if the application is paused for any reason
+     */
     @Override
     protected void onPause()
     {
-        super.onPause();
-        unregisterReceiver(this.minuteUpdateReceiver);
+        super.onPause();        // Calls the super class method
+        unregisterReceiver(this.minuteUpdateReceiver);      // Unregisters the receiver
     }
 
+    /**
+     * This method is called when the system resumes back to this class
+     */
     @Override
     protected void onResume()
     {
-        super.onResume();
-        startMinuteUpdater();
+        super.onResume();       // Calls the super class method
+        startMinuteUpdater();       // Unregisters the receiver
     }
 }
