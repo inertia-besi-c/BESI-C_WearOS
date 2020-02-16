@@ -72,6 +72,8 @@ public class MainActivity extends WearableActivity
 
         this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
         this.setUpUIElements();     // Calls the specified method to run
+
+        
     }
 
     /**
@@ -162,8 +164,6 @@ public class MainActivity extends WearableActivity
         this.time.setText(this.systemInformation.getDateTime("h:mm a"));
         this.date.setText(this.systemInformation.getDateTime("MMM d, YYYY"));
         this.battery.setText(this.batteryInformation);
-
-        this.logHeaders();      // Calls the method listed
     }
 
     /**
@@ -198,7 +198,8 @@ public class MainActivity extends WearableActivity
             @Override
             public void onReceive(Context context, Intent intent)
             {
-                setUpUIElements();
+                logHeaders();      // Calls the method to log the header files
+                setUpUIElements();      // Calls the method to set up UI elements
             }
         };
 
