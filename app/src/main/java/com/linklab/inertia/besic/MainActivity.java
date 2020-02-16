@@ -31,20 +31,19 @@ import java.util.Map;
  */
 public class MainActivity extends WearableActivity
 {
-    private BroadcastReceiver minuteUpdateReceiver;
+    private BroadcastReceiver minuteUpdateReceiver;     // Sets up the broadcast receiver
     private SharedPreferences sharedPreferences;        // Initializes the shared preferences
     private Map<String, ?> preferenceKeys;      // Creates a map to store key values
     private SystemInformation systemInformation;        // Initializes the system information
     private Intent startSettings;      // Initializes intents for the class
-    private IntentFilter intentFilter;
+    private IntentFilter intentFilter;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
     private DataLogger dataLogger;      // initializes the datalogger of the class
-    private StringBuilder stringBuilder;
-    private Button start, sleep;
-    private TextView date, time, battery;
-    private String batteryInformation;
-    private boolean loggedHeaders;      // Initializes the boolean of the class
-
+    private StringBuilder stringBuilder;        // Initializes string builder of the system
+    private Button start, sleep;        // Makes all button on the system
+    private TextView date, time, battery;        // Makes all text views on the system
+    private String batteryInformation;      // Sets up the string in the class
+    
     /**
      * This method is run when the application is called at anytime.
      * @param savedInstanceState is a parameter passed into the super class
@@ -66,13 +65,13 @@ public class MainActivity extends WearableActivity
 
         this.intentFilter.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
 
-        this.start = findViewById(R.id.start);
-        this.sleep = findViewById(R.id.sleep);
-        this.date = findViewById(R.id.date);
-        this.time = findViewById(R.id.time);
-        this.battery = findViewById(R.id.battery);
+        this.start = findViewById(R.id.start);      // Sets up the start button in the view
+        this.sleep = findViewById(R.id.sleep);      // Sets up the sleep button in the view
+        this.date = findViewById(R.id.date);        // Sets up the date view
+        this.time = findViewById(R.id.time);        // Sets up the time view
+        this.battery = findViewById(R.id.battery);      // Sets up the battery view
 
-        this.setUpUIElements();
+        this.setUpUIElements();     // Calls the specified method to run
     }
 
     /**
@@ -149,7 +148,7 @@ public class MainActivity extends WearableActivity
                 this.dataLogger.saveData("log");        // Save that data in log mode
             }
 
-            this.logInitialSettings();
+            this.logInitialSettings();      // Calls the method to log the initial setting into the file
         }
     }
 
