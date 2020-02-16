@@ -73,7 +73,7 @@
                 <!-- A text input parameter is initialized for the max sleepmode parameters-->
                 <ListPreference
                     android:key="sleepmode_setup"
-                    android:title="Sleep Mode Automatic Setup (Refresh Rate)"
+                    android:title="Sleep Mode Automatic Setup (Minutes)"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
                     android:defaultValue="45">
@@ -134,10 +134,10 @@
                 <!-- A text input parameter is initialized for reminder buzz parameters-->
                 <ListPreference
                     android:key="battery_remind"
-                    android:title="Battery Level Alert (Refresh Rate)"
+                    android:title="Battery Level Alert (Minute)"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
-                    android:defaultValue="30">
+                    android:defaultValue="10">
                 </ListPreference>
             </PreferenceCategory>
 

@@ -49,7 +49,7 @@ public class MainActivity extends WearableActivity
     private Button start, sleep;        // Makes all button on the system
     private TextView date, time, battery;        // Makes all text views on the system
     private String batteryInformation;      // Sets up the string in the class
-    private int hapticLevel;        // Initializes the integers of the class
+    private int hapticLevel, sleepAutomatically;        // Initializes the integers of the class
     private boolean sleepMode;      // Initializes the boolean variables of the class
 
     /**
@@ -74,8 +74,10 @@ public class MainActivity extends WearableActivity
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Get instance of Vibrator from current Context
         this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
-        this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));
         this.minuteTimeTick.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
+
+        this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));
+        this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));
 
         this.start = findViewById(R.id.start);      // Sets up the start button in the view
         this.sleep = findViewById(R.id.sleep);      // Sets up the sleep button in the view
@@ -125,6 +127,7 @@ public class MainActivity extends WearableActivity
                         systemInformation.toast(getApplicationContext(), "Do not disturb is off");      // Shows a toast
 
                         startService(startSensors);     // Calls to start the service class
+                        sleepAutomatically = Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "")));
 
                         sleepMode = false;       // Explicitly sets the sleepmode to be false
                     }
@@ -144,6 +147,8 @@ public class MainActivity extends WearableActivity
                     stopService(startSensors);     // Calls to start the service class
                     sleepMode = true;       // Explicitly sets the sleepmode to be true
                 }
+
+                checkSteps.saveData("write");
             }
         });
     }
@@ -275,19 +280,29 @@ public class MainActivity extends WearableActivity
             {
                 logHeaders();      // Calls the method to log the header files
 
-                if(systemInformation.isCharging(getApplicationContext()))       // Checks if the system is charging
+                if(systemInformation.isCharging(getApplicationContext()) || sleepAutomatically <= 0)       // Checks if the system is charging
                 {
                     sleep.performClick();       // Clicks the sleep button
+                    stopService(startSensors);
                 }
 
-                if(!sleepMode)      // If sleepmode is disabled
+                if(!isRunning(SensorTimer.class) && sleepAutomatically > 0)       // If the sensor timer class is not running
                 {
-                    if(!isRunning(SensorTimer.class))       // If the sensor timer class is not running
-                    {
-                        startService(startSensors);     // Calls to start the service class
-                    }
+                    startService(startSensors);     // Calls to start the service class
                 }
 
+                if (checkSteps.readData().contains("no"))
+                {
+                    sleepAutomatically--;
+                }
+                else
+                {
+                    sleepAutomatically = Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "")));
+                    sleepMode = true;
+                    sleep.performClick();
+                }
+
+                checkSteps.saveData("write");
                 setUpUIElements();      // Calls the method to set up UI elements
             }
         };
