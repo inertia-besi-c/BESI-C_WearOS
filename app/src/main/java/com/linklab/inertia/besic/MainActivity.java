@@ -3,12 +3,17 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.wearable.activity.WearableActivity;
 
 import androidx.core.app.ActivityCompat;
@@ -23,12 +28,14 @@ import java.io.File;
  */
 public class MainActivity extends WearableActivity
 {
-    SharedPreferences sharedPreferences;        // Initializes the shared preferences
-    SystemInformation systemInformation;        // Initializes the system information
-    Intent startSettings;      // Initializes intents for the class
-    File directory;     // Initializes the files of the class
-    DataLogger dataLogger;      // initializes the datalogger of the class
-    boolean loggedHeaders;      // Initializes the boolean of the class
+    private BroadcastReceiver minuteUpdateReceiver;
+    private SharedPreferences sharedPreferences;        // Initializes the shared preferences
+    private SystemInformation systemInformation;        // Initializes the system information
+    private Intent startSettings;      // Initializes intents for the class
+    private IntentFilter intentFilter;
+    private File directory;     // Initializes the files of the class
+    private DataLogger dataLogger;      // initializes the datalogger of the class
+    private boolean loggedHeaders;      // Initializes the boolean of the class
 
     /**
      * This method is run when the application is called at anytime.
@@ -44,9 +51,27 @@ public class MainActivity extends WearableActivity
         this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
         this.startActivity(this.startSettings);       // Starts the intent for the settings
 
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
+        this.systemInformation = new SystemInformation();
 //        this.logHeaders();      // Calls the method to log the files
 
         this.setContentView(R.layout.activity_main);        // Sets the view of the system
+    }
+
+    public void startMinuteUpdater()
+    {
+        this.intentFilter = new IntentFilter();
+        this.intentFilter.addAction(Intent.ACTION_TIME_TICK);
+        this.minuteUpdateReceiver = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                systemInformation.toast(getApplicationContext(), "TOASTING AT THE MINUTE!!!");
+            }
+        };
+
+        registerReceiver(this.minuteUpdateReceiver, this.intentFilter);
     }
 
     /**
@@ -123,5 +148,19 @@ public class MainActivity extends WearableActivity
                 this.dataLogger.saveData("log");        // Save that data in log mode
             }
         }
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        unregisterReceiver(this.minuteUpdateReceiver);
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        startMinuteUpdater();
     }
 }
