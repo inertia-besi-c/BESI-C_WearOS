@@ -4,8 +4,6 @@ package com.linklab.inertia.besic;
  * Imports needed by the system to function appropriately
  */
 import android.Manifest;
-import android.app.WallpaperManager;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -27,9 +25,10 @@ public class MainActivity extends WearableActivity
 {
     SharedPreferences sharedPreferences;        // Initializes the shared preferences
     SystemInformation systemInformation;        // Initializes the system information
-    Intent changeWatchFace, startSettings;      // Initializes intents for the class
+    Intent startSettings;      // Initializes intents for the class
+    File directory;     // Initializes the files of the class
     DataLogger dataLogger;      // initializes the datalogger of the class
-    File directory;     // Initializes all files in the system
+    boolean loggedHeaders;      // Initializes the boolean of the class
 
     /**
      * This method is run when the application is called at anytime.
@@ -40,18 +39,14 @@ public class MainActivity extends WearableActivity
     {
         super.onCreate(savedInstanceState);     // Creates an instance of the application
 
-        this.changeWatchFace = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,        // Gets a watchface picker to show
-                new ComponentName(getPackageName(), WatchFace.class.getName()));        // Shows the components of the watchface
-        this.startSettings = new Intent(MainActivity.this, Settings.class);       // Starts a new intent for the settings class
-
-//        this.startActivity(this.changeWatchFace);     // Starts the intent for the watchface picker
-        this.startActivity(this.startSettings);       // Starts the intent for the settings
+        this.startSettings = new Intent(getApplicationContext(), Settings.class);       // Starts a new intent for the settings class
 
         this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
+        this.startActivity(this.startSettings);       // Starts the intent for the settings
+
 //        this.logHeaders();      // Calls the method to log the files
 
-        this.setContentView(R.layout.activity_main);
-
+        this.setContentView(R.layout.activity_main);        // Sets the view of the system
     }
 
     /**
@@ -100,7 +95,7 @@ public class MainActivity extends WearableActivity
     private void logHeaders()
     {
         this.directory = new File(Environment.getExternalStorageDirectory() + "/" + this.sharedPreferences.getString("directory_key", ""));     // Makes a reference to a directory
-        if (!directory.isDirectory())       // Checks if the directory is a directory or not, if not, it runs the following
+        if (!this.directory.isDirectory())       // Checks if the directory is a directory or not, if not, it runs the following
         {
             String[][] Files =      // A list of file and their headers to be made
                     {
