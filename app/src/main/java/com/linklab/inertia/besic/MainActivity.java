@@ -13,8 +13,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.wearable.activity.WearableActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -23,6 +25,7 @@ import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This is the main process that is fired upon the application being initiated on the device.
@@ -33,9 +36,10 @@ public class MainActivity extends WearableActivity
 {
     private BroadcastReceiver minuteUpdateReceiver;     // Sets up the broadcast receiver
     private SharedPreferences sharedPreferences;        // Initializes the shared preferences
+    private Vibrator vibrator;      // Initializes the vibrator of the class
     private Map<String, ?> preferenceKeys;      // Creates a map to store key values
     private SystemInformation systemInformation;        // Initializes the system information
-    private Intent startSettings;      // Initializes intents for the class
+    private Intent startSettings, startEMA;      // Initializes intents for the class
     private IntentFilter intentFilter;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
     private DataLogger dataLogger;      // initializes the datalogger of the class
@@ -43,6 +47,7 @@ public class MainActivity extends WearableActivity
     private Button start, sleep;        // Makes all button on the system
     private TextView date, time, battery;        // Makes all text views on the system
     private String batteryInformation;      // Sets up the string in the class
+    private int hapticLevel;        // Initializes the integers of the class
 
     /**
      * This method is run when the application is called at anytime.
@@ -54,14 +59,16 @@ public class MainActivity extends WearableActivity
         super.onCreate(savedInstanceState);     // Creates an instance of the application
 
         this.startSettings = new Intent(getApplicationContext(), Settings.class);       // Starts a new intent for the settings class
+        this.systemInformation = new SystemInformation();       // Initializes the system information
+        this.intentFilter = new IntentFilter();     // Initializes the intent filter
 
         this.setContentView(R.layout.activity_main);        // Sets the view of the system
 
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
-        this.systemInformation = new SystemInformation();       // Initializes the system information
-        this.intentFilter = new IntentFilter();     // Initializes the intent filter
-        this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
+        this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Get instance of Vibrator from current Context
 
+        this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
+        this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));
         this.intentFilter.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
 
         this.start = findViewById(R.id.start);      // Sets up the start button in the view
@@ -73,7 +80,18 @@ public class MainActivity extends WearableActivity
         this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
         this.setUpUIElements();     // Calls the specified method to run
 
-        
+        this.start.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                vibrator.vibrate(hapticLevel);
+                logHeaders();
+
+                startEMA = new Intent(getApplicationContext(), PainSurvey.class);
+                startActivity(startEMA);
+            }
+        });
     }
 
     /**
@@ -224,5 +242,14 @@ public class MainActivity extends WearableActivity
     {
         super.onResume();       // Calls the super class method
         startMinuteUpdater();       // Unregisters the receiver
+    }
+
+    /**
+     * This method is called when the system needs to end this activity
+     */
+    @Override
+    protected void onStop()     // To stop the activity.
+    {
+        super.onStop();     // Calls the super class method
     }
 }
