@@ -58,7 +58,7 @@ public class SensorTimer extends Service
     {
         this.heartrate = new Intent(getBaseContext(), HeartRate.class);     // Gets an intent on the specified class
 
-        if (runMode)        // Checks if the sensor is wanted to run
+        if (runMode && !this.systemInformation.isCharging(getApplicationContext()))        // Checks if the sensor is wanted to run
         {
             this.heartrateTimer = new Timer();      // Sets up a timer for the heartrate sensor
             this.heartrateTimer.schedule(new TimerTask()        // Schedules the timer
@@ -148,7 +148,7 @@ public class SensorTimer extends Service
     private void startAccelerometer(boolean runMode)
     {
         this.accelerometer = new Intent(getBaseContext(), Accelerometer.class);     // Sets up the intent to start the service
-        if(!isRunning(Accelerometer.class) && runMode)     // Checks if the service is already running, if it is not
+        if(!isRunning(Accelerometer.class) && runMode && !this.systemInformation.isCharging(getApplicationContext()))     // Checks if the service is already running, if it is not
         {
             startService(this.accelerometer);       // Automatically starts the service
 
@@ -189,11 +189,9 @@ public class SensorTimer extends Service
     private void killProcess()
     {
         this.heartrateTimer.cancel();       // Cancels the timer
-        this.estimoteTimer.cancel();        // Cancels the timer
 
         this.startAccelerometer(false);     // Stops the sensor from running
         this.startHeartRate(false);     // Stops the sensor from running
-        this.startEstimote(false);     // Stops the sensor from running
     }
 
     /**

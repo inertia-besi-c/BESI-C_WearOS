@@ -5,6 +5,7 @@ package com.linklab.inertia.besic;
  */
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -40,10 +41,10 @@ public class MainActivity extends WearableActivity
     private Vibrator vibrator;      // Initializes the vibrator of the class
     private Map<String, ?> preferenceKeys;      // Creates a map to store key values
     private SystemInformation systemInformation;        // Initializes the system information
-    private Intent startSettings, startEMA;      // Initializes intents for the class
+    private Intent startSettings, startEMA, startSensors;      // Initializes intents for the class
     private IntentFilter minuteTimeTick;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
-    private DataLogger dataLogger;      // initializes the datalogger of the class
+    private DataLogger dataLogger, checkSteps;      // initializes the datalogger of the class
     private StringBuilder stringBuilder;        // Initializes string builder of the system
     private Button start, sleep;        // Makes all button on the system
     private TextView date, time, battery;        // Makes all text views on the system
@@ -60,7 +61,9 @@ public class MainActivity extends WearableActivity
     {
         super.onCreate(savedInstanceState);     // Creates an instance of the application
 
+        this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
         this.startSettings = new Intent(getApplicationContext(), Settings.class);       // Starts a new intent for the settings class
+        this.startSensors = new Intent(getApplicationContext(), SensorTimer.class);     // Sets up the intent for the service
         this.systemInformation = new SystemInformation();       // Initializes the system information
         this.minuteTimeTick = new IntentFilter();     // Initializes the intent filter
 
@@ -70,7 +73,6 @@ public class MainActivity extends WearableActivity
 
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Get instance of Vibrator from current Context
-
         this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
         this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));
         this.minuteTimeTick.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
@@ -113,6 +115,7 @@ public class MainActivity extends WearableActivity
             {
                 vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
                 logHeaders();       // Logs the header files
+                setUpUIElements();      // Calls the method to set up UI elements
 
                 if (!systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
                 {
@@ -120,20 +123,25 @@ public class MainActivity extends WearableActivity
                     {
                         sleep.setBackgroundColor(Color.BLUE);       // Changes the background
                         systemInformation.toast(getApplicationContext(), "Do not disturb is off");      // Shows a toast
+
+                        startService(startSensors);     // Calls to start the service class
+
+                        sleepMode = false;       // Explicitly sets the sleepmode to be false
                     }
                     else        // If sleepmode is not enabled
                     {
                         sleep.setBackgroundColor(Color.GRAY);       // Changes the background
                         systemInformation.toast(getApplicationContext(), "Do not disturb is on");       // Shows a toast
-                    }
 
-                    sleepMode = !sleepMode;     // Updates the variable to reflect the changes wanted
+                        sleepMode = true;       // Explicitly sets the sleepmode to be true
+                    }
                 }
                 else        // If the system is charging
                 {
                     sleep.setBackgroundColor(Color.GRAY);       // Sets the background color
                     systemInformation.toast(getApplicationContext(), "Charging Device");        // Shows a toast
 
+                    stopService(startSensors);     // Calls to start the service class
                     sleepMode = true;       // Explicitly sets the sleepmode to be true
                 }
             }
@@ -272,11 +280,38 @@ public class MainActivity extends WearableActivity
                     sleep.performClick();       // Clicks the sleep button
                 }
 
+                if(!sleepMode)      // If sleepmode is disabled
+                {
+                    if(!isRunning(SensorTimer.class))       // If the sensor timer class is not running
+                    {
+                        startService(startSensors);     // Calls to start the service class
+                    }
+                }
+
                 setUpUIElements();      // Calls the method to set up UI elements
             }
         };
 
         registerReceiver(this.minuteUpdateReceiver, this.minuteTimeTick);     // Registers the receiver with the system to make sure it runs
+    }
+
+    /**
+     * Checks if a given service is currently running or not
+     * @param serviceClass is the service class to be checked
+     * @return a boolean true or false
+     */
+    @SuppressWarnings("ALL")        // Suppresses the warnings associated with this method
+    private boolean isRunning(Class<?> serviceClass)        // A general file that checks if a system is running.
+    {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);     // Starts the activity manager to check the service called.
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))        // For each service called by the running service.
+        {
+            if (serviceClass.getName().equals(service.service.getClassName()))      // It checks if it is running.
+            {
+                return true;        // Returns true
+            }
+        }
+        return false;       // If not, it returns false.
     }
 
     /**
@@ -286,7 +321,7 @@ public class MainActivity extends WearableActivity
     protected void onPause()
     {
         super.onPause();        // Calls the super class method
-        unregisterReceiver(this.minuteUpdateReceiver);      // Unregisters the receiver
+        this.unregisterReceiver(this.minuteUpdateReceiver);      // Unregisters the receiver
     }
 
     /**
@@ -296,7 +331,8 @@ public class MainActivity extends WearableActivity
     protected void onResume()
     {
         super.onResume();       // Calls the super class method
-        startMinuteUpdater();       // Unregisters the receiver
+        this.setUpUIElements();     // Calls the method
+        this.startMinuteUpdater();       // Unregisters the receiver
     }
 
     /**
