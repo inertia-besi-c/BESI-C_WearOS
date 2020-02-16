@@ -54,7 +54,7 @@ public class WatchFace extends CanvasWatchFaceService
         private SystemInformation systemInformation;        // Gets a context to the system information class
         private Paint.FontMetrics startBackground, sleepEODEMABackground;      // Sets variables background
         private DataLogger dataLogger, checkEODDate, checkSteps;      // Initializes a datalogger instance
-        private Intent eodEMAProcessIntent, timerIntent, surveyIntent, estimoteIntent, lowBatteryIntent;     // Initializes the intents of the class
+        private Intent eodEMAProcessIntent, timerIntent, surveyIntent, estimoteIntent, lowBatteryIntent, mainActivity;     // Initializes the intents of the class
         private StringBuilder stringBuilder;        // Initializes a string builder variable
         private TextPaint batteryPaint, timePaint, datePaint, startPaint, sleepEODEMAPaint;     // Sets the paint instance for the texts
         private String batteryLevel, currentTime, currentDate, startMessage, sleepEODEMAMessage, data;        // Sets up string variables
@@ -693,6 +693,10 @@ public class WatchFace extends CanvasWatchFaceService
         public void onTimeTick()
         {
             super.onTimeTick();     // Calls to superclass
+
+//            this.mainActivity = new Intent(getApplicationContext(), MainActivity.class);
+//            startActivity(this.mainActivity);
+
             this.invalidate();       // Redraws the screen
         }
 

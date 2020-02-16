@@ -3,16 +3,16 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
+import android.Manifest;
 import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.Manifest;
 import android.os.Environment;
+import android.support.wearable.activity.WearableActivity;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -23,7 +23,7 @@ import java.io.File;
  * This class asks the user to pick what watchface they would like, allows the developer to set
  * the preferences of the device, and also checks for the required permissions the application needs
  */
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends WearableActivity
 {
     SharedPreferences sharedPreferences;        // Initializes the shared preferences
     SystemInformation systemInformation;        // Initializes the system information
@@ -44,11 +44,13 @@ public class MainActivity extends AppCompatActivity
                 new ComponentName(getPackageName(), WatchFace.class.getName()));        // Shows the components of the watchface
         this.startSettings = new Intent(MainActivity.this, Settings.class);       // Starts a new intent for the settings class
 
-        this.startActivity(this.changeWatchFace);     // Starts the intent for the watchface picker
+//        this.startActivity(this.changeWatchFace);     // Starts the intent for the watchface picker
         this.startActivity(this.startSettings);       // Starts the intent for the settings
 
         this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
-        this.logHeaders();      // Calls the method to log the files
+//        this.logHeaders();      // Calls the method to log the files
+
+        this.setContentView(R.layout.activity_main);
 
     }
 
