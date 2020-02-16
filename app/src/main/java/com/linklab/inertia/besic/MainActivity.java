@@ -41,7 +41,7 @@ public class MainActivity extends WearableActivity
     private Vibrator vibrator;      // Initializes the vibrator of the class
     private Map<String, ?> preferenceKeys;      // Creates a map to store key values
     private SystemInformation systemInformation;        // Initializes the system information
-    private Intent startSettings, startEMA, startSensors;      // Initializes intents for the class
+    private Intent startSettings, startEMA, startSensors, estimoteSensor;      // Initializes intents for the class
     private IntentFilter minuteTimeTick;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
     private DataLogger dataLogger, checkSteps;      // initializes the datalogger of the class
@@ -64,6 +64,7 @@ public class MainActivity extends WearableActivity
         this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
         this.startSettings = new Intent(getApplicationContext(), Settings.class);       // Starts a new intent for the settings class
         this.startSensors = new Intent(getApplicationContext(), SensorTimer.class);     // Sets up the intent for the service
+        this.estimoteSensor = new Intent(getApplicationContext(), Estimote.class);
         this.systemInformation = new SystemInformation();       // Initializes the system information
         this.minuteTimeTick = new IntentFilter();     // Initializes the intent filter
 
@@ -88,6 +89,7 @@ public class MainActivity extends WearableActivity
         this.sleepMode = false;     // Initializes the sleepmode variable
 
         this.setUpUIElements();     // Calls the specified method to run
+        this.checkSteps.saveData("write");
 
         this.start.setOnClickListener(new View.OnClickListener()        // Sets up the start button
         {
@@ -278,31 +280,45 @@ public class MainActivity extends WearableActivity
             @Override
             public void onReceive(Context context, Intent intent)
             {
+                checkSteps.saveData("write");       // Writes data to the file
+
                 logHeaders();      // Calls the method to log the header files
 
-                if(systemInformation.isCharging(getApplicationContext()) || sleepAutomatically <= 0)       // Checks if the system is charging
+                if(systemInformation.isCharging(getApplicationContext()))       // Checks if the system is charging
                 {
                     sleep.performClick();       // Clicks the sleep button
-                    stopService(startSensors);
+                    stopService(startSensors);      // Stops the sensor class
                 }
 
-                if(!isRunning(SensorTimer.class) && sleepAutomatically > 0)       // If the sensor timer class is not running
+                if(sleepAutomatically <= 0)     // Checks if the variable is below the limit
                 {
-                    startService(startSensors);     // Calls to start the service class
+                    sleepMode = false;      // Forces the sleepmode to be false
+                    sleep.performClick();       // Clicks the sleep button
+                    if(isRunning(Estimote.class))       // Checks if the estimote class is running
+                    {
+                        stopService(estimoteSensor);        // Stops the estimote class
+                    }
+                }
+                else        // If the variable is within parameters
+                {
+                    if(!isRunning(SensorTimer.class))       // If the sensor timer class is not running
+                    {
+                        startService(startSensors);     // Calls to start the service class
+                    }
                 }
 
-                if (checkSteps.readData().contains("no"))
+                if (checkSteps.readData().contains("no"))       // Checks if the file is a no
                 {
-                    sleepAutomatically--;
+                    sleepAutomatically--;       // Decrements the boolean value
                 }
-                else
+                else        // If it contains anything else
                 {
-                    sleepAutomatically = Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "")));
-                    sleepMode = true;
-                    sleep.performClick();
+                    sleepAutomatically = Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "")));       // Resets the variable
+                    sleepMode = true;       // Sets the value to be true
+                    sleep.performClick();       // Performs a click
                 }
 
-                checkSteps.saveData("write");
+                checkSteps.saveData("write");       // Writes data to the file
                 setUpUIElements();      // Calls the method to set up UI elements
             }
         };
