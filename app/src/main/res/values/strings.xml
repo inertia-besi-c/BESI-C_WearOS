@@ -10,6 +10,7 @@
     <string name="battery_level_string">Battery:</string>   <!--This is the battery information shown in front of the battery information-->
     <string name="start_string">START</string>  <!--This is the string that is shown on the green button-->
     <string name="sleep_string">SLEEP</string>  <!--This is the string that is shown on the blue button-->
+    <string name="dnd_string">DO NOT DISTURB</string>  <!--This is the string that is shown on the blue button-->
     <string name="eodema_string">SURVEY</string>  <!--This is the string that is shown on the red button-->
     <string name="survey_string">Text</string>      <!--The id for the survey question-->
     <string name="back_button">Back</string>        <!--The id for the back button-->

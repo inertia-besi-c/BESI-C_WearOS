@@ -3,18 +3,17 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-
-import android.Manifest;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.support.wearable.activity.WearableActivity;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.os.Environment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.preference.PreferenceManager;
-import android.support.wearable.activity.WearableActivity;
+import android.content.IntentFilter;
+import android.os.Environment;
+import android.content.Intent;
+import android.os.Bundle;
+import android.Manifest;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -136,6 +135,11 @@ public class MainActivity extends WearableActivity
                 this.dataLogger.saveData("log");        // Save that data in log mode
             }
         }
+    }
+
+    private void setUpUIElements()
+    {
+        
     }
 
     /**
