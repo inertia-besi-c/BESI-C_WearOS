@@ -53,7 +53,7 @@ public class MainActivity extends WearableActivity
     private String batteryInformation, batteryFileInformation;      // Sets up the string in the class
     private Timer lowBatteryTimer;       // Sets the timers for the class
     private int hapticLevel, sleepAutomatically, lowBatteryThreshHold, startHour, startMinute, startSecond, endHour, endMinute, endSecond;        // Initializes the integers of the class
-    private boolean sleepMode, runLowBattery, alreadyRunSettings;      // Initializes the boolean variables of the class
+    private boolean sleepMode, runLowBattery;      // Initializes the boolean variables of the class
 
     /**
      * This method is run when the application is called at anytime.
@@ -219,7 +219,6 @@ public class MainActivity extends WearableActivity
         };
 
         boolean needPermissions = false;        // To begin the permission is set to false.
-//        this.alreadyRunSettings = true;        // To begin permission is set to true
 
         for (String permission : Required_Permissions)     // For each of the permission listed above.
         {
@@ -231,7 +230,6 @@ public class MainActivity extends WearableActivity
 
         if (needPermissions)        // When they have permission
         {
-//            this.alreadyRunSettings = false;        // Resets to false if not already completed
             ActivityCompat.requestPermissions(this, Required_Permissions,0);     // Allow them to work on device.
         }
     }

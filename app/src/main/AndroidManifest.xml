@@ -31,7 +31,7 @@
         android:label="@string/app_name_abbreviated"
         android:launchMode="singleInstance"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.DeviceDefault"
+        android:theme="@style/BESIStyle"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
         <meta-data
