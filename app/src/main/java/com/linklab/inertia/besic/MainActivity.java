@@ -12,8 +12,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.app.WallpaperManager;
-import android.content.ComponentName;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,6 +26,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
@@ -43,19 +42,21 @@ public class MainActivity extends WearableActivity
     private BroadcastReceiver minuteUpdateReceiver;     // Sets up the broadcast receiver
     private SharedPreferences sharedPreferences;        // Initializes the shared preferences
     private Vibrator vibrator;      // Initializes the vibrator of the class
+    private Calendar calendar;      // Initializes the calendar variable
     private Map<String, ?> preferenceKeys;      // Creates a map to store key values
     private SystemInformation systemInformation;        // Initializes the system information
-    private Intent startSettings, startEMA, startLowBattery, startSensors, estimoteSensor, changeWatchFace;      // Initializes intents for the class
+    private Intent startSettings, startEMA, startLowBattery, startSensors, estimoteSensor;      // Initializes intents for the class
     private IntentFilter minuteTimeTick;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
-    private DataLogger dataLogger, checkSteps, checkDate, batteryData;      // initializes the datalogger of the class
+    private DataLogger dataLogger, checkSteps, checkDate;      // initializes the datalogger of the class
     private StringBuilder stringBuilder;        // Initializes string builder of the system
     private Button start, sleep, dailyEMA;        // Makes all button on the system
     private TextView date, time, battery;        // Makes all text views on the system
-    private String batteryInformation, batteryFileInformation;      // Sets up the string in the class
+    private String batteryInformation;      // Sets up the string in the class
     private Timer lowBatteryTimer;       // Sets the timers for the class
     private int hapticLevel, sleepAutomatically, lowBatteryThreshHold, startHour, startMinute, startSecond, endHour, endMinute, endSecond;        // Initializes the integers of the class
     private boolean sleepMode, runLowBattery, runEODEMAButton;      // Initializes the boolean variables of the class
+    private long startAutomaticEMA;     // Initializes the long variables of the class
 
     /**
      * This method is run when the application is called at anytime.
@@ -66,10 +67,6 @@ public class MainActivity extends WearableActivity
     {
         super.onCreate(savedInstanceState);     // Creates an instance of the application
 
-        this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
-        this.checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
-        this.changeWatchFace = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,        // Gets a watchface picker to show
-                new ComponentName(getPackageName(), WatchFace.class.getName()));        // Shows the components of the watchface
         this.startSettings = new Intent(getApplicationContext(), Settings.class);       // Starts a new intent for the settings class
         this.startSensors = new Intent(getApplicationContext(), SensorTimer.class);     // Sets up the intent for the service
         this.estimoteSensor = new Intent(getApplicationContext(), Estimote.class);     // Sets up the intent for the service
@@ -78,20 +75,10 @@ public class MainActivity extends WearableActivity
         this.minuteTimeTick = new IntentFilter();     // Initializes the intent filter
         this.lowBatteryTimer = new Timer();
 
-        this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
-        this.startActivity(this.changeWatchFace);     // Starts the intent for the watchface picker
         this.startActivity(this.startSettings);     // Run the settings
+        this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
 
         this.setContentView(R.layout.activity_main);        // Sets the view of the system
-
-        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
-        this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Get instance of Vibrator from current Context
-        this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
-        this.minuteTimeTick.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
-
-        this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Gets the haptic  level preference
-        this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));     // Gets the sleep level max number
-        this.lowBatteryThreshHold = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_alert", "")));     // Gets the low battery thresh hold
 
         this.start = findViewById(R.id.start);      // Sets up the start button in the view
         this.sleep = findViewById(R.id.sleep);      // Sets up the sleep button in the view
@@ -100,6 +87,17 @@ public class MainActivity extends WearableActivity
         this.time = findViewById(R.id.time);        // Sets up the time view
         this.battery = findViewById(R.id.battery);      // Sets up the battery view
 
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
+        this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Get instance of Vibrator from current Context
+        this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
+        this.minuteTimeTick.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
+
+        this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "20")));       // Gets the haptic  level preference
+        this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "45")));     // Gets the sleep level max number
+        this.lowBatteryThreshHold = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_alert", "10")));     // Gets the low battery thresh hold
+        this.directory = new File(Environment.getExternalStorageDirectory() + "/" + this.sharedPreferences.getString("directory_key", getResources().getString(R.string.app_name_abbreviated)));     // Makes a reference to a directory
+        this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
+        this.checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
         this.sleepMode = false;     // Initializes the sleepmode variable
 
         this.logHeaders();      // Calls the method to log the header files
@@ -119,15 +117,13 @@ public class MainActivity extends WearableActivity
             {
                 if(systemInformation.getBatteryLevel(getApplicationContext()) <= lowBatteryThreshHold && !runLowBattery)        // Checks if the battery level is lower than expected
                 {
+                    logHeaders();      // Calls the method to log the header files
+
                     if (!isRunning(Battery.class) && !systemInformation.isCharging(getApplicationContext()))        // Makes sure the class is not already running and that the system is not charging
                         startActivity(startLowBattery);
                 }
-
-                batteryFileInformation = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + systemInformation.getBatteryLevel(getApplicationContext()) + (",") + systemInformation.isCharging(getApplicationContext());     // Data to be logged by the system
-                batteryData = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.battery), batteryFileInformation);      // Sets a new datalogger variable
-                batteryData.saveData("log");        // Saves the data with the specified type
             }
-        }, 0, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", ""))) * 60 * 1000);     // Repeats at the specified interval
+        }, 0, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10"))) * 60 * 1000);     // Repeats at the specified interval
 
         this.start.setOnClickListener(new View.OnClickListener()        // Sets up the start button
         {
@@ -139,7 +135,7 @@ public class MainActivity extends WearableActivity
             public void onClick(View v)
             {
                 vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
-                logHeaders();       // Logs the headers
+                logHeaders();      // Calls the method to log the header files
 
                 startEMA = new Intent(getApplicationContext(), PainSurvey.class);       // Makes a new intent
                 startActivity(startEMA);        // Starts the activity
@@ -156,7 +152,7 @@ public class MainActivity extends WearableActivity
             public void onClick(View v)
             {
                 vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
-                logHeaders();       // Logs the headers
+                logHeaders();      // Calls the method to log the header files
 
                 startEMA = new Intent(getApplicationContext(), EndOfDaySurvey.class);       // Makes a new intent
                 startActivity(startEMA);        // Starts the activity
@@ -173,8 +169,9 @@ public class MainActivity extends WearableActivity
             public void onClick(View v)
             {
                 vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
-                logHeaders();       // Logs the header files
                 setUpUIElements();      // Calls the method to set up UI elements
+                logHeaders();      // Calls the method to log the header files
+
 
                 if (!systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
                 {
@@ -257,7 +254,6 @@ public class MainActivity extends WearableActivity
      */
     private void logHeaders()
     {
-        this.directory = new File(Environment.getExternalStorageDirectory() + "/" + this.sharedPreferences.getString("directory_key", "BESI-C"));     // Makes a reference to a directory
         if (!this.directory.isDirectory())       // Checks if the directory is a directory or not, if not, it runs the following
         {
             String[][] Files =      // A list of file and their headers to be made
@@ -307,12 +303,12 @@ public class MainActivity extends WearableActivity
      */
     private void setUpLowBattery()
     {
-        this.startHour = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "")));     // Gets the start hour from preferences
-        this.startMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "")));     // Gets the start minute from preferences
-        this.startSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "")));     // Gets the start second from preferences
-        this.endHour = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "")));         // Gets the end hour from preferences
-        this.endMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "")));     // Gets the end minute from preferences
-        this.endSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "")));     // Gets the end second from preferences
+        this.startHour = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "00")));     // Gets the start hour from preferences
+        this.startMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "00")));     // Gets the start minute from preferences
+        this.startSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "00")));     // Gets the start second from preferences
+        this.endHour = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "07")));         // Gets the end hour from preferences
+        this.endMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "59")));     // Gets the end minute from preferences
+        this.endSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "59")));     // Gets the end second from preferences
 
         this.runLowBattery = this.systemInformation.isTimeBetweenTimes(this.systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
     }
@@ -322,22 +318,37 @@ public class MainActivity extends WearableActivity
      */
     private void setUpEODEMAButton()
     {
-        this.startHour = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_hour", "")));     // Gets the start hour from preferences
-        this.startMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_minute", "")));     // Gets the start minute from preferences
-        this.startSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_second", "")));     // Gets the start second from preferences
-        this.endHour = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_hour", "")));         // Gets the end hour from preferences
-        this.endMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_minute", "")));     // Gets the end minute from preferences
-        this.endSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_second", "")));     // Gets the end second from preferences
+        this.calendar = Calendar.getInstance();     // Makes an instance of the calendar
+        this.calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_hour", "20"))));     // Assigns the hour
+        this.calendar.set(Calendar.MINUTE, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_minute", "00"))));        // Assigns the minute
+        this.calendar.set(Calendar.SECOND, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_second", "00"))));        // Assigns the seconds
+
+        this.startHour = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_hour", "17")));     // Gets the start hour from preferences
+        this.startMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_minute", "00")));     // Gets the start minute from preferences
+        this.startSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_second", "00")));     // Gets the start second from preferences
+        this.endHour = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_hour", "23")));         // Gets the end hour from preferences
+        this.endMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_minute", "59")));     // Gets the end minute from preferences
+        this.endSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_second", "59")));     // Gets the end second from preferences
 
         this.runEODEMAButton = this.systemInformation.isTimeBetweenTimes(this.systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
+        this.startAutomaticEMA = this.calendar.getTimeInMillis();       // Gets the time in milliseconds for the calendar time
 
-        if (runEODEMAButton && !this.checkDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))
+        if (runEODEMAButton && !this.checkDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))       // Checks the conditions for the daily survey button
         {
             this.dailyEMA.bringToFront();       // Brings the button to the front
         }
-        else
+        else        // If the conditions fail
         {
             this.sleep.bringToFront();      // Brings the button to the front
+        }
+
+        if (System.currentTimeMillis() >= this.startAutomaticEMA && System.currentTimeMillis() <= this.startAutomaticEMA + (5*60*1000))     // Checks the time for the automatic ema
+        {
+            if (!this.systemInformation.isCharging(getApplicationContext()) && !sleepMode && !this.checkDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))      // Makes sure the system is not charging or in sleepmode
+            {
+                this.startEMA = new Intent(getApplicationContext(), EndOfDayPrompt1.class);       // Makes a new intent
+                this.startActivity(this.startEMA);        // Starts the activity
+            }
         }
     }
 
@@ -376,8 +387,8 @@ public class MainActivity extends WearableActivity
                 checkSteps.saveData("write");       // Writes data to the file
                 setUpLowBattery();      // Calls the method
                 setUpEODEMAButton();        // Calls the method
-
                 logHeaders();      // Calls the method to log the header files
+
 
                 if(systemInformation.isCharging(getApplicationContext()))       // Checks if the system is charging
                 {
