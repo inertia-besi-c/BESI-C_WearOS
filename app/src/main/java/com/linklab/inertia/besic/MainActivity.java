@@ -99,12 +99,10 @@ public class MainActivity extends WearableActivity
         this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
         this.checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
         this.sleepMode = false;     // Initializes the sleepmode variable
-        
+
         this.setUpUIElements();     // Calls the specified method to run
         this.setUpLowBattery();     // Calls the method
         this.setUpEODEMAButton();       // Calls the method
-        this.checkSteps.saveData("write");      // Saves the data in the mode provided
-
 
         this.lowBatteryTimer.schedule(new TimerTask()        // Schedules the timer
         {
@@ -341,7 +339,7 @@ public class MainActivity extends WearableActivity
             this.sleep.bringToFront();      // Brings the button to the front
         }
 
-        if (System.currentTimeMillis() >= this.startAutomaticEMA && System.currentTimeMillis() <= this.startAutomaticEMA + (5*60*1000))     // Checks the time for the automatic ema
+        if (System.currentTimeMillis() >= this.startAutomaticEMA && System.currentTimeMillis() <= this.startAutomaticEMA + (2*60*1000))     // Checks the time for the automatic ema
         {
             if (!this.systemInformation.isCharging(getApplicationContext()) && !sleepMode && !this.checkDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))      // Makes sure the system is not charging or in sleepmode
             {
