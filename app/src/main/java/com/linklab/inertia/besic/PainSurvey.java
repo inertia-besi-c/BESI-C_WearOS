@@ -63,6 +63,8 @@ public class PainSurvey extends WearableActivity
                     "What is your current location?",
                     "Did patient take an opioid for the pain?",
                     "Why not?",
+                    "Did patient do anything else for the pain?",
+                    "What did patient do?",
                     "Ready to submit your answers?",
             };
     private final String[][] caregiverAnswers =       // These are the answers for the care giver in order.
@@ -74,6 +76,8 @@ public class PainSurvey extends WearableActivity
                     {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
                     {"Yes", "No", "Unsure"},
                     {"Not time yet", "Side effects", "Out of pills", "Worried taking too many", "Pain not bad enough", "Other Reason", "Unsure"},
+                    {"Yes", "No", "Unsure"},
+                    {"Exercise/Stretching", "Prayer/Meditation", "Hot/Cold Pack", "Position Change", "Rest", "Massage", "Took Non-Opioid Medication",  "Other"},
                     {"Yes", "No"},
             };
 
@@ -86,6 +90,8 @@ public class PainSurvey extends WearableActivity
                     "What is your current location?",
                     "Did you take an opioid for the pain?",
                     "Why not?",
+                    "Did you do anything else for the pain?",
+                    "What did you do?",
                     "Ready to submit your answers?",
             };
     private final String[][] patientAnswers =         // These are the patient answers in order.
@@ -97,6 +103,8 @@ public class PainSurvey extends WearableActivity
                     {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
                     {"Yes", "No"},
                     {"Not time yet", "Side effects", "Out of pills", "Worried taking too many", "Pain not bad enough", "Other Reason"},
+                    {"Yes", "No"},
+                    {"Exercise/Stretching", "Prayer/Meditation", "Hot/Cold Pack", "Position Change", "Rest", "Massage", "Took Non-Opioid Medication",  "Other"},
                     {"Yes", "No"}
             };
 
@@ -179,7 +187,7 @@ public class PainSurvey extends WearableActivity
                 this.back.setText(this.answers[0][1]);      // Sets the back button to be an answer choice
                 this.answer.setVisibility(View.INVISIBLE);     // Removes the middle button option from the user
             }
-            else if (this.currentQuestion == questions.length-3)        // Checks the question location of the watch
+            else if (this.currentQuestion == 5 || this.currentQuestion == 7)        // Checks the question location of the watch
             {
                 if (this.role.equalsIgnoreCase("PT"))       // Checks the role of the watch
                 {
@@ -215,7 +223,7 @@ public class PainSurvey extends WearableActivity
                     systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append(next.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
-                    if (currentQuestion == questions.length-3)
+                    if (currentQuestion == 5)
                     {
                         userResponses[currentQuestion] = next.getText().toString();     // Adds the data to be saved to an array list
                         logActivity();      // Calls the method to log the data
