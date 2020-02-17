@@ -223,7 +223,7 @@ public class PainSurvey extends WearableActivity
                     systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append(next.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
-                    if (currentQuestion == 5)
+                    if (currentQuestion == 5)       // Checks for the question wanted
                     {
                         userResponses[currentQuestion] = next.getText().toString();     // Adds the data to be saved to an array list
                         logActivity();      // Calls the method to log the data
@@ -323,7 +323,7 @@ public class PainSurvey extends WearableActivity
                 {
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
-                    if (currentQuestion == questions.length-3)      // Checks if this is the third question
+                    if (currentQuestion == 5 || currentQuestion == 7)      // Checks if this is the third question
                     {
                         if (role.equalsIgnoreCase("CG"))        // Checks for the role of the device
                         {
