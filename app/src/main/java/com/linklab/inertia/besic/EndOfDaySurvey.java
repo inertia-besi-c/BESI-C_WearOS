@@ -4,20 +4,29 @@ package com.linklab.inertia.besic;
  * Imports needed by the system to function appropriately
  */
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.support.wearable.activity.WearableActivity;
 import android.content.SharedPreferences;
+import android.view.LayoutInflater;
 import android.view.WindowManager;
 import android.content.Context;
+import android.view.ViewGroup;
 import android.os.Vibrator;
 import android.view.Window;
 import android.preference.PreferenceManager;
+import android.app.ActivityManager;
 import android.widget.TextView;
+import android.content.Intent;
 import android.widget.Button;
+import android.widget.Toast;
 import android.os.Bundle;
 import android.view.View;
 import android.os.Handler;
 import android.os.Looper;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.TimerTask;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,16 +43,20 @@ import java.util.Date;
 public class EndOfDaySurvey extends WearableActivity
 {
     private SharedPreferences sharedPreferences;        // Gets a reference to the shared preferences of the wearable activity
+    private LayoutInflater layoutInflater;      // Layout inflater for the activity
     private Vibrator vibrator;      // Gets a link to the system vibrator
     private Window window;      // Gets access to the touch screen of the device
     private int currentQuestion, answersTapped, index, hapticLevel, activityStartLevel, activityRemindLevel, emaReminderInterval, emaDelayInterval, maxReminder;       // Initializes various integers to be used by the system
     private int[] userResponseIndex;        // This is the user response index that keeps track of the index response of the user.
     private Button back, next, answer;      // The buttons on the screen
     private Timer reminderTimer;        // Sets up the timers for the survey
+    private View view;      // Makes the view variable
+    private Toast toast;        // Makes the toast variable
     private TextView question;      // Links to the text shown on the survey screen
     private String role, data, startTime, endTime, duration;        // Sets up all the string variable in the system
     private String[] userResponses, questions;     // String list variables used in the method
     private String[][] answers;     // String list in list variables used in the class
+    private Intent heartRate, estimote;     // Initializes an intent variable
     private DataLogger dataLogger, checkEODDate;      // Makes a global variable for the data logger
     private StringBuilder surveyLogs, systemLogs;       // Initializes a global string builder variable
     private SimpleDateFormat timeFormatter;     // Initiates a date time variable
@@ -138,12 +151,15 @@ public class EndOfDaySurvey extends WearableActivity
         this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
         this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
         this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
+        this.toast = new Toast(getApplicationContext());      // Sets up the toast in term of this context
+        this.heartRate = new Intent(getBaseContext(), HeartRate.class);     // Makes an intent to the heartrate class
+        this.estimote = new Intent(getBaseContext(), Estimote.class);       // Makes an intent to the estimote class
         this.currentQuestion = 0;       // Sets the number of questioned answered by the user
 
         this.back = findViewById(R.id.back);        // Gets a reference to the back button
         this.next = findViewById(R.id.next);        // Gets a reference to the next button
-        this.answer = findViewById(R.id.answer);        // Gets a reference to the answer button
-        this.question = findViewById(R.id.question);        // Gets a reference to the question text view
+        this.answer = findViewById(R.id.responses);        // Gets a reference to the answer button
+        this.question = findViewById(R.id.request);        // Gets a reference to the question text view
 
         this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
         this.activityStartLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;      // Alert for starting the activity
@@ -165,16 +181,31 @@ public class EndOfDaySurvey extends WearableActivity
      */
     private void deploySurvey()
     {
+        if(!isRunning(HeartRate.class) || !isRunning(Estimote.class))     // Checks if the classes are running
+        {
+            this.startService(this.heartRate);       // Starts the service
+            this.startService(this.estimote);        // Starts the service
+        }
+
         this.question.setText(this.questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
         this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
         this.responses.clear();     // Cleats the array list of any values in it
-        this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("pain_remind_max", "")));        // Maximum reminders allowed for the survey
+        this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_remind_max", "")));        // Maximum reminders allowed for the survey
 
         Collections.addAll(this.responses, this.answers[this.currentQuestion]);     // Calls on the collections object to add all the values in the array list so it can remember them
         this.nextAnswer();      // Calls on the method to update the answer view
 
         if (this.currentQuestion < questions.length)        // Checks to make sure there is still questions to be asked
         {
+            if (this.currentQuestion == 0)      // Checks if this is the first question
+            {
+                this.back.setBackgroundColor(Color.GRAY);       // Grays out the color
+            }
+            else        // If it is any other
+            {
+                this.back.setBackgroundColor(Color.RED);        // Resets the color to red
+            }
+
             if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
             {
                 this.next.setText(this.answers[questions.length-1][0]);     // Sets the next button accordingly
@@ -209,6 +240,15 @@ public class EndOfDaySurvey extends WearableActivity
                         userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
                         logActivity();      // Calls the method to log the data
 
+                        if (currentQuestion == 0)       // Checks if this is the first question
+                        {
+                            runServices();      // Calls the method to run some services
+
+                            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "End of Day Survey" + (",") + "Started HeartRate and Estimote Class";       // Data to be logged by the system
+                            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                            dataLogger.saveData("log");      // Saves the data in the mode specified
+                        }
+
                         currentQuestion++;      // Increments the current question position
                         deploySurvey();     // Calls the method on itself to move the question forward
                     }
@@ -227,8 +267,6 @@ public class EndOfDaySurvey extends WearableActivity
                     {
                         userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
                         logActivity();      // Calls the method to log the data
-
-                        submitSurvey();     // Automatically submit the survey
                     }
                     else if (currentQuestion == questions.length-1)     // If this is the last question
                     {
@@ -300,6 +338,25 @@ public class EndOfDaySurvey extends WearableActivity
     }
 
     /**
+     * This method automatically starts the heartrate and the localization sensor if the user decides to go along with performing the survey.
+     */
+    private void runServices()
+    {
+        if(isRunning(HeartRate.class) || isRunning(Estimote.class))     // Checks if the classes are running
+        {
+            this.stopService(this.heartRate);       // Stops the service
+            this.stopService(this.estimote);        // Stops the service
+        }
+
+        this.startService(this.heartRate);      // Starts the service
+        this.startService(this.estimote);       // Starts the service
+
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Starting HeartRate and Estimote Class";       // Data to be logged by the system
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+        this.dataLogger.saveData("log");      // Saves the data in the mode specified
+    }
+
+    /**
      * This method aggregates all the values of the responses into a single variable and logs them all into a file with a specific format.
      * Upon completing the logs, it finishes the survey.
      */
@@ -307,8 +364,8 @@ public class EndOfDaySurvey extends WearableActivity
     {
         this.endTime = this.getEstablishedTime();     // Sets the end time of the survey
         this.logResponse();     // Calls the method to perform an action
-        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_toast));     // Makes a special thank you toast
-        finish();       // Finishes the survey and cleans up the system
+        this.imageToast(this.randomNumber());       // Shows a specially made toast to the screen
+        this.finish();       // Finishes the survey and cleans up the system
     }
 
     /**
@@ -370,6 +427,56 @@ public class EndOfDaySurvey extends WearableActivity
     }
 
     /**
+     * This method sets up the image toast that is to be run
+     * @param imageNumber is the image number wanted to be run
+     */
+     private void imageToast(int imageNumber)       // This is the image toast
+     {
+         this.layoutInflater = this.getLayoutInflater();      // Calls a layout
+
+         if (imageNumber == 1)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_1, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 2)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_2, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 3)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_3, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 4)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_4, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 5)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_5, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 6)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_6, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 7)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_7, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 8)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_8, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+         else if (imageNumber == 9)      // If this is the specified image number
+         {
+             this.view = layoutInflater.inflate(R.layout.toast_9, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+         }
+
+         this.toast.setDuration(Toast.LENGTH_LONG);       // Makes the toast longer
+         this.toast.setView(this.view);        // Sets the view
+         this.toast.show();       // Shows the toast
+     }
+
+    /**
      * Sets up the only the responses to the answers and logs them to a specified file given
      */
     private void logResponse()
@@ -393,6 +500,46 @@ public class EndOfDaySurvey extends WearableActivity
 
         this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), this.systemInformation.getDateTime("yyyy/MM/dd"));        // Makes a new data logger item
         this.checkEODDate.saveData("write");        // Saves the data in the format specified
+
+        if(isRunning(HeartRate.class) || isRunning(Estimote.class))     // Checks if the classes are running
+        {
+            this.stopService(this.heartRate);       // Stops the service
+            this.stopService(this.estimote);        // Stops the service
+
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "End of Day Survey" + (",") + "Stopped HeartRate and Estimote Class";       // Data to be logged by the system
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");      // Saves the data in the mode specified
+        }
+    }
+
+    /**
+     * Checks if a given service is currently running or not
+     * @param serviceClass is the service class to be checked
+     * @return a boolean true or false
+     */
+    @SuppressWarnings("ALL")        // Suppresses the warnings associated with this method
+    private boolean isRunning(Class<?> serviceClass)        // A general file that checks if a system is running.
+    {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);     // Starts the activity manager to check the service called.
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))        // For each service called by the running service.
+        {
+            if (serviceClass.getName().equals(service.service.getClassName()))      // It checks if it is running.
+            {
+                return true;        // Returns true
+            }
+        }
+        return false;       // If not, it returns false.
+    }
+
+    /**
+     * This method picks a random number from a list of given numbers
+     * @return and integer value of a random number
+     */
+    public int randomNumber()       // This is the method that return a random number triggering an image toast.
+    {
+        List<Integer> imageToast = new ArrayList<>(Arrays.asList(1,2,3,4,5,6,7,8,9));       // This is the list of all the possible images
+        Random random = new Random();     // Gets the random module
+        return imageToast.get(random.nextInt(imageToast.size()));     // Returns a random item from the list
     }
 
     /**
@@ -412,9 +559,9 @@ public class EndOfDaySurvey extends WearableActivity
     private void unlockScreen()
     {
         this.window = this.getWindow();     // Gets access to the screen of the device
-        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);        // Makes sure the screen is on if off
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        // Makes sure the screen stays on for the duration of the activity
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);        // Makes sure the screen is on if off
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        // Makes sure the screen stays on for the duration of the activity
     }
 
     /**
@@ -425,7 +572,7 @@ public class EndOfDaySurvey extends WearableActivity
     {
         this.index = this.answersTapped%this.responses.size();      // Sets up the index that the user is currently on
         this.answer.setText(this.responses.get(this.index));        // Sets the answer choice seen by the user to be that of the index in the answer choice
-        return index;       // Returns the index to where the method was called
+        return this.index;       // Returns the index to where the method was called
     }
 
     /**

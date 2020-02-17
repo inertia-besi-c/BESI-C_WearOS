@@ -10,17 +10,19 @@
     <string name="battery_level_string">Battery:</string>   <!--This is the battery information shown in front of the battery information-->
     <string name="start_string">START</string>  <!--This is the string that is shown on the green button-->
     <string name="sleep_string">SLEEP</string>  <!--This is the string that is shown on the blue button-->
-    <string name="eodema_string">SURVEY</string>  <!--This is the string that is shown on the red button-->
-    <string name="survey_string">EMA Text</string>      <!--The id for the survey question-->
+    <string name="dnd_string">DO NOT DISTURB</string>  <!--This is the string that is shown on the blue button-->
+    <string name="eodema_string">DAILY SURVEY</string>  <!--This is the string that is shown on the red button-->
+    <string name="survey_string">Text</string>      <!--The id for the survey question-->
     <string name="back_button">Back</string>        <!--The id for the back button-->
     <string name="next_button">Next</string>        <!--The id for the next button-->
     <string name="answer_button">Answer</string>        <!--The id for the answer button-->
-    <string name="thank_toast">Thank You!</string>      <!--The thank you toast for completing a survey-->
-
-    <!--Alarm Key and Value Information-->
-    <string name="survey_alarm_key">Survey Alarm</string>       <!--The key for the survey alarm-->
-    <string name="followup_identifier">Followup Survey</string>     <!--The identifier value for the followup survey-->
-    <string name="endofday_identifier">End of Day Survey</string>     <!--The identifier value for the end of day survey-->
+    <string name="dismiss_button">Dismiss</string>        <!--The id for the dismiss button-->
+    <string name="proceed_button">Go</string>        <!--The id for the proceed button-->
+    <string name="snooze_button">Snooze</string>        <!--The id for the snooze button-->
+    <string name="thank_you">Thank You!</string>      <!--The thank you toast for completing a survey-->
+    <string name="todo">TODO</string>        <!--TODO string resource-->
+    <string name="low_battery_request">Low Battery! Please proceed to charge the device</string>       <!--Question for the low battery file-->
+    <string name="endofday_request">Please answer the following questions over the past day…</string>       <!--Question for the prompt file-->
 
     <!--User Interface Size Information-->
     <string name="ui_time_size">85</string>     <!--Size of the time-->
@@ -29,15 +31,20 @@
     <string name="ui_start_button_size">65</string>     <!--Size of the start button-->
     <string name="ui_sleep_button_size">50</string>     <!--Size of the sleep button-->
     <string name="ui_survey_button_size">40</string>        <!--Size of the survey button-->
+    <string name="ui_button_ambient">2</string>            <!--Size of the survey button while in ambient mode-->
+    <string name="ui_button_not_ambient">1</string>       <!--Size of the survey button when out of ambient mode-->
 
     <!--Name of Unique Device Screens-->
     <string name="watchface_name">BESI-C</string>  <!--This is the string that is shown as the watchface name-->
     <string name="mainactivity_name">BESI-C: Main Activity</string>  <!--This is the string that is shown as the mainactivity name-->
+    <string name="batteryactivity_name">BESI-C: Battery Activity</string>   <!--This is the string that is shown as the battery activity name-->
     <string name="preference_name">BESI-C: Preferences</string>  <!--This is the string that is shown as the settings name-->
     <string name="datalogger_name">BESI-C: DataLogger</string>  <!--This is the string that is shown as the datalogger name-->
     <string name="painsurvey_name">BESI-C: Pain Survey</string>  <!--This is the string that is shown as the pain survey name-->
     <string name="followupsurvey_name">BESI-C: Followup Survey</string>  <!--This is the string that is shown as the followup survey name-->
     <string name="endofdaysurvey_name">BESI-C: End Of Day Survey</string>   <!--This is the string that is shown as the endofday survey name-->
+    <string name="endofdaypromptone_name">BESI-C: End Of Day Prompt 1</string>   <!--This is the string that is shown as the endofday survey prompt name-->
+    <string name="endofdayprompttwo_name">BESI-C: End Of Day Prompt 2</string>   <!--This is the string that is shown as the endofday survey prompt name-->
 
     <!--The name of the Sub Folders for information to be stored-->
     <string name="subdirectory_information">Information</string>     <!--This is the sub folder where some system information will be stored-->
@@ -48,13 +55,13 @@
 
     <!--The general name of the files where items will be stored-->
     <string name="settings">Settings.csv</string>       <!--Name of the settings file-->
-    <string name="painactivity">Pain_EMA_Activity.csv</string>       <!--Name of the file that would store individual answers about the ema-->
-    <string name="painresponse">Pain_EMA_Responses.csv</string>         <!--Name of the file that would store the answers to the survey questions in a separate file-->
-    <string name="followupactivity">Followup_EMA_Activity.csv</string>       <!--Name of the file that would store individual answers about the ema-->
-    <string name="followupresponse">Followup_EMA_Responses.csv</string>         <!--Name of the file that would store the answers to the survey questions in a separate file-->
-    <string name="endofdayactivity">EndOfDay_EMA_Activity.csv</string>       <!--Name of the file that would store individual answers about the ema-->
-    <string name="endofdayresponse">EndOfDay_EMA_Responses.csv</string>         <!--Name of the file that would store the answers to the survey questions in a separate file-->
-    <string name="battery">Battery_Information.csv</string>     <!--Name of the folder where the battery information is stored-->
+    <string name="painactivity">PainActivity.csv</string>       <!--Name of the file that would store individual answers about the ema-->
+    <string name="painresponse">PainResponses.csv</string>         <!--Name of the file that would store the answers to the survey questions in a separate file-->
+    <string name="followupactivity">FollowupActivity.csv</string>       <!--Name of the file that would store individual answers about the ema-->
+    <string name="followupresponse">FollowupResponses.csv</string>         <!--Name of the file that would store the answers to the survey questions in a separate file-->
+    <string name="endofdayactivity">EndOfDayActivity.csv</string>       <!--Name of the file that would store individual answers about the ema-->
+    <string name="endofdayresponse">EndOfDayResponses.csv</string>         <!--Name of the file that would store the answers to the survey questions in a separate file-->
+    <string name="battery">Battery.csv</string>     <!--Name of the folder where the battery information is stored-->
     <string name="accelerometer">Accelerometer.csv</string>     <!--Name of the file where the accelerometer data is stored-->
     <string name="estimote">Estimote.csv</string>       <!--Name of the file where the estimote data is stored-->
     <string name="pedometer">Pedometer.csv</string>     <!--Name of the file where the pedometer data is stored-->
@@ -70,6 +77,7 @@
     <string name="settings_header">Date and Time, Key, Value</string>       <!--Header item for the settings file-->
     <string name="system_header">Date and Time, System Location, Action Performed</string>      <!--Header items for the systems file-->
     <string name="sensor_header">Date and Time, Sensor Location, Action Performed</string>      <!--Header items for the sensor file-->
+    <string name="battery_header">Date and Time, Battery Level (Percentage), Currently Charging?</string>      <!--Header items for the heartrate file-->
     <string name="accelerometer_header">Date and Time, X-Value, Y-Value, Z-Value, Battery Level, Currently Charging?</string>       <!--Header items for the accelerometer file-->
     <string name="pedometer_header">Date and Time, Value, Accuracy, Battery Level, Currently Charging?</string>      <!--Header items for the pedometer file-->
     <string name="heartrate_header">Date and Time, Value, Accuracy, Battery Level, Currently Charging?</string>      <!--Header items for the heartrate file-->

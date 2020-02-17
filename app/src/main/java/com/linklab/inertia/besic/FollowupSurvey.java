@@ -11,7 +11,9 @@ import android.content.Context;
 import android.os.Vibrator;
 import android.view.Window;
 import android.preference.PreferenceManager;
+import android.app.ActivityManager;
 import android.widget.TextView;
+import android.content.Intent;
 import android.widget.Button;
 import android.os.Bundle;
 import android.view.View;
@@ -41,6 +43,7 @@ public class FollowupSurvey extends WearableActivity
     private String role, data, startTime, endTime, duration;        // Sets up all the string variable in the system
     private String[] userResponses, questions;     // String list variables used in the method
     private String[][] answers;     // String list in list variables used in the class
+    private Intent heartRate, estimote;     // Initializes an intent variable
     private DataLogger dataLogger;      // Makes a global variable for the data logger
     private StringBuilder surveyLogs, systemLogs;       // Initializes a global string builder variable
     private SimpleDateFormat timeFormatter;     // Initiates a date time variable
@@ -54,6 +57,7 @@ public class FollowupSurvey extends WearableActivity
                     "What is the patient's pain level?",
                     "How distressed are you?",
                     "How distressed is the patient?",
+                    "What is your current location?",
                     "Did the patient take another opioid for the pain?",
                     "Why not?",
                     "Ready to submit your answers?",
@@ -64,6 +68,7 @@ public class FollowupSurvey extends WearableActivity
                     {"1","2","3","4","5","6","7","8","9","10"},
                     {"Not at all", "A little", "Fairly", "Very"},
                     {"Not at all", "A little", "Fairly", "Very", "Unsure"},
+                    {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
                     {"Yes", "No", "Unsure"},
                     {"Not time yet", "Side effects", "Out of pills", "Worried taking too many", "Pain not bad enough", "Other Reason", "Unsure"},
                     {"Yes", "No"},
@@ -75,6 +80,7 @@ public class FollowupSurvey extends WearableActivity
                     "What is your pain level?",
                     "How distressed are you?",
                     "How distressed is your caregiver?",
+                    "What is your current location?",
                     "Did you take another opioid for the pain?",
                     "Why not?",
                     "Ready to submit your answers?",
@@ -85,6 +91,7 @@ public class FollowupSurvey extends WearableActivity
                     {"1","2","3","4","5","6","7","8","9","10"},
                     {"Not at all", "A little", "Fairly", "Very"},
                     {"Not at all", "A little", "Fairly", "Very", "Unsure"},
+                    {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
                     {"Yes", "No"},
                     {"Not time yet", "Side effects", "Out of pills", "Worried taking too many", "Pain not bad enough", "Other Reason"},
                     {"Yes", "No"},
@@ -108,21 +115,21 @@ public class FollowupSurvey extends WearableActivity
         this.systemLogs = new StringBuilder(this.startTime).append(",").append("Followup Survey").append(",").append("Starting Followup Survey").append("\n");       // Logs to the string builder variable
 
         this.unlockScreen();        // Calls the method to unlock the screen in a specified manner
-
         this.setContentView(R.layout.activity_ema);      // Sets the view of the watch to be the specified activity
-
         this.decideRoleQuestions();      // Decides the role the device is playing
 
         this.userResponses = new String[questions.length];      // Sets up the responses needed by the user to be the length of the number given
         this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
         this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
         this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
+        this.heartRate = new Intent(getBaseContext(), HeartRate.class);     // Makes an intent to the heartrate class
+        this.estimote = new Intent(getBaseContext(), Estimote.class);       // Makes an intent to the estimote class
         this.currentQuestion = 0;       // Sets the number of questioned answered by the user
 
         this.back = findViewById(R.id.back);        // Gets a reference to the back button
         this.next = findViewById(R.id.next);        // Gets a reference to the next button
-        this.answer = findViewById(R.id.answer);        // Gets a reference to the answer button
-        this.question = findViewById(R.id.question);        // Gets a reference to the question text view
+        this.answer = findViewById(R.id.responses);        // Gets a reference to the answer button
+        this.question = findViewById(R.id.request);        // Gets a reference to the question text view
 
         this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
         this.activityStartLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;      // Alert for starting the activity
@@ -144,6 +151,12 @@ public class FollowupSurvey extends WearableActivity
      */
     private void deploySurvey()
     {
+        if(!isRunning(HeartRate.class) || !isRunning(Estimote.class))     // Checks if the classes are running
+        {
+            this.startService(this.heartRate);       // Starts the service
+            this.startService(this.estimote);        // Starts the service
+        }
+
         this.question.setText(questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
         this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
         this.responses.clear();     // Cleats the array list of any values in it
@@ -228,6 +241,15 @@ public class FollowupSurvey extends WearableActivity
                         userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
                         userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
                         logActivity();      // Calls the method to log the data
+
+                        if (currentQuestion == 0)       // Checks if this is the first question
+                        {
+                            runServices();      // Calls the method to run some services
+
+                            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Followup Survey" + (",") + "Started HeartRate and Estimote Class";       // Data to be logged by the system
+                            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                            dataLogger.saveData("log");      // Saves the data in the mode specified
+                        }
 
                         currentQuestion++;      // Increments the current question position
                         deploySurvey();     // Calls the method on itself to move the question forward
@@ -345,6 +367,25 @@ public class FollowupSurvey extends WearableActivity
     }
 
     /**
+     * This method automatically starts the heartrate and the localization sensor if the user decides to go along with performing the survey.
+     */
+    private void runServices()
+    {
+        if(isRunning(HeartRate.class) || isRunning(Estimote.class))     // Checks if the classes are running
+        {
+            this.stopService(this.heartRate);       // Stops the service
+            this.stopService(this.estimote);        // Stops the service
+        }
+
+        this.startService(this.heartRate);      // Starts the service
+        this.startService(this.estimote);       // Starts the service
+
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Starting HeartRate and Estimote Class";       // Data to be logged by the system
+        this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+        this.dataLogger.saveData("log");      // Saves the data in the mode specified
+    }
+
+    /**
      * This method aggregates all the values of the responses into a single variable and logs them all into a file with a specific format.
      * Upon completing the logs, it finishes the survey and initiates a timer for a followup if it is needed.
      */
@@ -352,7 +393,7 @@ public class FollowupSurvey extends WearableActivity
     {
         this.endTime = this.getEstablishedTime();     // Sets the end time of the survey
         this.logResponse();     // Calls the method to perform an action
-        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_toast));     // Makes a special thank you toast
+        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_you));     // Makes a special thank you toast
         finish();       // Finishes the survey and cleans up the system
     }
 
@@ -435,6 +476,35 @@ public class FollowupSurvey extends WearableActivity
 
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), String.valueOf(this.systemLogs));        // Makes a new data logger item
         this.dataLogger.saveData("log");        // Saves the data in the format specified
+
+        if(isRunning(HeartRate.class) || isRunning(Estimote.class))     // Checks if the classes are running
+        {
+            this.stopService(this.heartRate);       // Stops the service
+            this.stopService(this.estimote);        // Stops the service
+
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Followup Survey" + (",") + "Stopped HeartRate and Estimote Class";       // Data to be logged by the system
+            this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");      // Saves the data in the mode specified
+        }
+    }
+
+    /**
+     * Checks if a given service is currently running or not
+     * @param serviceClass is the service class to be checked
+     * @return a boolean true or false
+     */
+    @SuppressWarnings("ALL")        // Suppresses the warnings associated with this method
+    private boolean isRunning(Class<?> serviceClass)        // A general file that checks if a system is running.
+    {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);     // Starts the activity manager to check the service called.
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))        // For each service called by the running service.
+        {
+            if (serviceClass.getName().equals(service.service.getClassName()))      // It checks if it is running.
+            {
+                return true;        // Returns true
+            }
+        }
+        return false;       // If not, it returns false.
     }
 
     /**
@@ -454,9 +524,9 @@ public class FollowupSurvey extends WearableActivity
     private void unlockScreen()
     {
         this.window = this.getWindow();     // Gets access to the screen of the device
-        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);        // Makes sure the screen is on if off
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        // Makes sure the screen stays on for the duration of the activity
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);        // Makes sure the screen is on if off
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        // Makes sure the screen stays on for the duration of the activity
     }
 
     /**
@@ -467,7 +537,7 @@ public class FollowupSurvey extends WearableActivity
     {
         this.index = this.answersTapped%this.responses.size();      // Sets up the index that the user is currently on
         this.answer.setText(this.responses.get(this.index));        // Sets the answer choice seen by the user to be that of the index in the answer choice
-        return index;       // Returns the index to where the method was called
+        return this.index;       // Returns the index to where the method was called
     }
 
     /**
