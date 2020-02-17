@@ -83,6 +83,26 @@
             tools:textSize="30sp" />
 
         <Button
+            android:id="@+id/eodSurvey"
+            android:layout_width="87dp"
+            android:layout_height="60dp"
+            android:background="#F44336"
+            android:fontFamily="serif"
+            android:text="@string/eodema_string"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:typeface="serif"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.748"
+            tools:textSize="15sp" />
+
+        <Button
             android:id="@+id/sleep"
             android:layout_width="87dp"
             android:layout_height="60dp"
