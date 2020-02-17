@@ -369,7 +369,7 @@
                     android:title="Automatic Start Minute"
                     android:entries="@array/minutesecondList"
                     android:entryValues="@array/minutesecondList"
-                    android:defaultValue="00">
+                    android:defaultValue="30">
                 </ListPreference>
 
                 <!-- A preference list is made for the seconds time -->

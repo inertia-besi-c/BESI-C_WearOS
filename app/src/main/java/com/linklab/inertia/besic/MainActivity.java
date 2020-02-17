@@ -201,7 +201,7 @@ public class MainActivity extends WearableActivity
                     sleepMode = true;       // Explicitly sets the sleepmode to be true
                 }
 
-                checkSteps.saveData("write");
+                checkSteps.saveData("write");       // Writes data to the storage location
             }
         });
     }
