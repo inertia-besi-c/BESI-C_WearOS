@@ -25,10 +25,17 @@ public class SensorTimer extends Service
     private SharedPreferences sharedPreferences;        // Access the shared preferences of the system
     private Intent accelerometer, pedometer, heartrate, estimote;     // Initializes the intents of the class
     private SystemInformation systemInformation;        // Initializes the system information class
-    private DataLogger dataLogger;      // Sets up the datalogger class
+    private DataLogger dataLogger, batteryData;      // Sets up the datalogger class
     private Timer heartrateTimer, estimoteTimer;       // Sets the timers for the class
-    private String data;        // Initializes the string variables
+    private String data, batteryFileInformation;        // Initializes the string variables
 
+    /**
+     * This is the method that is called to run as soon as this service is called to run
+     * @param intent is the intent service of the application
+     * @param flags is any flags added to the service item
+     * @param startId is the starting identification
+     * @return an integer allowing for the continual running of the service or not
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
@@ -43,11 +50,15 @@ public class SensorTimer extends Service
         return START_STICKY;        // Allows the service to be run outside the context of the application
     }
 
+    /**
+     * This class is set to run the accelerometer sensor at a specified duty cycle rate
+     * @param runMode is the mode that decides if the sensor should run or not
+     */
     private void startHeartRate(boolean runMode)
     {
         this.heartrate = new Intent(getBaseContext(), HeartRate.class);     // Gets an intent on the specified class
 
-        if (runMode)        // Checks if the sensor is wanted to run
+        if (runMode && !this.systemInformation.isCharging(getApplicationContext()))        // Checks if the sensor is wanted to run
         {
             this.heartrateTimer = new Timer();      // Sets up a timer for the heartrate sensor
             this.heartrateTimer.schedule(new TimerTask()        // Schedules the timer
@@ -65,6 +76,10 @@ public class SensorTimer extends Service
                         data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Sensor Time Service" + (",") + "Calling to Start the HeartRate Class";       // Data to be logged by the system
                         dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
                         dataLogger.saveData("log");      // Saves the data in the mode specified
+
+                        batteryFileInformation = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + systemInformation.getBatteryLevel(getApplicationContext()) + (",") + systemInformation.isCharging(getApplicationContext());     // Data to be logged by the system
+                        batteryData = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.battery), batteryFileInformation);      // Sets a new datalogger variable
+                        batteryData.saveData("log");        // Saves the data with the specified type
                     }
                     else    // If the if statement fails
                     {
@@ -85,6 +100,10 @@ public class SensorTimer extends Service
         }
     }
 
+    /**
+     * This method is called to run the estimote service at a certain duty cycle
+     * @param runMode is set to decide if the system should run or not
+     */
     private void startEstimote(boolean runMode)
     {
         this.estimote = new Intent(getBaseContext(), Estimote.class);     // Gets an intent on the specified class
@@ -133,7 +152,7 @@ public class SensorTimer extends Service
     private void startAccelerometer(boolean runMode)
     {
         this.accelerometer = new Intent(getBaseContext(), Accelerometer.class);     // Sets up the intent to start the service
-        if(!isRunning(Accelerometer.class) && runMode)     // Checks if the service is already running, if it is not
+        if(!isRunning(Accelerometer.class) && runMode && !this.systemInformation.isCharging(getApplicationContext()))     // Checks if the service is already running, if it is not
         {
             startService(this.accelerometer);       // Automatically starts the service
 
@@ -174,11 +193,9 @@ public class SensorTimer extends Service
     private void killProcess()
     {
         this.heartrateTimer.cancel();       // Cancels the timer
-        this.estimoteTimer.cancel();        // Cancels the timer
 
         this.startAccelerometer(false);     // Stops the sensor from running
         this.startHeartRate(false);     // Stops the sensor from running
-        this.startEstimote(false);     // Stops the sensor from running
     }
 
     /**
@@ -196,6 +213,7 @@ public class SensorTimer extends Service
      * @param serviceClass is the service class to be checked
      * @return a boolean true or false
      */
+    @SuppressWarnings("ALL")        // Ignores the warning from this method
     private boolean isRunning(Class<?> serviceClass)        // A general file that checks if a system is running.
     {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);     // Starts the activity manager to check the service called.

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Layout to define the face-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--Constraints for the element in the layout-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!--Text view for the questions-->
+
+        <!--Back button attributes-->
+
+        <!--Next button attributes-->
+
+        <!--Answer button attributes-->
+
+        <TextView
+            android:id="@+id/request"
+            android:layout_width="192dp"
+            android:layout_height="74dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="@string/survey_string"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.222" />
+
+        <Button
+            android:id="@+id/proceed"
+            android:layout_width="197dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="5dp"
+            android:background="@color/green"
+            android:text="@string/proceed_button"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/request"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <Button
+            android:id="@+id/snooze"
+            android:layout_width="197dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="35dp"
+            android:background="@android:color/holo_orange_light"
+            android:text="@string/snooze_button"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/request"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <Button
+            android:id="@+id/dismiss"
+            android:layout_width="197dp"
+            android:layout_height="24dp"
+            android:background="@color/dark_red"
+            android:text="@string/dismiss_button"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/request"
+            app:layout_constraintVertical_bias="0.985" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

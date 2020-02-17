@@ -57,6 +57,7 @@ public class FollowupSurvey extends WearableActivity
                     "What is the patient's pain level?",
                     "How distressed are you?",
                     "How distressed is the patient?",
+                    "What is your current location?",
                     "Did the patient take another opioid for the pain?",
                     "Why not?",
                     "Ready to submit your answers?",
@@ -67,6 +68,7 @@ public class FollowupSurvey extends WearableActivity
                     {"1","2","3","4","5","6","7","8","9","10"},
                     {"Not at all", "A little", "Fairly", "Very"},
                     {"Not at all", "A little", "Fairly", "Very", "Unsure"},
+                    {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
                     {"Yes", "No", "Unsure"},
                     {"Not time yet", "Side effects", "Out of pills", "Worried taking too many", "Pain not bad enough", "Other Reason", "Unsure"},
                     {"Yes", "No"},
@@ -78,6 +80,7 @@ public class FollowupSurvey extends WearableActivity
                     "What is your pain level?",
                     "How distressed are you?",
                     "How distressed is your caregiver?",
+                    "What is your current location?",
                     "Did you take another opioid for the pain?",
                     "Why not?",
                     "Ready to submit your answers?",
@@ -88,6 +91,7 @@ public class FollowupSurvey extends WearableActivity
                     {"1","2","3","4","5","6","7","8","9","10"},
                     {"Not at all", "A little", "Fairly", "Very"},
                     {"Not at all", "A little", "Fairly", "Very", "Unsure"},
+                    {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
                     {"Yes", "No"},
                     {"Not time yet", "Side effects", "Out of pills", "Worried taking too many", "Pain not bad enough", "Other Reason"},
                     {"Yes", "No"},
@@ -124,8 +128,8 @@ public class FollowupSurvey extends WearableActivity
 
         this.back = findViewById(R.id.back);        // Gets a reference to the back button
         this.next = findViewById(R.id.next);        // Gets a reference to the next button
-        this.answer = findViewById(R.id.answer);        // Gets a reference to the answer button
-        this.question = findViewById(R.id.question);        // Gets a reference to the question text view
+        this.answer = findViewById(R.id.responses);        // Gets a reference to the answer button
+        this.question = findViewById(R.id.request);        // Gets a reference to the question text view
 
         this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
         this.activityStartLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;      // Alert for starting the activity
@@ -147,6 +151,12 @@ public class FollowupSurvey extends WearableActivity
      */
     private void deploySurvey()
     {
+        if(!isRunning(HeartRate.class) || !isRunning(Estimote.class))     // Checks if the classes are running
+        {
+            this.startService(this.heartRate);       // Starts the service
+            this.startService(this.estimote);        // Starts the service
+        }
+
         this.question.setText(questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
         this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
         this.responses.clear();     // Cleats the array list of any values in it
@@ -235,6 +245,10 @@ public class FollowupSurvey extends WearableActivity
                         if (currentQuestion == 0)       // Checks if this is the first question
                         {
                             runServices();      // Calls the method to run some services
+
+                            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Followup Survey" + (",") + "Started HeartRate and Estimote Class";       // Data to be logged by the system
+                            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                            dataLogger.saveData("log");      // Saves the data in the mode specified
                         }
 
                         currentQuestion++;      // Increments the current question position
@@ -379,7 +393,7 @@ public class FollowupSurvey extends WearableActivity
     {
         this.endTime = this.getEstablishedTime();     // Sets the end time of the survey
         this.logResponse();     // Calls the method to perform an action
-        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_toast));     // Makes a special thank you toast
+        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_you));     // Makes a special thank you toast
         finish();       // Finishes the survey and cleans up the system
     }
 
@@ -468,7 +482,7 @@ public class FollowupSurvey extends WearableActivity
             this.stopService(this.heartRate);       // Stops the service
             this.stopService(this.estimote);        // Stops the service
 
-            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Stopped HeartRate and Estimote Class";       // Data to be logged by the system
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Followup Survey" + (",") + "Stopped HeartRate and Estimote Class";       // Data to be logged by the system
             this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
             this.dataLogger.saveData("log");      // Saves the data in the mode specified
         }
@@ -510,9 +524,9 @@ public class FollowupSurvey extends WearableActivity
     private void unlockScreen()
     {
         this.window = this.getWindow();     // Gets access to the screen of the device
-        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);        // Makes sure the screen is on if off
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        // Makes sure the screen stays on for the duration of the activity
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);        // Makes sure the screen is on if off
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        // Makes sure the screen stays on for the duration of the activity
     }
 
     /**
@@ -523,7 +537,7 @@ public class FollowupSurvey extends WearableActivity
     {
         this.index = this.answersTapped%this.responses.size();      // Sets up the index that the user is currently on
         this.answer.setText(this.responses.get(this.index));        // Sets the answer choice seen by the user to be that of the index in the answer choice
-        return index;       // Returns the index to where the method was called
+        return this.index;       // Returns the index to where the method was called
     }
 
     /**

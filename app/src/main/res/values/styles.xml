@@ -1,0 +1,8 @@
+<!--This resource is made to allow specific system actions for this application only-->
+<resources>
+    <style
+        name="BESIStyle"
+        parent="@android:style/Theme.DeviceDefault">        <!--Sets the name and parent of the style-->
+        <item name="android:windowSwipeToDismiss">false</item>      <!--Sets the item to override-->
+    </style>
+</resources>
