@@ -18,7 +18,7 @@
         <TextView
             android:id="@+id/request"
             android:layout_width="98dp"
-            android:layout_height="119dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:text="@string/survey_string"
@@ -27,9 +27,10 @@
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/next"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/back"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.088" />
+            app:layout_constraintVertical_bias="0.14" />
 
         <Button
             android:id="@+id/back"
@@ -64,8 +65,9 @@
 
         <Button
             android:id="@+id/responses"
-            android:layout_width="96dp"
-            android:layout_height="62dp"
+            android:layout_width="95dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
             android:background="@color/dark_blue"
             android:text="@string/answer_button"
             android:textColor="@color/white"
