@@ -277,13 +277,24 @@ public class PainSurvey extends WearableActivity
 
                         submitSurvey();     // Calls the method to run
                     }
-                    else if (currentQuestion == questions.length-3)     // If the question position is fulfilled
+                    else if (currentQuestion == 5)     // If the question position is fulfilled
                     {
                         userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
                         logActivity();      // Calls the method to log the data
 
                         currentQuestion++;      // Increment the question
                         deploySurvey();     // Call the method on itself
+                    }
+                    else if (currentQuestion == 7)
+                    {
+                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
+                        logActivity();      // Calls the method to log the data
+
+                        userResponses[currentQuestion+1] = "**Skipped**";     // Adds the data to be saved to an array list
+                        logActivity();      // Calls the method to log the data
+
+                        currentQuestion += 2;       // Skips a question not pertaining to the survey
+                        deploySurvey();       // Calls the question system method
                     }
                     else if (currentQuestion == questions.length-1)     // If this is the last question
                     {
