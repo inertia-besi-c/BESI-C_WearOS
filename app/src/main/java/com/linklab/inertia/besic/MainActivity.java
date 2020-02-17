@@ -48,9 +48,9 @@ public class MainActivity extends WearableActivity
     private Intent startSettings, startEMA, startLowBattery, startSensors, estimoteSensor, changeWatchFace;      // Initializes intents for the class
     private IntentFilter minuteTimeTick;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
-    private DataLogger dataLogger, checkSteps, batteryData;      // initializes the datalogger of the class
+    private DataLogger dataLogger, checkSteps, checkDate, batteryData;      // initializes the datalogger of the class
     private StringBuilder stringBuilder;        // Initializes string builder of the system
-    private Button start, sleep;        // Makes all button on the system
+    private Button start, sleep, dailyEMA;        // Makes all button on the system
     private TextView date, time, battery;        // Makes all text views on the system
     private String batteryInformation, batteryFileInformation;      // Sets up the string in the class
     private Timer lowBatteryTimer;       // Sets the timers for the class
@@ -67,6 +67,7 @@ public class MainActivity extends WearableActivity
         super.onCreate(savedInstanceState);     // Creates an instance of the application
 
         this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
+        this.checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
         this.changeWatchFace = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,        // Gets a watchface picker to show
                 new ComponentName(getPackageName(), WatchFace.class.getName()));        // Shows the components of the watchface
         this.startSettings = new Intent(getApplicationContext(), Settings.class);       // Starts a new intent for the settings class
@@ -78,8 +79,8 @@ public class MainActivity extends WearableActivity
         this.lowBatteryTimer = new Timer();
 
         this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
-        this.startActivity(this.startSettings);     // Run the settings
         this.startActivity(this.changeWatchFace);     // Starts the intent for the watchface picker
+        this.startActivity(this.startSettings);     // Run the settings
 
         this.setContentView(R.layout.activity_main);        // Sets the view of the system
 
@@ -94,6 +95,7 @@ public class MainActivity extends WearableActivity
 
         this.start = findViewById(R.id.start);      // Sets up the start button in the view
         this.sleep = findViewById(R.id.sleep);      // Sets up the sleep button in the view
+        this.dailyEMA = findViewById(R.id.eodSurvey);       // Sets up the button in the view
         this.date = findViewById(R.id.date);        // Sets up the date view
         this.time = findViewById(R.id.time);        // Sets up the time view
         this.battery = findViewById(R.id.battery);      // Sets up the battery view
@@ -140,6 +142,23 @@ public class MainActivity extends WearableActivity
                 logHeaders();       // Logs the headers
 
                 startEMA = new Intent(getApplicationContext(), PainSurvey.class);       // Makes a new intent
+                startActivity(startEMA);        // Starts the activity
+            }
+        });
+
+        this.dailyEMA.setOnClickListener(new View.OnClickListener()        // Sets up the daily survey button
+        {
+            /**
+             * The following is run when the button is clicked
+             * @param v is the view in which it is clicked in
+             */
+            @Override
+            public void onClick(View v)
+            {
+                vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
+                logHeaders();       // Logs the headers
+
+                startEMA = new Intent(getApplicationContext(), EndOfDaySurvey.class);       // Makes a new intent
                 startActivity(startEMA);        // Starts the activity
             }
         });
@@ -312,13 +331,13 @@ public class MainActivity extends WearableActivity
 
         this.runEODEMAButton = this.systemInformation.isTimeBetweenTimes(this.systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
 
-        if (runEODEMAButton)
+        if (runEODEMAButton && !this.checkDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))
         {
-            // Set up the eodema button and push sleep to background
+            this.dailyEMA.bringToFront();       // Brings the button to the front
         }
         else
         {
-            // Pull the sleep button back to the foreground
+            this.sleep.bringToFront();      // Brings the button to the front
         }
     }
 
