@@ -83,9 +83,9 @@ public class MainActivity extends WearableActivity
         this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
         this.minuteTimeTick.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
 
-        this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));
-        this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));
-        this.lowBatteryThreshHold = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_alert", "")));
+        this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Gets the haptic  level preference
+        this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));     // Gets the sleep level max number
+        this.lowBatteryThreshHold = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_alert", "")));     // Gets the low battery thresh hold
         this.startHour = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "")));     // Gets the start hour from preferences
         this.startMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "")));     // Gets the start minute from preferences
         this.startSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "")));     // Gets the start second from preferences
