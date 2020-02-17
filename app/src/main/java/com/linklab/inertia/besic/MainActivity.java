@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.app.WallpaperManager;
+import android.content.ComponentName;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
@@ -43,7 +45,7 @@ public class MainActivity extends WearableActivity
     private Vibrator vibrator;      // Initializes the vibrator of the class
     private Map<String, ?> preferenceKeys;      // Creates a map to store key values
     private SystemInformation systemInformation;        // Initializes the system information
-    private Intent startSettings, startEMA, startLowBattery, startSensors, estimoteSensor;      // Initializes intents for the class
+    private Intent startSettings, startEMA, startLowBattery, startSensors, estimoteSensor, changeWatchFace;      // Initializes intents for the class
     private IntentFilter minuteTimeTick;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
     private DataLogger dataLogger, checkSteps, batteryData;      // initializes the datalogger of the class
@@ -65,6 +67,8 @@ public class MainActivity extends WearableActivity
         super.onCreate(savedInstanceState);     // Creates an instance of the application
 
         this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
+        this.changeWatchFace = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,        // Gets a watchface picker to show
+                new ComponentName(getPackageName(), WatchFace.class.getName()));        // Shows the components of the watchface
         this.startSettings = new Intent(getApplicationContext(), Settings.class);       // Starts a new intent for the settings class
         this.startSensors = new Intent(getApplicationContext(), SensorTimer.class);     // Sets up the intent for the service
         this.estimoteSensor = new Intent(getApplicationContext(), Estimote.class);     // Sets up the intent for the service
@@ -75,6 +79,7 @@ public class MainActivity extends WearableActivity
 
         this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
         this.startActivity(this.startSettings);     // Run the settings
+        this.startActivity(this.changeWatchFace);     // Starts the intent for the watchface picker
 
         this.setContentView(R.layout.activity_main);        // Sets the view of the system
 
