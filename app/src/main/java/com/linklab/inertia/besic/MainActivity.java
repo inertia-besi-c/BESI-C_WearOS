@@ -99,8 +99,7 @@ public class MainActivity extends WearableActivity
         this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
         this.checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
         this.sleepMode = false;     // Initializes the sleepmode variable
-
-        this.logHeaders();      // Calls the method to log the header files
+        
         this.setUpUIElements();     // Calls the specified method to run
         this.setUpLowBattery();     // Calls the method
         this.setUpEODEMAButton();       // Calls the method
