@@ -55,7 +55,7 @@ public class MainActivity extends WearableActivity
     private String batteryInformation, batteryFileInformation;      // Sets up the string in the class
     private Timer lowBatteryTimer;       // Sets the timers for the class
     private int hapticLevel, sleepAutomatically, lowBatteryThreshHold, startHour, startMinute, startSecond, endHour, endMinute, endSecond;        // Initializes the integers of the class
-    private boolean sleepMode, runLowBattery;      // Initializes the boolean variables of the class
+    private boolean sleepMode, runLowBattery, runEODEMAButton;      // Initializes the boolean variables of the class
 
     /**
      * This method is run when the application is called at anytime.
@@ -91,14 +91,6 @@ public class MainActivity extends WearableActivity
         this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Gets the haptic  level preference
         this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));     // Gets the sleep level max number
         this.lowBatteryThreshHold = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_alert", "")));     // Gets the low battery thresh hold
-        this.startHour = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "")));     // Gets the start hour from preferences
-        this.startMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "")));     // Gets the start minute from preferences
-        this.startSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "")));     // Gets the start second from preferences
-        this.endHour = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "")));         // Gets the end hour from preferences
-        this.endMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "")));     // Gets the end minute from preferences
-        this.endSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "")));     // Gets the end second from preferences
-
-        this.runLowBattery = this.systemInformation.isTimeBetweenTimes(this.systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
 
         this.start = findViewById(R.id.start);      // Sets up the start button in the view
         this.sleep = findViewById(R.id.sleep);      // Sets up the sleep button in the view
@@ -110,6 +102,8 @@ public class MainActivity extends WearableActivity
 
         this.logHeaders();      // Calls the method to log the header files
         this.setUpUIElements();     // Calls the specified method to run
+        this.setUpLowBattery();     // Calls the method
+        this.setUpEODEMAButton();       // Calls the method
         this.checkSteps.saveData("write");      // Saves the data in the mode provided
 
 
@@ -290,6 +284,45 @@ public class MainActivity extends WearableActivity
     }
 
     /**
+     * Method to set up the information for the low battery screen check
+     */
+    private void setUpLowBattery()
+    {
+        this.startHour = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "")));     // Gets the start hour from preferences
+        this.startMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "")));     // Gets the start minute from preferences
+        this.startSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "")));     // Gets the start second from preferences
+        this.endHour = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "")));         // Gets the end hour from preferences
+        this.endMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "")));     // Gets the end minute from preferences
+        this.endSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "")));     // Gets the end second from preferences
+
+        this.runLowBattery = this.systemInformation.isTimeBetweenTimes(this.systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
+    }
+
+    /**
+     * Method to set up the information for the low battery screen check
+     */
+    private void setUpEODEMAButton()
+    {
+        this.startHour = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_hour", "")));     // Gets the start hour from preferences
+        this.startMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_minute", "")));     // Gets the start minute from preferences
+        this.startSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_second", "")));     // Gets the start second from preferences
+        this.endHour = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_hour", "")));         // Gets the end hour from preferences
+        this.endMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_minute", "")));     // Gets the end minute from preferences
+        this.endSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_second", "")));     // Gets the end second from preferences
+
+        this.runEODEMAButton = this.systemInformation.isTimeBetweenTimes(this.systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
+
+        if (runEODEMAButton)
+        {
+            // Set up the eodema button and push sleep to background
+        }
+        else
+        {
+            // Pull the sleep button back to the foreground
+        }
+    }
+
+    /**
      * This method is called to log the data that is set in the shared preferences to the device.
      */
     private void logInitialSettings()
@@ -322,6 +355,8 @@ public class MainActivity extends WearableActivity
             public void onReceive(Context context, Intent intent)
             {
                 checkSteps.saveData("write");       // Writes data to the file
+                setUpLowBattery();      // Calls the method
+                setUpEODEMAButton();        // Calls the method
 
                 logHeaders();      // Calls the method to log the header files
 
