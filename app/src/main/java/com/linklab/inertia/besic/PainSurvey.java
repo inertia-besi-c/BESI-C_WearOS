@@ -285,7 +285,7 @@ public class PainSurvey extends WearableActivity
                         currentQuestion++;      // Increment the question
                         deploySurvey();     // Call the method on itself
                     }
-                    else if (currentQuestion == 7)
+                    else if (currentQuestion == 7)      // Checks the question
                     {
                         userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
                         logActivity();      // Calls the method to log the data

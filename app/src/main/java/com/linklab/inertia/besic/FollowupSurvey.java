@@ -60,6 +60,8 @@ public class FollowupSurvey extends WearableActivity
                     "What is your current location?",
                     "Did the patient take another opioid for the pain?",
                     "Why not?",
+                    "Did patient do anything else for the pain?",
+                    "What did patient do?",
                     "Ready to submit your answers?",
             };
     private final String[][] caregiverAnswers =       // These are the answers for the care giver in order.
@@ -71,6 +73,8 @@ public class FollowupSurvey extends WearableActivity
                     {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
                     {"Yes", "No", "Unsure"},
                     {"Not time yet", "Side effects", "Out of pills", "Worried taking too many", "Pain not bad enough", "Other Reason", "Unsure"},
+                    {"Yes", "No", "Unsure"},
+                    {"Exercise/Stretching", "Prayer/Meditation", "Hot/Cold Pack", "Position Change", "Rest", "Massage", "Took Non-Opioid Medication",  "Other"},
                     {"Yes", "No"},
             };
 
@@ -83,6 +87,8 @@ public class FollowupSurvey extends WearableActivity
                     "What is your current location?",
                     "Did you take another opioid for the pain?",
                     "Why not?",
+                    "Did you do anything else for the pain?",
+                    "What did you do?",
                     "Ready to submit your answers?",
             };
     private final String[][] patientAnswers =         // These are the patient answers in order.
@@ -94,6 +100,8 @@ public class FollowupSurvey extends WearableActivity
                     {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
                     {"Yes", "No"},
                     {"Not time yet", "Side effects", "Out of pills", "Worried taking too many", "Pain not bad enough", "Other Reason"},
+                    {"Yes", "No"},
+                    {"Exercise/Stretching", "Prayer/Meditation", "Hot/Cold Pack", "Position Change", "Rest", "Massage", "Took Non-Opioid Medication",  "Other"},
                     {"Yes", "No"},
             };
 
@@ -182,7 +190,7 @@ public class FollowupSurvey extends WearableActivity
                     this.answer.setVisibility(View.INVISIBLE);     // Removes the middle button option from the user
                 }
             }
-            else if (this.currentQuestion == questions.length-3)        // Checks the question location of the watch
+            else if (this.currentQuestion == 5 || this.currentQuestion == 7)        // Checks the question location of the watch
             {
                 if (this.role.equalsIgnoreCase("PT"))       // Checks the role of the watch
                 {
@@ -218,7 +226,7 @@ public class FollowupSurvey extends WearableActivity
                     systemLogs.append(getEstablishedTime()).append(",").append("Followup Survey").append(",").append(next.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
-                    if (currentQuestion == questions.length-3)
+                    if (currentQuestion == 5)
                     {
                         userResponses[currentQuestion] = next.getText().toString();     // Adds the data to be saved to an array list
                         logActivity();      // Calls the method to log the data
@@ -272,13 +280,24 @@ public class FollowupSurvey extends WearableActivity
 
                         submitSurvey();     // Calls the method to run
                     }
-                    else if (currentQuestion == questions.length-3)     // If the question position is fulfilled
+                    else if (currentQuestion == 5)     // If the question position is fulfilled
                     {
                         userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
                         logActivity();      // Calls the method to log the data
 
                         currentQuestion++;      // Increment the question
                         deploySurvey();     // Call the method on itself
+                    }
+                    else if (currentQuestion == 7)      // Checks the question
+                    {
+                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
+                        logActivity();      // Calls the method to log the data
+
+                        userResponses[currentQuestion+1] = "**Skipped**";     // Adds the data to be saved to an array list
+                        logActivity();      // Calls the method to log the data
+
+                        currentQuestion += 2;       // Skips a question not pertaining to the survey
+                        deploySurvey();       // Calls the question system method
                     }
                     else if (currentQuestion == questions.length-1)     // If this is the last question
                     {
@@ -307,7 +326,7 @@ public class FollowupSurvey extends WearableActivity
                 {
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
-                    if (currentQuestion == 0 || currentQuestion == questions.length-3)      // Checks if this is the third question
+                    if (currentQuestion == 0 || currentQuestion == 5 || currentQuestion == 7)      // Checks if this is the third question
                     {
                         if (role.equalsIgnoreCase("CG"))        // Checks for the role of the device
                         {
