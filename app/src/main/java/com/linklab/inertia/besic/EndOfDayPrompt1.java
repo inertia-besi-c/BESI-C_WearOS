@@ -28,7 +28,7 @@ import java.util.TimerTask;
 public class EndOfDayPrompt1 extends WearableActivity
 {
     private SystemInformation systemInformation;        // Private link to the class
-    private DataLogger dataLogger;      // Private initialization to the data logger
+    private DataLogger dataLogger, checkDate;      // Private initialization to the data logger
     private Button proceed, snooze, dismiss;     // Initializes a button
     private String data;        // Sets up a string for data
     private TextView textView;      // Text view for the system
@@ -134,12 +134,22 @@ public class EndOfDayPrompt1 extends WearableActivity
                     @Override
                     public void run()
                     {
-                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 1" + "," + "Starting End of Day Prompt 2";      // Sets up the data to be logged
-                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
-                        dataLogger.saveData("log");        // Saves the data
+                        checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
+                        if (!checkDate.readData().contains(systemInformation.getDateTime("yyyy/mm/dd")))        // Checks if there it was not completed
+                        {
+                            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 1" + "," + "Starting End of Day Prompt 2";      // Sets up the data to be logged
+                            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+                            dataLogger.saveData("log");        // Saves the data
 
-                        promptTwo = new Intent(getApplicationContext(), EndOfDayPrompt2.class);       // Makes an intent to the estimote class
-                        startActivity(promptTwo);       // Calls to start the activity
+                            promptTwo = new Intent(getApplicationContext(), EndOfDayPrompt2.class);       // Makes an intent to the estimote class
+                            startActivity(promptTwo);       // Calls to start the activity
+                        }
+                        else        // If completed
+                        {
+                            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 1" + "," + "Dismissed End of Day Prompt 2";      // Sets up the data to be logged
+                            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+                            dataLogger.saveData("log");        // Saves the data
+                        }
                     }
                 }, Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("eod_automatic_snooze_time", ""))) * 60 * 1000);      // Repeats at the specified interval
 
