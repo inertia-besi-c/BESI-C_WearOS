@@ -204,6 +204,8 @@ public class MainActivity extends WearableActivity
                 checkSteps.saveData("write");       // Writes data to the storage location
             }
         });
+
+//        getApplicationContext().startService(new Intent(getApplicationContext(), TransferService.class));
     }
 
     /**

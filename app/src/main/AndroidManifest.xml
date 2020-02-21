@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.BODY_SENSORS" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -66,6 +67,10 @@
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
+        <service android:name= "com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
+            android:exported="true"
+            android:permission="true">
+        </service>
         <service
             android:name=".Accelerometer"
             android:enabled="true"
@@ -111,8 +116,8 @@
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.HOME" />          <!-- Comment this out to be able to return to the regular home settings for the watch-->
-                <category android:name="android.intent.category.DEFAULT" />       <!--Comment this out to be able to have the default watch activity be the default for the watch-->
+<!--                <category android:name="android.intent.category.HOME" />          &lt;!&ndash; Comment this out to be able to return to the regular home settings for the watch&ndash;&gt;-->
+<!--                <category android:name="android.intent.category.DEFAULT" />       &lt;!&ndash;Comment this out to be able to have the default watch activity be the default for the watch&ndash;&gt;-->
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -194,7 +199,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Amazon" />
+        <activity
+            android:name=".Amazon"
+            android:enabled="true"
+            android:label="@string/amazon_name"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
-
 </manifest>
