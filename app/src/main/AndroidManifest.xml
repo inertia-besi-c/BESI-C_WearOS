@@ -67,7 +67,8 @@
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE" />
             </intent-filter>
         </service>
-        <service android:name= "com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
+        <service
+            android:name= "com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:exported="true"
             android:permission="true">
         </service>
@@ -78,25 +79,29 @@
             android:permission="true"
             android:launchMode="singleInstance">
         </service>
-        <service android:name=".Pedometer"
+        <service
+            android:name=".Pedometer"
             android:enabled="true"
             android:exported="true"
             android:permission="true"
             android:launchMode="singleInstance">
         </service>
-        <service android:name=".HeartRate"
+        <service
+            android:name=".HeartRate"
             android:enabled="true"
             android:exported="true"
             android:permission="true"
             android:launchMode="singleInstance">
         </service>
-        <service android:name=".SensorTimer"
+        <service
+            android:name=".SensorTimer"
             android:enabled="true"
             android:exported="true"
             android:permission="true"
             android:launchMode="singleInstance">
         </service>
-        <service android:name=".Estimote"
+        <service
+            android:name=".Estimote"
             android:enabled="true"
             android:exported="true"
             android:permission="true"
