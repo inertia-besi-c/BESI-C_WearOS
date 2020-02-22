@@ -45,7 +45,7 @@ public class MainActivity extends WearableActivity
     private Calendar calendar;      // Initializes the calendar variable
     private Map<String, ?> preferenceKeys;      // Creates a map to store key values
     private SystemInformation systemInformation;        // Initializes the system information
-    private Intent startSettings, startEMA, startLowBattery, startSensors, estimoteSensor;      // Initializes intents for the class
+    private Intent startSettings, startEMA, startLowBattery, startSensors, estimoteSensor, startAWSUpload;      // Initializes intents for the class
     private IntentFilter minuteTimeTick;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
     private DataLogger dataLogger, checkSteps, checkDate;      // initializes the datalogger of the class
@@ -71,6 +71,7 @@ public class MainActivity extends WearableActivity
         this.startSensors = new Intent(getApplicationContext(), SensorTimer.class);     // Sets up the intent for the service
         this.estimoteSensor = new Intent(getApplicationContext(), Estimote.class);     // Sets up the intent for the service
         this.startLowBattery = new Intent(getApplicationContext(), Battery.class);     // Sets up the intent for the service
+        this.startAWSUpload = new Intent(getApplicationContext(), Amazon.class);
         this.systemInformation = new SystemInformation();       // Initializes the system information
         this.minuteTimeTick = new IntentFilter();     // Initializes the intent filter
         this.lowBatteryTimer = new Timer();
@@ -204,6 +205,8 @@ public class MainActivity extends WearableActivity
                 checkSteps.saveData("write");       // Writes data to the storage location
             }
         });
+
+//        getApplicationContext().startService(new Intent(getApplicationContext(), TransferService.class));
     }
 
     /**
@@ -391,7 +394,9 @@ public class MainActivity extends WearableActivity
                 {
                     sleepMode = false;      // Sets the sleepmode level
                     sleep.performClick();       // Clicks the sleep button
-                    stopService(startSensors);      // Stops the sensor class
+                    if (isRunning(SensorTimer.class))
+                        stopService(startSensors);      // Stops the sensor class
+                    startActivity(startAWSUpload);        // Starts the AWS upload to the cloud
                 }
 
                 if(sleepAutomatically <= 0)     // Checks if the variable is below the limit

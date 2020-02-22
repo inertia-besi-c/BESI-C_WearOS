@@ -420,7 +420,7 @@ public class PainSurvey extends WearableActivity
      */
     private void scheduleFollowupSurvey()
     {
-        if(this.userResponses[this.questions.length-3] != null && this.userResponses[this.questions.length-3].equalsIgnoreCase(this.answers[this.questions.length-3][0]))     // Checks for a specific requirement
+        if(this.userResponses[5] != null && this.userResponses[5].equalsIgnoreCase(this.answers[5][0]))     // Checks for a specific requirement
         {
             this.followupTimer.schedule(new TimerTask()         // Schedules the HRTimer at a fixed rate
             {
