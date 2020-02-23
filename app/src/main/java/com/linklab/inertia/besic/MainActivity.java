@@ -122,7 +122,10 @@ public class MainActivity extends WearableActivity
                     logHeaders();      // Calls the method to log the header files
 
                     if (!isRunning(Battery.class) && !systemInformation.isCharging(getApplicationContext()))        // Makes sure the class is not already running and that the system is not charging
+                    {
                         startActivity(startLowBattery);
+                        finish();       // Clears the main activity
+                    }
                 }
             }
         }, 0, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10"))) * 60 * 1000);     // Repeats at the specified interval
@@ -141,6 +144,7 @@ public class MainActivity extends WearableActivity
 
                 startEMA = new Intent(getApplicationContext(), PainSurvey.class);       // Makes a new intent
                 startActivity(startEMA);        // Starts the activity
+                finish();       // Clears the main activity
             }
         });
 
@@ -158,6 +162,7 @@ public class MainActivity extends WearableActivity
 
                 startEMA = new Intent(getApplicationContext(), EndOfDaySurvey.class);       // Makes a new intent
                 startActivity(startEMA);        // Starts the activity
+                finish();       // Clears the main activity
             }
         });
 
@@ -184,7 +189,8 @@ public class MainActivity extends WearableActivity
                         sleep.setBackgroundColor(Color.BLUE);       // Changes the background
                         systemInformation.toast(getApplicationContext(), "Do not disturb is off");      // Shows a toast
 
-                        startService(startSensors);     // Calls to start the service class
+                        if(!isRunning(SensorTimer.class))       // Checks if the class is not running
+                             startService(startSensors);     // Calls to start the service class
                         sleepAutomatically = Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "")));
 
                         sleepMode = false;       // Explicitly sets the sleepmode to be false
@@ -388,7 +394,6 @@ public class MainActivity extends WearableActivity
             @Override
             public void onReceive(Context context, Intent intent)
             {
-                checkSteps.saveData("write");       // Writes data to the file
                 setUpLowBattery();      // Calls the method
                 setUpEODEMAButton();        // Calls the method
                 logHeaders();      // Calls the method to log the header files
@@ -400,7 +405,8 @@ public class MainActivity extends WearableActivity
                     sleep.performClick();       // Clicks the sleep button
                     if (isRunning(SensorTimer.class))
                         stopService(startSensors);      // Stops the sensor class
-                    startActivity(startAWSUpload);        // Starts the AWS upload to the cloud
+                    if(!isRunning(Estimote.class))       // Checks if the class is not running
+                        startService(estimoteSensor);        // Starts the estimote service
                 }
 
                 if(sleepAutomatically <= 0)     // Checks if the variable is below the limit
@@ -408,29 +414,23 @@ public class MainActivity extends WearableActivity
                     sleepMode = false;      // Forces the sleepmode to be false
                     sleep.performClick();       // Clicks the sleep button
                     if(isRunning(Estimote.class))       // Checks if the estimote class is running
-                    {
                         stopService(estimoteSensor);        // Stops the estimote class
-                    }
                 }
                 else        // If the variable is within parameters
                 {
                     if(!isRunning(SensorTimer.class))       // If the sensor timer class is not running
-                    {
                         startService(startSensors);     // Calls to start the service class
-                    }
+
                 }
 
                 if (checkSteps.readData().contains("no"))       // Checks if the file is a no
-                {
                     sleepAutomatically--;       // Decrements the boolean value
-                }
 
                 if (checkSteps.readData().contains("yes"))        // If it contains anything else
                 {
                     sleepAutomatically = Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "")));       // Resets the variable
                     sleepMode = true;       // Sets the value to be true
                     sleep.performClick();       // Performs a click
-                    systemInformation.toast(getApplicationContext(), "Clicked Sleep 1");
                 }
 
                 checkSteps.saveData("write");       // Writes data to the file
