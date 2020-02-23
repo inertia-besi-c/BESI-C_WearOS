@@ -77,7 +77,11 @@ public class MainActivity extends WearableActivity
         this.lowBatteryTimer = new Timer();
 
         this.startActivity(this.startSettings);     // Run the settings
-        this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
+        if(!this.systemInformation.getSetSettings())        // Checks the settings level and if it is done
+        {
+            this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
+            this.systemInformation.setSetSettings(true);        // Sets the variable in the information level to be done
+        }
 
         this.setContentView(R.layout.activity_main);        // Sets the view of the system
 
