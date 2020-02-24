@@ -19,6 +19,8 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.wearable.activity.WearableActivity;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -43,6 +45,7 @@ public class MainActivity extends WearableActivity
     private SharedPreferences sharedPreferences;        // Initializes the shared preferences
     private Vibrator vibrator;      // Initializes the vibrator of the class
     private Calendar calendar;      // Initializes the calendar variable
+    private Window window;      // Gets access to the touch screen of the device
     private Map<String, ?> preferenceKeys;      // Creates a map to store key values
     private SystemInformation systemInformation;        // Initializes the system information
     private Intent startSettings, startEMA, startLowBattery, startSensors, estimoteSensor, startAWSUpload;      // Initializes intents for the class
@@ -66,6 +69,8 @@ public class MainActivity extends WearableActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);     // Creates an instance of the application
+
+        this.unlockScreen();        // Unlocks the screen
 
         this.startSettings = new Intent(getApplicationContext(), Settings.class);       // Starts a new intent for the settings class
         this.startSensors = new Intent(getApplicationContext(), SensorTimer.class);     // Sets up the intent for the service
@@ -495,6 +500,16 @@ public class MainActivity extends WearableActivity
         return false;       // If not, it returns false.
     }
 
+    /**
+     * This method sets up the screen actions that go along with waking up to the activity and how the screen behaves while the activity is ongoing
+     */
+    private void unlockScreen()
+    {
+        this.window = this.getWindow();     // Gets access to the screen of the device
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);        // Makes sure the screen is on if off
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        // Makes sure the screen stays on for the duration of the activity
+    }
 
     /**
      * This method is called when the system resumes back to this class
