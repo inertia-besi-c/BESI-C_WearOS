@@ -293,6 +293,7 @@ public class MainActivity extends WearableActivity
             }
 
             this.logInitialSettings();      // Calls the method to log the initial setting into the file
+            this.systemInformation.setSetSettings(true);        // Sets the variable in the information level to be done
         }
     }
 

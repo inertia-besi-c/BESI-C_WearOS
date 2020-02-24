@@ -82,11 +82,11 @@ public class EndOfDaySurvey extends WearableActivity
     private final String[][] caregiverAnswers =       // These are the answers for the care giver in order.
             {
                     {"Not at all", "A little", "Fairly", "Very"},
-                    {"None", "A little", "Medium", "A lot"},
+                    {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
                     {"Not at all", "A little", "Fairly", "Very"},
                     {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
-                    {"None", "A little", "Medium", "A lot"},
-                    {"None", "A little", "Medium", "A lot"},
+                    {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
+                    {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
                     {"Poor", "Fair", "Good", "Very Good"},
                     {"Not at all", "A little", "Medium", "A lot"},
                     {"Poor", "Fair", "Good", "Very Good"},
@@ -113,11 +113,11 @@ public class EndOfDaySurvey extends WearableActivity
     private final String[][] patientAnswers =         // These are the patient answers in order.
             {
                     {"Not at all", "A little", "Fairly", "Very"},
-                    {"None", "A little", "Medium", "A lot"},
+                    {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
                     {"Not at all", "A little", "Fairly", "Very"},
                     {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
-                    {"None", "A little", "Medium", "A lot"},
-                    {"None", "A little", "Medium", "A lot"},
+                    {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
+                    {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
                     {"Poor", "Fair", "Good", "Very Good"},
                     {"Not at all", "A little", "Medium", "A lot"},
                     {"Poor", "Fair", "Good", "Very Good"},
