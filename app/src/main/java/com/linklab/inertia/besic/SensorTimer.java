@@ -203,6 +203,7 @@ public class SensorTimer extends Service
 
         this.startAccelerometer(false);     // Stops the sensor from running
         this.startHeartRate(false);     // Stops the sensor from running
+        this.startEstimote(false);      // Stops the sensor from running
     }
 
     /**

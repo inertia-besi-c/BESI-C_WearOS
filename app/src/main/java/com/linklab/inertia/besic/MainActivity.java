@@ -3,7 +3,6 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
-
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
@@ -19,8 +18,8 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.wearable.activity.WearableActivity;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -58,7 +57,7 @@ public class MainActivity extends WearableActivity
     private String batteryInformation, data;      // Sets up the string in the class
     private Timer lowBatteryTimer;       // Sets the timers for the class
     private int hapticLevel, sleepAutomatically, lowBatteryThreshHold, startHour, startMinute, startSecond, endHour, endMinute, endSecond;        // Initializes the integers of the class
-    private boolean sleepMode, runLowBattery, runEODEMAButton;      // Initializes the boolean variables of the class
+    private boolean sleepMode, runLowBattery, runEODEMAButton, ranIsCharging;      // Initializes the boolean variables of the class
     private long startAutomaticEMA;     // Initializes the long variables of the class
 
     /**
@@ -104,10 +103,13 @@ public class MainActivity extends WearableActivity
         this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
         this.checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
         this.sleepMode = false;     // Initializes the sleepmode variable
+        this.ranIsCharging = false;     // Initializes the variable
 
         this.setUpUIElements();     // Calls the specified method to run
         this.setUpLowBattery();     // Calls the method
         this.setUpEODEMAButton();       // Calls the method
+        this.logHeaders();      // Calls the method
+
 
         this.lowBatteryTimer.schedule(new TimerTask()        // Schedules the timer
         {
@@ -119,8 +121,6 @@ public class MainActivity extends WearableActivity
             {
                 if(systemInformation.getBatteryLevel(getApplicationContext()) <= lowBatteryThreshHold && !runLowBattery)        // Checks if the battery level is lower than expected
                 {
-                    logHeaders();      // Calls the method to log the header files
-
                     if (!isRunning(Battery.class) && !systemInformation.isCharging(getApplicationContext()))        // Makes sure the class is not already running and that the system is not charging
                     {
                         data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Starting Low Battery Notification";       // Data to be logged by the system
@@ -144,7 +144,6 @@ public class MainActivity extends WearableActivity
             public void onClick(View v)
             {
                 vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
-                logHeaders();      // Calls the method to log the header files
 
                 data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Starting Pain EMA";       // Data to be logged by the system
                 dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
@@ -166,7 +165,6 @@ public class MainActivity extends WearableActivity
             public void onClick(View v)
             {
                 vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
-                logHeaders();      // Calls the method to log the header files
 
                 data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Starting End of Day EMA";       // Data to be logged by the system
                 dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
@@ -189,7 +187,6 @@ public class MainActivity extends WearableActivity
             {
                 vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
                 setUpUIElements();      // Calls the method to set up UI elements
-                logHeaders();      // Calls the method to log the header files
 
                 if (!systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
                 {
@@ -273,9 +270,11 @@ public class MainActivity extends WearableActivity
 
         if (needPermissions)        // When they have permission
         {
-            ActivityCompat.requestPermissions(this, Required_Permissions,0);     // Allow them to work on device.
-            this.startActivity(this.startSettings);     // Run the settings
+            ActivityCompat.requestPermissions(this, Required_Permissions, 0);     // Allow them to work on device.
         }
+
+//        if (needPermissions)
+//            this.startActivity(this.startSettings);     // Run the settings
     }
 
     /**
@@ -283,37 +282,77 @@ public class MainActivity extends WearableActivity
      */
     private void logHeaders()
     {
-        if (!this.directory.isDirectory())       // Checks if the directory is a directory or not, if not, it runs the following
+        String[][] Files =      // A list of file and their headers to be made
+                {
+                        {getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date"},       // End of day Updater file
+                        {getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no"},      // stepMode Updater file
+                        {getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), String.valueOf(this.systemInformation.getSleepMode())},      // SleepMode Updater file
+                        {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.pedometer), getResources().getString(R.string.pedometer_header)},       // Pedometer file
+                        {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.accelerometer), getResources().getString(R.string.accelerometer_header)},      // Accelerometer file
+                        {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.heartrate), getResources().getString(R.string.heartrate_header)},       // Heart Rate File
+                        {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.estimote), getResources().getString(R.string.estimote_header)},       // Estimote File
+                        {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.battery), getResources().getString(R.string.battery_header)},      // Battery file
+                        {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), getResources().getString(R.string.settings_header)},        // Settings file
+                        {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), getResources().getString(R.string.system_header)},        // System response file
+                        {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), getResources().getString(R.string.sensor_header)},        // Sensor response file
+                        {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painactivity), getResources().getString(R.string.painactivity_header)},        // Pain activity file
+                        {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.followupactivity), getResources().getString(R.string.followupactivity_header)},        // Followup activity file
+                        {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.endofdayactivity), getResources().getString(R.string.endofdayactivity_header)},        // Followup activity file
+                        {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.painresponse), getResources().getString(R.string.painresponse_header)},       // Pain response file
+                        {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.followupresponse), getResources().getString(R.string.followupresponse_header)},        // Followup response file
+                        {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.endofdayresponse), getResources().getString(R.string.endofdayresponse_header)},        // End of Day response file
+                };
+
+        if (this.directory.isDirectory())       // Checks if the directory is a directory or not, if not, it runs the following
         {
-            String[][] Files =      // A list of file and their headers to be made
-                    {
-                            {getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date"},       // End of day Updater file
-                            {getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), String.valueOf(this.systemInformation.getSleepMode())},      // SleepMode Updater file
-                            {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.pedometer), getResources().getString(R.string.pedometer_header)},       // Pedometer file
-                            {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.accelerometer), getResources().getString(R.string.accelerometer_header)},      // Accelerometer file
-                            {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.heartrate), getResources().getString(R.string.heartrate_header)},       // Heart Rate File
-                            {getResources().getString(R.string.subdirectory_sensors), getResources().getString(R.string.estimote), getResources().getString(R.string.estimote_header)},       // Estimote File
-                            {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.battery), getResources().getString(R.string.battery_header)},      // Battery file
-                            {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.settings), getResources().getString(R.string.settings_header)},        // Settings file
-                            {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), getResources().getString(R.string.system_header)},        // System response file
-                            {getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), getResources().getString(R.string.sensor_header)},        // Sensor response file
-                            {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.painactivity), getResources().getString(R.string.painactivity_header)},        // Pain activity file
-                            {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.followupactivity), getResources().getString(R.string.followupactivity_header)},        // Followup activity file
-                            {getResources().getString(R.string.subdirectory_survey_activities), getResources().getString(R.string.endofdayactivity), getResources().getString(R.string.endofdayactivity_header)},        // Followup activity file
-                            {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.painresponse), getResources().getString(R.string.painresponse_header)},       // Pain response file
-                            {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.followupresponse), getResources().getString(R.string.followupresponse_header)},        // Followup response file
-                            {getResources().getString(R.string.subdirectory_survey_responses), getResources().getString(R.string.endofdayresponse), getResources().getString(R.string.endofdayresponse_header)},        // End of Day response file
-                    };
+            if (Files.length != this.findAndLogAllFiles(this.directory))        // Checks if all the files have been added
+            {
+                for (String[] file : Files)     // For every file in the files
+                {
+                    this.dataLogger = new DataLogger(getApplicationContext(), file[0], file[1], file[2]);       // Make a specified data to the file
+                    this.dataLogger.saveData("write");        // Save that data in log mode
+                }
+
+                this.logInitialSettings();      // Calls the method to log the initial setting into the file
+                this.systemInformation.setSetSettings(true);        // Sets the variable in the information level to be done
+            }
+        }
+        else        // If Not
+        {
+            this.startActivity(this.startSettings);     // Run the settings
 
             for (String[] file : Files)     // For every file in the files
             {
                 this.dataLogger = new DataLogger(getApplicationContext(), file[0], file[1], file[2]);       // Make a specified data to the file
-                this.dataLogger.saveData("log");        // Save that data in log mode
+                this.dataLogger.saveData("write");        // Save that data in log mode
             }
 
             this.logInitialSettings();      // Calls the method to log the initial setting into the file
             this.systemInformation.setSetSettings(true);        // Sets the variable in the information level to be done
         }
+    }
+
+    /**
+     * This method is made to recursively find all the files in a given directory
+     * @param folder  is the directory files is needed from
+     */
+    private int findAndLogAllFiles(final File folder)
+    {
+        int value = 0;      // Initializes a value
+
+        for (final File fileEntry : folder.listFiles())     // For every file in the folder
+        {
+            if (fileEntry.isDirectory())        // If the file is a directory
+            {
+                value += this.findAndLogAllFiles(fileEntry);     // Calls the method
+            }
+            else        // IF not
+            {
+                value++;        // Increments the value
+            }
+        }
+
+        return value;       // returns the value
     }
 
     /**
@@ -431,13 +470,14 @@ public class MainActivity extends WearableActivity
                 checkSteps.saveData("write");       // Writes data to the file
                 setUpLowBattery();      // Calls the method
                 setUpEODEMAButton();        // Calls the method
-                logHeaders();      // Calls the method to log the header files
 
-
-                if(systemInformation.isCharging(getApplicationContext()))       // Checks if the system is charging
+                if(systemInformation.isCharging(getApplicationContext()) && !ranIsCharging)       // Checks if the system is charging
                 {
-                    sleepMode = false;      // Sets the sleepmode level
-                    sleep.performClick();       // Clicks the sleep button
+                    ranIsCharging = true;       // Sets the variable to be true
+
+                    sleepMode = false;      // Forces the sleep mode to be false;
+                    sleep.performClick();       // Clicks the sleep button programmatically.
+
                     if (isRunning(SensorTimer.class))
                         stopService(startSensors);      // Stops the sensor class
                     if(!isRunning(Estimote.class))       // Checks if the class is not running
@@ -447,7 +487,12 @@ public class MainActivity extends WearableActivity
                     dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
                     dataLogger.saveData("log");      // Saves the data in the mode specified
 
-                    startService(startAWSUpload);       // Starts an upload intent to aws
+                    startActivity(startAWSUpload);       // Starts an upload intent to aws
+                }
+                else
+                {
+                    if (!systemInformation.isCharging(getApplicationContext()))
+                        ranIsCharging = false;      // Resets the variable
                 }
 
                 if(sleepAutomatically <= 0)     // Checks if the variable is below the limit
@@ -519,7 +564,7 @@ public class MainActivity extends WearableActivity
     {
         super.onResume();       // Calls the super class method
         this.setUpUIElements();     // Calls the method
-        this.startMinuteUpdater();       // Unregisters the receiver
+        this.startMinuteUpdater();       // Does not unregisters the receiver
     }
 
     /**
@@ -529,6 +574,6 @@ public class MainActivity extends WearableActivity
     protected void onStop()     // To stop the activity.
     {
         super.onStop();     // Calls the super class method
-        this.startMinuteUpdater();       // Unregisters the receiver
+        this.startMinuteUpdater();       // Does not unregister the  receiver
     }
 }
