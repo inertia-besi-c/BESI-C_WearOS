@@ -46,6 +46,7 @@
     <string name="endofdaysurvey_name">BESI-C: End Of Day Survey</string>   <!--This is the string that is shown as the endofday survey name-->
     <string name="endofdaypromptone_name">BESI-C: End Of Day Prompt 1</string>   <!--This is the string that is shown as the endofday survey prompt name-->
     <string name="endofdayprompttwo_name">BESI-C: End Of Day Prompt 2</string>   <!--This is the string that is shown as the endofday survey prompt name-->
+    <string name="endofdaypromptmanual_name">BESI-C: End Of Day Prompt Manual</string>   <!--This is the string that is shown as the endofday survey prompt name-->
 
     <!--The name of the Sub Folders for information to be stored-->
     <string name="subdirectory_information">Information</string>     <!--This is the sub folder where some system information will be stored-->
