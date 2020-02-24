@@ -489,11 +489,6 @@ public class MainActivity extends WearableActivity
 
                     startActivity(startAWSUpload);       // Starts an upload intent to aws
                 }
-                else
-                {
-                    if (!systemInformation.isCharging(getApplicationContext()))
-                        ranIsCharging = false;      // Resets the variable
-                }
 
                 if(sleepAutomatically <= 0)     // Checks if the variable is below the limit
                 {
