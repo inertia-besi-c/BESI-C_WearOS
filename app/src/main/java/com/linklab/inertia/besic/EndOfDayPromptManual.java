@@ -20,8 +20,7 @@ import android.widget.TextView;
 import java.util.Objects;
 
 /**
- * This class is run only when the system is almost out of battery which is a defined variable set up in the
- * preference file. The user has the option to dismiss this warning or charge the watch.
+ * This class is run only when the user manually clicks the button to start a daily survey
  */
 public class EndOfDayPromptManual extends WearableActivity
 {
@@ -64,7 +63,7 @@ public class EndOfDayPromptManual extends WearableActivity
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");        // Saves the data
 
-        this.ok.setOnClickListener(new View.OnClickListener() // Waits for the dismiss button to be clicked.
+        this.ok.setOnClickListener(new View.OnClickListener() // Waits for the dismiss ok to be clicked.
         {
             /**
              * This is run when the button is clicked

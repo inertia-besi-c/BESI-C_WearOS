@@ -52,7 +52,7 @@ public class MainActivity extends WearableActivity
     private StringBuilder stringBuilder;        // Initializes string builder of the system
     private Button start, sleep, dailyEMA;        // Makes all button on the system
     private TextView date, time, battery;        // Makes all text views on the system
-    private String batteryInformation;      // Sets up the string in the class
+    private String batteryInformation, data;      // Sets up the string in the class
     private Timer lowBatteryTimer;       // Sets the timers for the class
     private int hapticLevel, sleepAutomatically, lowBatteryThreshHold, startHour, startMinute, startSecond, endHour, endMinute, endSecond;        // Initializes the integers of the class
     private boolean sleepMode, runLowBattery, runEODEMAButton;      // Initializes the boolean variables of the class
@@ -118,6 +118,10 @@ public class MainActivity extends WearableActivity
 
                     if (!isRunning(Battery.class) && !systemInformation.isCharging(getApplicationContext()))        // Makes sure the class is not already running and that the system is not charging
                     {
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Starting Low Battery Notification";       // Data to be logged by the system
+                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+                        dataLogger.saveData("log");      // Saves the data in the mode specified
+
                         startActivity(startLowBattery);
                         finish();       // Clears the main activity
                     }
@@ -137,6 +141,10 @@ public class MainActivity extends WearableActivity
                 vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
                 logHeaders();      // Calls the method to log the header files
 
+                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Starting Pain EMA";       // Data to be logged by the system
+                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+                dataLogger.saveData("log");      // Saves the data in the mode specified
+
                 startEMA = new Intent(getApplicationContext(), PainSurvey.class);       // Makes a new intent
                 startActivity(startEMA);        // Starts the activity
                 finish();       // Clears the main activity
@@ -154,6 +162,10 @@ public class MainActivity extends WearableActivity
             {
                 vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
                 logHeaders();      // Calls the method to log the header files
+
+                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Starting End of Day EMA";       // Data to be logged by the system
+                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+                dataLogger.saveData("log");      // Saves the data in the mode specified
 
                 startEMA = new Intent(getApplicationContext(), EndOfDayPromptManual.class);       // Makes a new intent
                 startActivity(startEMA);        // Starts the activity
@@ -174,11 +186,14 @@ public class MainActivity extends WearableActivity
                 setUpUIElements();      // Calls the method to set up UI elements
                 logHeaders();      // Calls the method to log the header files
 
-
                 if (!systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
                 {
                     if (sleepMode)      // Checks if sleepmode is enabled, if it is
                     {
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Do not disturb Activated";       // Data to be logged by the system
+                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+                        dataLogger.saveData("log");      // Saves the data in the mode specified
+
                         systemInformation.toast(getApplicationContext(), "Clicked Sleep 2");
 
                         sleep.setBackgroundColor(Color.BLUE);       // Changes the background
@@ -192,6 +207,10 @@ public class MainActivity extends WearableActivity
                     }
                     else        // If sleepmode is not enabled
                     {
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Do not disturb De-Activated";       // Data to be logged by the system
+                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+                        dataLogger.saveData("log");      // Saves the data in the mode specified
+
                         sleep.setBackgroundColor(Color.GRAY);       // Changes the background
                         systemInformation.toast(getApplicationContext(), "Do not disturb is ON");       // Shows a toast
 
@@ -203,15 +222,14 @@ public class MainActivity extends WearableActivity
                     sleep.setBackgroundColor(Color.GRAY);       // Sets the background color
                     systemInformation.toast(getApplicationContext(), "Charging Device");        // Shows a toast
 
-                    stopService(startSensors);     // Calls to start the service class
+                    if (isRunning(SensorTimer.class))       // Checks if the class is running
+                        stopService(startSensors);     // Calls to start the service class
                     sleepMode = true;       // Explicitly sets the sleepmode to be true
                 }
 
                 checkSteps.saveData("write");       // Writes data to the storage location
             }
         });
-
-//        getApplicationContext().startService(new Intent(getApplicationContext(), TransferService.class));
     }
 
     /**
@@ -344,10 +362,18 @@ public class MainActivity extends WearableActivity
 
         if (runEODEMAButton && !this.checkDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))       // Checks the conditions for the daily survey button
         {
+            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "End of Day Button Activated";       // Data to be logged by the system
+            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+            dataLogger.saveData("log");      // Saves the data in the mode specified
+
             this.dailyEMA.bringToFront();       // Brings the button to the front
         }
         else        // If the conditions fail
         {
+            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Sleep Button Activated";       // Data to be logged by the system
+            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+            dataLogger.saveData("log");      // Saves the data in the mode specified
+
             this.sleep.bringToFront();      // Brings the button to the front
         }
 
@@ -355,6 +381,10 @@ public class MainActivity extends WearableActivity
         {
             if (!this.systemInformation.isCharging(getApplicationContext()) && !sleepMode && !this.checkDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))      // Makes sure the system is not charging or in sleepmode
             {
+                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Automatically Starting End of Day Survey";       // Data to be logged by the system
+                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+                dataLogger.saveData("log");      // Saves the data in the mode specified
+
                 this.startEMA = new Intent(getApplicationContext(), EndOfDayPrompt1.class);       // Makes a new intent
                 this.startActivity(this.startEMA);        // Starts the activity
             }
@@ -393,6 +423,7 @@ public class MainActivity extends WearableActivity
             @Override
             public void onReceive(Context context, Intent intent)
             {
+                checkSteps.saveData("write");       // Writes data to the file
                 setUpLowBattery();      // Calls the method
                 setUpEODEMAButton();        // Calls the method
                 logHeaders();      // Calls the method to log the header files
@@ -407,7 +438,11 @@ public class MainActivity extends WearableActivity
                     if(!isRunning(Estimote.class))       // Checks if the class is not running
                         startService(estimoteSensor);        // Starts the estimote service
 
-                    startService(startAWSUpload);
+                    data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Uploading Data to Amazon Web Services!!!";       // Data to be logged by the system
+                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+                    dataLogger.saveData("log");      // Saves the data in the mode specified
+
+                    startService(startAWSUpload);       // Starts an upload intent to aws
                 }
 
                 if(sleepAutomatically <= 0)     // Checks if the variable is below the limit
@@ -421,7 +456,6 @@ public class MainActivity extends WearableActivity
                 {
                     if(!isRunning(SensorTimer.class))       // If the sensor timer class is not running
                         startService(startSensors);     // Calls to start the service class
-
                 }
 
                 if (checkSteps.readData().contains("no"))       // Checks if the file is a no
