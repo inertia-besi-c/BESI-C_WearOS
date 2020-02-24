@@ -74,14 +74,9 @@ public class MainActivity extends WearableActivity
         this.startAWSUpload = new Intent(getApplicationContext(), Amazon.class);
         this.systemInformation = new SystemInformation();       // Initializes the system information
         this.minuteTimeTick = new IntentFilter();     // Initializes the intent filter
-        this.lowBatteryTimer = new Timer();
+        this.lowBatteryTimer = new Timer();     // Loe battery timer
 
-        this.startActivity(this.startSettings);     // Run the settings
-        if(!this.systemInformation.getSetSettings())        // Checks the settings level and if it is done
-        {
-            this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
-            this.systemInformation.setSetSettings(true);        // Sets the variable in the information level to be done
-        }
+        this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
 
         this.setContentView(R.layout.activity_main);        // Sets the view of the system
 
@@ -160,7 +155,7 @@ public class MainActivity extends WearableActivity
                 vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
                 logHeaders();      // Calls the method to log the header files
 
-                startEMA = new Intent(getApplicationContext(), EndOfDaySurvey.class);       // Makes a new intent
+                startEMA = new Intent(getApplicationContext(), EndOfDayPromptManual.class);       // Makes a new intent
                 startActivity(startEMA);        // Starts the activity
                 finish();       // Clears the main activity
             }
@@ -187,7 +182,7 @@ public class MainActivity extends WearableActivity
                         systemInformation.toast(getApplicationContext(), "Clicked Sleep 2");
 
                         sleep.setBackgroundColor(Color.BLUE);       // Changes the background
-                        systemInformation.toast(getApplicationContext(), "Do not disturb is off");      // Shows a toast
+                        systemInformation.toast(getApplicationContext(), "Do not disturb is OFF");      // Shows a toast
 
                         if(!isRunning(SensorTimer.class))       // Checks if the class is not running
                              startService(startSensors);     // Calls to start the service class
@@ -198,7 +193,7 @@ public class MainActivity extends WearableActivity
                     else        // If sleepmode is not enabled
                     {
                         sleep.setBackgroundColor(Color.GRAY);       // Changes the background
-                        systemInformation.toast(getApplicationContext(), "Do not disturb is on");       // Shows a toast
+                        systemInformation.toast(getApplicationContext(), "Do not disturb is ON");       // Shows a toast
 
                         sleepMode = true;       // Explicitly sets the sleepmode to be true
                     }
@@ -256,6 +251,7 @@ public class MainActivity extends WearableActivity
         if (needPermissions)        // When they have permission
         {
             ActivityCompat.requestPermissions(this, Required_Permissions,0);     // Allow them to work on device.
+            this.startActivity(this.startSettings);     // Run the settings
         }
     }
 
@@ -408,6 +404,8 @@ public class MainActivity extends WearableActivity
                         stopService(startSensors);      // Stops the sensor class
                     if(!isRunning(Estimote.class))       // Checks if the class is not running
                         startService(estimoteSensor);        // Starts the estimote service
+
+                    startService(startAWSUpload);
                 }
 
                 if(sleepAutomatically <= 0)     // Checks if the variable is below the limit
@@ -461,15 +459,6 @@ public class MainActivity extends WearableActivity
         return false;       // If not, it returns false.
     }
 
-    /**
-     * This method is called if the application is paused for any reason
-     */
-    @Override
-    protected void onPause()
-    {
-        super.onPause();        // Calls the super class method
-        this.unregisterReceiver(this.minuteUpdateReceiver);      // Unregisters the receiver
-    }
 
     /**
      * This method is called when the system resumes back to this class
@@ -489,5 +478,6 @@ public class MainActivity extends WearableActivity
     protected void onStop()     // To stop the activity.
     {
         super.onStop();     // Calls the super class method
+        this.startMinuteUpdater();       // Unregisters the receiver
     }
 }
