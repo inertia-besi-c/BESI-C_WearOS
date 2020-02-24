@@ -303,6 +303,8 @@ public class MainActivity extends WearableActivity
         this.time.setText(this.systemInformation.getDateTime("h:mm a"));        // Sets up the time text
         this.date.setText(this.systemInformation.getDateTime("MMM d, YYYY"));       // Sets up the date text
         this.battery.setText(this.batteryInformation);      // Sets up the battery text
+
+        this.checkSteps.saveData("write");       // Writes data to the storage location
     }
 
     /**

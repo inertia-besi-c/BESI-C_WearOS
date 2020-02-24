@@ -202,12 +202,7 @@ public class EndOfDaySurvey extends WearableActivity
                 this.back.setBackgroundColor(Color.GRAY);       // Grays out the color
                 this.back.setText(" ");      // Removes the back button text
             }
-            else        // If it is any other
-            {
-                this.back.setBackgroundColor(Color.RED);        // Resets the color to red
-            }
-
-            if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
+            else if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
             {
                 this.next.setText(this.answers[questions.length-1][0]);     // Sets the next button accordingly
                 this.back.setText(this.answers[questions.length-1][1]);     // Sets the back button accordingly
@@ -217,6 +212,7 @@ public class EndOfDaySurvey extends WearableActivity
             {
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
+                this.back.setBackgroundColor(Color.RED);        // Resets the color to red
                 this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
             }
 
