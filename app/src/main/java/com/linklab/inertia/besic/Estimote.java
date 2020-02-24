@@ -109,9 +109,17 @@ public class Estimote extends SensorTimer
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
-        this.beaconManager.stopRanging(this.beaconRegion);       // Calls the beacon range to stop
-        this.ESTimer.cancel();        // Cancels the ESTimer made by the class
-        this.stopForeground(true);      // Stops the foreground notification
+
+        try     // Tries to perform the following
+        {
+            this.beaconManager.stopRanging(this.beaconRegion);       // Calls the beacon range to stop
+            this.ESTimer.cancel();        // Cancels the ESTimer made by the class
+            this.stopForeground(true);      // Stops the foreground notification
+        }
+        catch (Exception e)     // If it fails
+        {
+            // Do nothing
+        }
     }
 
     /**

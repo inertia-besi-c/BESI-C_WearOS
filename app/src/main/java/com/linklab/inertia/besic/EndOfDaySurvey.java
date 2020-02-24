@@ -82,11 +82,11 @@ public class EndOfDaySurvey extends WearableActivity
     private final String[][] caregiverAnswers =       // These are the answers for the care giver in order.
             {
                     {"Not at all", "A little", "Fairly", "Very"},
-                    {"None", "A little", "Medium", "A lot"},
+                    {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
                     {"Not at all", "A little", "Fairly", "Very"},
                     {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
-                    {"None", "A little", "Medium", "A lot"},
-                    {"None", "A little", "Medium", "A lot"},
+                    {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
+                    {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
                     {"Poor", "Fair", "Good", "Very Good"},
                     {"Not at all", "A little", "Medium", "A lot"},
                     {"Poor", "Fair", "Good", "Very Good"},
@@ -113,11 +113,11 @@ public class EndOfDaySurvey extends WearableActivity
     private final String[][] patientAnswers =         // These are the patient answers in order.
             {
                     {"Not at all", "A little", "Fairly", "Very"},
-                    {"None", "A little", "Medium", "A lot"},
+                    {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
                     {"Not at all", "A little", "Fairly", "Very"},
                     {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
-                    {"None", "A little", "Medium", "A lot"},
-                    {"None", "A little", "Medium", "A lot"},
+                    {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
+                    {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
                     {"Poor", "Fair", "Good", "Very Good"},
                     {"Not at all", "A little", "Medium", "A lot"},
                     {"Poor", "Fair", "Good", "Very Good"},
@@ -200,13 +200,9 @@ public class EndOfDaySurvey extends WearableActivity
             if (this.currentQuestion == 0)      // Checks if this is the first question
             {
                 this.back.setBackgroundColor(Color.GRAY);       // Grays out the color
+                this.back.setText(" ");      // Removes the back button text
             }
-            else        // If it is any other
-            {
-                this.back.setBackgroundColor(Color.RED);        // Resets the color to red
-            }
-
-            if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
+            else if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
             {
                 this.next.setText(this.answers[questions.length-1][0]);     // Sets the next button accordingly
                 this.back.setText(this.answers[questions.length-1][1]);     // Sets the back button accordingly
@@ -216,6 +212,7 @@ public class EndOfDaySurvey extends WearableActivity
             {
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
+                this.back.setBackgroundColor(Color.RED);        // Resets the color to red
                 this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
             }
 

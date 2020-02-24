@@ -29,7 +29,7 @@ class SystemInformation
     private Date current;       // Private date variables
     private IntentFilter battery;       // Private intent filter variables
     private Intent batteryStatus;       // Private intent variables
-    private boolean sleepMode;      // Private boolean variable for the sleep level of the application
+    private boolean sleepMode, setSettings;      // Private boolean variable for the sleep level of the application
     private int level, scale, batteryPercent, batteryLevel;       // private integer variables
 
     /**
@@ -41,6 +41,7 @@ class SystemInformation
         this.scale = 0;     // Sets the scale
         this.batteryPercent = 0;        // Sets the battery percentage
         this.sleepMode = false;     // Sets the initial sleepMode of the system
+        this.setSettings = false;       // Sets the initial settings of the system
     }
 
     /**
@@ -165,6 +166,16 @@ class SystemInformation
     }
 
     /**
+     * Sets the value of the setting
+     * @param settingMode is the setting wanted
+     */
+    @SuppressWarnings("ALL")        // Supresses the warnings
+    void setSetSettings(boolean settingMode)
+    {
+        this.setSettings = settingMode;        // Sets the variable appropriately
+    }
+
+    /**
      * Sets the battery percentage to the input
      * @param batteryPercentInput is the battery input acquired
      */
@@ -195,6 +206,7 @@ class SystemInformation
      * Sets the sleepMode of the system
      * @param sleepMode is the level needed to be changed to
      */
+    @SuppressWarnings("ALL")        // Supresses the warnings
     void setSleepMode(boolean sleepMode)
     {
         this.sleepMode = sleepMode;        // Sets the variable appropriately
@@ -252,5 +264,14 @@ class SystemInformation
     boolean getSleepMode()
     {
         return this.sleepMode;      // Returns the value associated with the variable
+    }
+
+    /**
+     * Creates a global access to the settings variable
+     * @return the value associated with the settings
+     */
+    boolean getSetSettings()
+    {
+        return this.setSettings;      // Returns the value associated with the variable
     }
 }
