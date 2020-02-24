@@ -185,7 +185,7 @@ public class MainActivity extends WearableActivity
             @Override
             public void onClick(View v)
             {
-                vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
+//                    vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
                 setUpUIElements();      // Calls the method to set up UI elements
 
                 if (!systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
@@ -272,9 +272,6 @@ public class MainActivity extends WearableActivity
         {
             ActivityCompat.requestPermissions(this, Required_Permissions, 0);     // Allow them to work on device.
         }
-
-//        if (needPermissions)
-//            this.startActivity(this.startSettings);     // Run the settings
     }
 
     /**
