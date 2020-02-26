@@ -66,7 +66,7 @@ public class HeartRate extends SensorTimer implements SensorEventListener
             }
         }, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("heartrate_duration", ""))) * 1000);      // Repeats at the specified interval
 
-        return START_STICKY;        // Returns an integer for the service schedule
+        return START_REDELIVER_INTENT;        // Returns an integer for the service schedule
     }
 
     /**

@@ -3,6 +3,7 @@ package com.linklab.inertia.besic;
 /*
  * Imports needed by the system to function appropriately
  */
+
 import android.Manifest;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
@@ -30,8 +31,6 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * This is the main process that is fired upon the application being initiated on the device.
@@ -55,8 +54,7 @@ public class MainActivity extends WearableActivity
     private Button start, sleep, dailyEMA;        // Makes all button on the system
     private TextView date, time, battery;        // Makes all text views on the system
     private String batteryInformation, data;      // Sets up the string in the class
-    private Timer lowBatteryTimer;       // Sets the timers for the class
-    private int hapticLevel, sleepAutomatically, lowBatteryThreshHold, startHour, startMinute, startSecond, endHour, endMinute, endSecond;        // Initializes the integers of the class
+    private int hapticLevel, sleepAutomatically, lowBatteryThreshHold, lowBatteryTime, startHour, startMinute, startSecond, endHour, endMinute, endSecond;        // Initializes the integers of the class
     private boolean sleepMode, runLowBattery, runEODEMAButton, ranIsCharging;      // Initializes the boolean variables of the class
     private long startAutomaticEMA;     // Initializes the long variables of the class
 
@@ -78,7 +76,6 @@ public class MainActivity extends WearableActivity
         this.startAWSUpload = new Intent(getApplicationContext(), Amazon.class);
         this.systemInformation = new SystemInformation();       // Initializes the system information
         this.minuteTimeTick = new IntentFilter();     // Initializes the intent filter
-        this.lowBatteryTimer = new Timer();     // Loe battery timer
 
         this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
 
@@ -98,7 +95,8 @@ public class MainActivity extends WearableActivity
 
         this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "20")));       // Gets the haptic  level preference
         this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "45")));     // Gets the sleep level max number
-        this.lowBatteryThreshHold = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_alert", "10")));     // Gets the low battery thresh hold
+        this.lowBatteryThreshHold = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_alert", "15")));     // Gets the low battery thresh hold
+        this.lowBatteryTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10")));        // Sets up a timer
         this.directory = new File(Environment.getExternalStorageDirectory() + "/" + this.sharedPreferences.getString("directory_key", getResources().getString(R.string.app_name_abbreviated)));     // Makes a reference to a directory
         this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
         this.checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
@@ -109,30 +107,6 @@ public class MainActivity extends WearableActivity
         this.setUpLowBattery();     // Calls the method
         this.setUpEODEMAButton();       // Calls the method
         this.logHeaders();      // Calls the method
-
-
-        this.lowBatteryTimer.schedule(new TimerTask()        // Schedules the timer
-        {
-            /**
-             * The following is called to run
-             */
-            @Override
-            public void run()
-            {
-                if(systemInformation.getBatteryLevel(getApplicationContext()) <= lowBatteryThreshHold && !runLowBattery)        // Checks if the battery level is lower than expected
-                {
-                    if (!isRunning(Battery.class) && !systemInformation.isCharging(getApplicationContext()))        // Makes sure the class is not already running and that the system is not charging
-                    {
-                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Starting Low Battery Notification";       // Data to be logged by the system
-                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
-                        dataLogger.saveData("log");      // Saves the data in the mode specified
-
-                        startActivity(startLowBattery);
-                        finish();       // Clears the main activity
-                    }
-                }
-            }
-        }, 0, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10"))) * 60 * 1000);     // Repeats at the specified interval
 
         this.start.setOnClickListener(new View.OnClickListener()        // Sets up the start button
         {
@@ -185,51 +159,8 @@ public class MainActivity extends WearableActivity
             @Override
             public void onClick(View v)
             {
-//                    vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
-                setUpUIElements();      // Calls the method to set up UI elements
-
-                if (!systemInformation.isCharging(getApplicationContext()))     // Checks if the system is charging
-                {
-                    if (sleepMode)      // Checks if sleepmode is enabled, if it is
-                    {
-                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Do not disturb Activated";       // Data to be logged by the system
-                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
-                        dataLogger.saveData("log");      // Saves the data in the mode specified
-
-                        systemInformation.toast(getApplicationContext(), "Clicked Sleep 2");
-
-                        sleep.setBackgroundColor(Color.BLUE);       // Changes the background
-                        systemInformation.toast(getApplicationContext(), "Do not disturb is OFF");      // Shows a toast
-
-                        if(!isRunning(SensorTimer.class))       // Checks if the class is not running
-                             startService(startSensors);     // Calls to start the service class
-                        sleepAutomatically = Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "")));
-
-                        sleepMode = false;       // Explicitly sets the sleepmode to be false
-                    }
-                    else        // If sleepmode is not enabled
-                    {
-                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Do not disturb De-Activated";       // Data to be logged by the system
-                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
-                        dataLogger.saveData("log");      // Saves the data in the mode specified
-
-                        sleep.setBackgroundColor(Color.GRAY);       // Changes the background
-                        systemInformation.toast(getApplicationContext(), "Do not disturb is ON");       // Shows a toast
-
-                        sleepMode = true;       // Explicitly sets the sleepmode to be true
-                    }
-                }
-                else        // If the system is charging
-                {
-                    sleep.setBackgroundColor(Color.GRAY);       // Sets the background color
-                    systemInformation.toast(getApplicationContext(), "Charging Device");        // Shows a toast
-
-                    if (isRunning(SensorTimer.class))       // Checks if the class is running
-                        stopService(startSensors);     // Calls to start the service class
-                    sleepMode = true;       // Explicitly sets the sleepmode to be true
-                }
-
-                checkSteps.saveData("write");       // Writes data to the storage location
+                vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
+                sleepSettings();        // Calls the method accordingly
             }
         });
     }
@@ -379,6 +310,69 @@ public class MainActivity extends WearableActivity
         this.endSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "59")));     // Gets the end second from preferences
 
         this.runLowBattery = this.systemInformation.isTimeBetweenTimes(this.systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
+        this.lowBatteryTime--;      // Decrements the time
+
+        if(this.systemInformation.getBatteryLevel(this.getApplicationContext()) <= this.lowBatteryThreshHold && !this.runLowBattery  && this.lowBatteryTime < 0 && !this.isRunning(Battery.class) && !this.systemInformation.isCharging(this.getApplicationContext()))        // Checks if the battery level is lower than expected
+        {
+            this.lowBatteryTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10")));        // Sets up a timer
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Starting Low Battery Notification";       // Data to be logged by the system
+            this.dataLogger = new DataLogger(this.getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");      // Saves the data in the mode specified
+
+            this.startActivity(this.startLowBattery);
+            this.finish();       // Clears the main activity
+        }
+    }
+
+    /**
+     * This method sets up the actions that the sleep button would perform if called
+     */
+    private void sleepSettings()
+    {
+        this.setUpUIElements();      // Calls the method to set up UI elements
+
+        if (!this.systemInformation.isCharging(this.getApplicationContext()))     // Checks if the system is charging
+        {
+            if (this.sleepMode)      // Checks if sleepmode is enabled, if it is
+            {
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Do not disturb Activated";       // Data to be logged by the system
+                this.dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), this.getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+                this.dataLogger.saveData("log");      // Saves the data in the mode specified
+
+                this.systemInformation.toast(this.getApplicationContext(), "Clicked Sleep 2");
+
+                this.sleep.setBackgroundColor(Color.BLUE);       // Changes the background
+                this.systemInformation.toast(this.getApplicationContext(), "Do not disturb is OFF");      // Shows a toast
+
+                if(!this.isRunning(SensorTimer.class))       // Checks if the class is not running
+                    this.startService(this.startSensors);     // Calls to start the service class
+                this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));
+
+                this.sleepMode = false;       // Explicitly sets the sleepmode to be false
+            }
+            else        // If sleepmode is not enabled
+            {
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Do not disturb De-Activated";       // Data to be logged by the system
+                this.dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), this.getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+                this.dataLogger.saveData("log");      // Saves the data in the mode specified
+
+                this.sleep.setBackgroundColor(Color.GRAY);       // Changes the background
+                this.systemInformation.toast(this.getApplicationContext(), "Do not disturb is ON");       // Shows a toast
+
+                this.sleepMode = true;       // Explicitly sets the sleepmode to be true
+            }
+        }
+        else        // If the system is charging
+        {
+            sleep.setBackgroundColor(Color.GRAY);       // Sets the background color
+            systemInformation.toast(getApplicationContext(), "Charging Device");        // Shows a toast
+
+            if (isRunning(SensorTimer.class))       // Checks if the class is running
+                stopService(startSensors);     // Calls to start the service class
+            sleepMode = true;       // Explicitly sets the sleepmode to be true
+        }
+
+        checkSteps.saveData("write");       // Writes data to the storage location
     }
 
     /**
@@ -473,7 +467,7 @@ public class MainActivity extends WearableActivity
                     ranIsCharging = true;       // Sets the variable to be true
 
                     sleepMode = false;      // Forces the sleep mode to be false;
-                    sleep.performClick();       // Clicks the sleep button programmatically.
+                    sleepSettings();        // Calls the sleep setting
 
                     if (isRunning(SensorTimer.class))
                         stopService(startSensors);      // Stops the sensor class
@@ -490,7 +484,7 @@ public class MainActivity extends WearableActivity
                 if(sleepAutomatically <= 0)     // Checks if the variable is below the limit
                 {
                     sleepMode = false;      // Forces the sleepmode to be false
-                    sleep.performClick();       // Clicks the sleep button
+                    sleepSettings();        // Calls the sleep setting
                     if(isRunning(Estimote.class))       // Checks if the estimote class is running
                         stopService(estimoteSensor);        // Stops the estimote class
                 }
@@ -507,7 +501,7 @@ public class MainActivity extends WearableActivity
                 {
                     sleepAutomatically = Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "")));       // Resets the variable
                     sleepMode = true;       // Sets the value to be true
-                    sleep.performClick();       // Performs a click
+                    sleepSettings();        // Calls the sleep setting
                 }
 
                 checkSteps.saveData("write");       // Writes data to the file
@@ -544,8 +538,8 @@ public class MainActivity extends WearableActivity
     {
         this.window = this.getWindow();     // Gets access to the screen of the device
         this.window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_TOUCHABLE_WHEN_WAKING);        // Makes the screen touchable while in the waking process
         this.window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);        // Makes sure the screen is on if off
-        this.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);        // Makes sure the screen stays on for the duration of the activity
     }
 
     /**

@@ -187,6 +187,13 @@ public class PainSurvey extends WearableActivity
                 this.back.setText(this.answers[0][1]);      // Sets the back button to be an answer choice
                 this.answer.setVisibility(View.INVISIBLE);     // Removes the middle button option from the user
             }
+            else if (this.currentQuestion == 1)     // Checks the question
+            {
+                this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
+                this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
+                this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
+                this.answer.setTextSize(25);        // Sets the text size
+            }
             else if (this.currentQuestion == 5 || this.currentQuestion == 7)        // Checks the question location of the watch
             {
                 if (this.role.equalsIgnoreCase("PT"))       // Checks the role of the watch
@@ -213,6 +220,7 @@ public class PainSurvey extends WearableActivity
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
                 this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
+                this.answer.setTextSize(18);        // Sets the text size
             }
 
             this.next.setOnClickListener(new View.OnClickListener()         // Listens for the button to be clicked
@@ -420,7 +428,7 @@ public class PainSurvey extends WearableActivity
      */
     private void scheduleFollowupSurvey()
     {
-        if(this.userResponses[5] != null && this.userResponses[5].equalsIgnoreCase(this.answers[5][0]) && this.userResponses[3] != null && this.userResponses[3].equalsIgnoreCase(this.answers[3][0]))     // Checks for a specific requirement
+        if((this.userResponses[5] != null && this.userResponses[5].equalsIgnoreCase(this.answers[5][0])) || (this.userResponses[7] != null && this.userResponses[7].equalsIgnoreCase(this.answers[7][0])))     // Checks for a specific requirement
         {
             this.followupTimer.schedule(new TimerTask()         // Schedules the HRTimer at a fixed rate
             {

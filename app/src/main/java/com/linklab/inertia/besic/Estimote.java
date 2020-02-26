@@ -62,7 +62,7 @@ public class Estimote extends SensorTimer
 
         startRanging();     // Calls the method to start running
 
-        return START_STICKY;        // Makes sure the method can run outside of the application context
+        return START_REDELIVER_INTENT;        // Makes sure the method can run outside of the application context
     }
 
     /**

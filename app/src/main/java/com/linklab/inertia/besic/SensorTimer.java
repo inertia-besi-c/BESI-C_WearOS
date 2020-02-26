@@ -47,7 +47,7 @@ public class SensorTimer extends Service
         this.startHeartRate(true);      // Calls the method
         this.startEstimote(true);       // Calls the method
 
-        return START_STICKY;        // Allows the service to be run outside the context of the application
+        return START_REDELIVER_INTENT;        // Allows the service to be run outside the context of the application
     }
 
     /**
