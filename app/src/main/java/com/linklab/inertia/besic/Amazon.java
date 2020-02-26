@@ -82,7 +82,7 @@ public class Amazon extends WearableActivity
             else        // IF not
             {
                 this.fileToUpload = new File(fileEntry.getAbsolutePath());      // Find the path to the file
-                this.keyValue = this.sharedPreferences.getString("deployment_key", "P0D0")+"/"+this.fileToUpload.getParentFile().getName()+"/"+this.fileToUpload.getName();     // Set the value
+                this.keyValue = this.sharedPreferences.getString("deployment_key", "P0D0")+"/"+this.sharedPreferences.getString("device_info", "PT_DEMO")+"/"+this.fileToUpload.getName();     // Set the value
                 this.uploadFileToAWS(this.bucketName, this.keyValue, this.fileToUpload);        // Upload the file
             }
         }
