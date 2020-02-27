@@ -98,7 +98,7 @@ public class WatchFace extends CanvasWatchFaceService
 //            this.lowBatteryCounter = 0;     // Sets up a counter for the battery
 
 //            this.timerIntent = new Intent(getApplicationContext(), SensorTimer.class);     // Sets up the intent for the service
-//            this.eodEMAProcessIntent = new Intent(getApplicationContext(), EndOfDayPrompt1.class);       // Initializes an intent to be run by the system
+//            this.eodEMAProcessIntent = new Intent(getApplicationContext(), EndOfDayPromptA1.class);       // Initializes an intent to be run by the system
 
 //            this.checkEODDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Checking End Of Day File");        // Makes a new data logger item
 //            this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable

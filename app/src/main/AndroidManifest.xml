@@ -183,7 +183,7 @@
         </intent-filter>
         </activity>
         <activity
-            android:name=".EndOfDayPrompt1"
+            android:name=".EndOfDayPromptA1"
             android:icon="@mipmap/besic_logo_round"
             android:label="@string/endofdaypromptone_name"
             android:launchMode="singleInstance">
@@ -194,7 +194,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EndOfDayPrompt2"
+            android:name=".EndOfDayPromptA2"
             android:icon="@mipmap/besic_logo_round"
             android:label="@string/endofdayprompttwo_name"
             android:launchMode="singleInstance">
@@ -215,7 +215,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EndOfDayPromptManual"
+            android:name=".EndOfDayPromptM1"
             android:enabled="true"
             android:label="@string/endofdaypromptmanual_name"
             android:launchMode="singleInstance">

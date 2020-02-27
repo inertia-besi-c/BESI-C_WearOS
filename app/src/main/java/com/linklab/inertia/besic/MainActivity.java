@@ -15,6 +15,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.wearable.activity.WearableActivity;
@@ -49,12 +51,14 @@ public class MainActivity extends WearableActivity
     private Intent startSettings, startEMA, startLowBattery, startSensors, estimoteSensor, startAWSUpload;      // Initializes intents for the class
     private IntentFilter minuteTimeTick;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
+    private PowerManager powerManger;        // Initializes a power manager for the system
+    private WakeLock wakeLock;     // Initializes the wakelock item
     private DataLogger dataLogger, checkSteps, checkDate;      // initializes the datalogger of the class
     private StringBuilder stringBuilder;        // Initializes string builder of the system
     private Button start, sleep, dailyEMA;        // Makes all button on the system
     private TextView date, time, battery;        // Makes all text views on the system
     private String batteryInformation, data;      // Sets up the string in the class
-    private int hapticLevel, sleepAutomatically, lowBatteryThreshHold, lowBatteryTime, startHour, startMinute, startSecond, endHour, endMinute, endSecond;        // Initializes the integers of the class
+    private int hapticLevel, sleepAutomatically, lowBatteryThreshHold, lowBatteryTime, followupTime, startHour, startMinute, startSecond, endHour, endMinute, endSecond;        // Initializes the integers of the class
     private boolean sleepMode, runLowBattery, runEODEMAButton, ranIsCharging;      // Initializes the boolean variables of the class
     private long startAutomaticEMA;     // Initializes the long variables of the class
 
@@ -97,6 +101,7 @@ public class MainActivity extends WearableActivity
         this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "45")));     // Gets the sleep level max number
         this.lowBatteryThreshHold = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_alert", "15")));     // Gets the low battery thresh hold
         this.lowBatteryTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10")));        // Sets up a timer
+        this.followupTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_trigger", ""))) * 1000;       // Followup ema timer extension
         this.directory = new File(Environment.getExternalStorageDirectory() + "/" + this.sharedPreferences.getString("directory_key", getResources().getString(R.string.app_name_abbreviated)));     // Makes a reference to a directory
         this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
         this.checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
@@ -107,6 +112,10 @@ public class MainActivity extends WearableActivity
         this.setUpLowBattery();     // Calls the method
         this.setUpEODEMAButton();       // Calls the method
         this.logHeaders();      // Calls the method
+
+        this.powerManger = (PowerManager) getSystemService(POWER_SERVICE);      // Gets the power manager
+        this.wakeLock = powerManger.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BESI-C: WakeLock");        // Acquires the wakelock for the device
+        this.wakeLock.acquire(this.followupTime);       // Sets the time limit for the wakelock
 
         this.start.setOnClickListener(new View.OnClickListener()        // Sets up the start button
         {
@@ -144,7 +153,7 @@ public class MainActivity extends WearableActivity
                 dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
                 dataLogger.saveData("log");      // Saves the data in the mode specified
 
-                startEMA = new Intent(getApplicationContext(), EndOfDayPromptManual.class);       // Makes a new intent
+                startEMA = new Intent(getApplicationContext(), EndOfDayPromptM1.class);       // Makes a new intent
                 startActivity(startEMA);        // Starts the activity
                 finish();       // Clears the main activity
             }
@@ -163,6 +172,8 @@ public class MainActivity extends WearableActivity
                 sleepSettings(true);        // Calls the method accordingly
             }
         });
+
+        registerReceiver(this.minuteUpdateReceiver, this.minuteTimeTick);     // Registers the receiver with the system to make sure it runs
     }
 
     /**
@@ -422,7 +433,7 @@ public class MainActivity extends WearableActivity
                 dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
                 dataLogger.saveData("log");      // Saves the data in the mode specified
 
-                this.startEMA = new Intent(getApplicationContext(), EndOfDayPrompt1.class);       // Makes a new intent
+                this.startEMA = new Intent(getApplicationContext(), EndOfDayPromptA1.class);       // Makes a new intent
                 this.startActivity(this.startEMA);        // Starts the activity
             }
         }
@@ -510,8 +521,6 @@ public class MainActivity extends WearableActivity
                 setUpUIElements();      // Calls the method to set up UI elements
             }
         };
-
-        registerReceiver(this.minuteUpdateReceiver, this.minuteTimeTick);     // Registers the receiver with the system to make sure it runs
     }
 
     /**
@@ -556,12 +565,38 @@ public class MainActivity extends WearableActivity
     }
 
     /**
+     * This method is called when the system pauses to do some action
+     */
+    @Override
+    protected void onPause()
+    {
+        super.onPause();        // Calls the super class method
+        try     // Tries to perform the action
+        {
+            this.wakeLock.release();        // Releases the claim to the wakelock
+            unregisterReceiver(this.minuteUpdateReceiver);     // Unregisters the receiver with the system to make sure it stops running
+        }
+        catch (Exception e)     // If an error occurs
+        {
+            // Do nothing
+        }
+    }
+
+    /**
      * This method is called when the system needs to end this activity
      */
     @Override
     protected void onStop()     // To stop the activity.
     {
         super.onStop();     // Calls the super class method
-        this.startMinuteUpdater();       // Does not unregister the  receiver
+        try     // Tries to perform the action
+        {
+            this.wakeLock.release();        // Releases the claim to the wakelock
+            unregisterReceiver(this.minuteUpdateReceiver);     // Unregisters the receiver with the system to make sure it stops running
+        }
+        catch (Exception e)     // If an error occurs
+        {
+            // Do nothing
+        }
     }
 }

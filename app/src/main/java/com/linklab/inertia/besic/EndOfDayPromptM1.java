@@ -22,7 +22,7 @@ import java.util.Objects;
 /**
  * This class is run only when the user manually clicks the button to start a daily survey
  */
-public class EndOfDayPromptManual extends WearableActivity
+public class EndOfDayPromptM1 extends WearableActivity
 {
     private SystemInformation systemInformation;        // Private link to the class
     private DataLogger dataLogger;      // Private initialization to the data logger

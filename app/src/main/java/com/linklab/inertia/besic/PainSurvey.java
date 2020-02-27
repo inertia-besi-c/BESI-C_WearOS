@@ -430,23 +430,36 @@ public class PainSurvey extends WearableActivity
     {
         if((this.userResponses[5] != null && this.userResponses[5].equalsIgnoreCase(this.answers[5][0])) || (this.userResponses[7] != null && this.userResponses[7].equalsIgnoreCase(this.answers[7][0])))     // Checks for a specific requirement
         {
-            this.followupTimer.schedule(new TimerTask()         // Schedules the HRTimer at a fixed rate
+            try     // Tries the following
             {
-                /**
-                 * The following is called to run
-                 */
-                @Override
-                public void run()
+                this.followupTimer.cancel();        // Cancels the timer if already running
+                this.followupTimer.purge();     // Clears the timer
+            }
+            catch (Exception e)     // If anything goes wrong
+            {
+                // Do nothing
+            }
+            finally         // After everything is taken care of
+            {
+                this.followupTimer = new Timer();       // Makes a new timer
+                this.followupTimer.schedule(new TimerTask()         // Schedules the HRTimer at a fixed rate
                 {
-                    startActivity(followUpEMA);     // Calls to start the followup EMA
+                    /**
+                     * The following is called to run
+                     */
+                    @Override
+                    public void run()
+                    {
+                        startActivity(followUpEMA);     // Calls to start the followup EMA
 
-                    data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Starting Followup EMA";       // Data to be logged by the system
-                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-                    dataLogger.saveData("log");      // Saves the data in the mode specified
-                }
-            }, this.followupTime);      // Repeats at the specified interval
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Starting Followup EMA";       // Data to be logged by the system
+                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                        dataLogger.saveData("log");      // Saves the data in the mode specified
+                    }
+                }, this.followupTime);      // Repeats at the specified interval
 
-            this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA Scheduled").append("\n");       // Logs to the system logs
+                this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA Scheduled").append("\n");       // Logs to the system logs
+            }
         }
         else        // If the requirement was failed
         {
