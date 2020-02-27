@@ -192,7 +192,7 @@ public class PainSurvey extends WearableActivity
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
                 this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
-                this.answer.setTextSize(25);        // Sets the text size
+                this.answer.setTextSize(50);        // Sets the text size
             }
             else if (this.currentQuestion == 5 || this.currentQuestion == 7)        // Checks the question location of the watch
             {

@@ -160,7 +160,7 @@ public class MainActivity extends WearableActivity
             public void onClick(View v)
             {
                 vibrator.vibrate(hapticLevel);      // Vibrates at the specific interval
-                sleepSettings();        // Calls the method accordingly
+                sleepSettings(true);        // Calls the method accordingly
             }
         });
     }
@@ -327,7 +327,7 @@ public class MainActivity extends WearableActivity
     /**
      * This method sets up the actions that the sleep button would perform if called
      */
-    private void sleepSettings()
+    private void sleepSettings(Boolean toast)
     {
         this.setUpUIElements();      // Calls the method to set up UI elements
 
@@ -335,29 +335,31 @@ public class MainActivity extends WearableActivity
         {
             if (this.sleepMode)      // Checks if sleepmode is enabled, if it is
             {
-                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Do not disturb Activated";       // Data to be logged by the system
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Do not disturb De-Activated";       // Data to be logged by the system
                 this.dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), this.getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
-                this.systemInformation.toast(this.getApplicationContext(), "Clicked Sleep 2");
-
                 this.sleep.setBackgroundColor(Color.BLUE);       // Changes the background
-                this.systemInformation.toast(this.getApplicationContext(), "Do not disturb is OFF");      // Shows a toast
+
+                if(toast)       // Checks if there is a need to toast
+                    this.systemInformation.toast(this.getApplicationContext(), "Do not disturb is OFF");      // Shows a toast
 
                 if(!this.isRunning(SensorTimer.class))       // Checks if the class is not running
                     this.startService(this.startSensors);     // Calls to start the service class
-                this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));
+                this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));     // Resets the value
 
                 this.sleepMode = false;       // Explicitly sets the sleepmode to be false
             }
             else        // If sleepmode is not enabled
             {
-                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Do not disturb De-Activated";       // Data to be logged by the system
+                this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Do not disturb Activated";       // Data to be logged by the system
                 this.dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), this.getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
                 this.sleep.setBackgroundColor(Color.GRAY);       // Changes the background
-                this.systemInformation.toast(this.getApplicationContext(), "Do not disturb is ON");       // Shows a toast
+
+                if(toast)       // Checks if there is a need to toast
+                    this.systemInformation.toast(this.getApplicationContext(), "Do not disturb is ON");       // Shows a toast
 
                 this.sleepMode = true;       // Explicitly sets the sleepmode to be true
             }
@@ -467,7 +469,7 @@ public class MainActivity extends WearableActivity
                     ranIsCharging = true;       // Sets the variable to be true
 
                     sleepMode = false;      // Forces the sleep mode to be false;
-                    sleepSettings();        // Calls the sleep setting
+                    sleepSettings(false);        // Calls the sleep setting
 
                     if (isRunning(SensorTimer.class))
                         stopService(startSensors);      // Stops the sensor class
@@ -484,9 +486,9 @@ public class MainActivity extends WearableActivity
                 if(sleepAutomatically <= 0)     // Checks if the variable is below the limit
                 {
                     sleepMode = false;      // Forces the sleepmode to be false
-                    sleepSettings();        // Calls the sleep setting
-                    if(isRunning(Estimote.class))       // Checks if the estimote class is running
-                        stopService(estimoteSensor);        // Stops the estimote class
+                    sleepSettings(false);        // Calls the sleep setting
+                    if(isRunning(SensorTimer.class))       // If the sensor timer class is not running
+                        stopService(startSensors);     // Calls to stop the service class
                 }
                 else        // If the variable is within parameters
                 {
@@ -501,7 +503,7 @@ public class MainActivity extends WearableActivity
                 {
                     sleepAutomatically = Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "")));       // Resets the variable
                     sleepMode = true;       // Sets the value to be true
-                    sleepSettings();        // Calls the sleep setting
+                    sleepSettings(false);        // Calls the sleep setting
                 }
 
                 checkSteps.saveData("write");       // Writes data to the file
