@@ -128,7 +128,7 @@ public class Amazon extends WearableActivity
         this.credentialsProvider = new CognitoCachingCredentialsProvider(this.getApplicationContext(), this.identityID, Regions.US_EAST_1);     // Sets the credentials
         this.s3 = new AmazonS3Client(this.credentialsProvider);     // Sends that to the bucket for verification
         this.transferUtility = new TransferUtility(this.s3, this.getApplicationContext());      // Initializes a transfer utility
-        this.observer = transferUtility.upload(bucket,key, file);       // Initialises an observer
+        this.observer = transferUtility.upload(bucket, key, file);       // Initialises an observer
 
         this.observer.setTransferListener(new TransferListener()
         {

@@ -86,7 +86,15 @@ public class MainActivity extends WearableActivity
         this.date = findViewById(R.id.date);        // Sets up the date view
         this.time = findViewById(R.id.time);        // Sets up the time view
         this.battery = findViewById(R.id.battery);      // Sets up the battery view
+
+        start.setVisibility(View.INVISIBLE);       // Sets the button look
+        sleep.setVisibility(View.INVISIBLE);       // Sets the button look
+        dailyEMA.setVisibility(View.INVISIBLE);       // Sets the button look
+        time.setVisibility(View.INVISIBLE);       // Sets the button look
+        date.setVisibility(View.INVISIBLE);       // Sets the button look
+        battery.setVisibility(View.INVISIBLE);       // Sets the button look
         this.powerOffScreen = findViewById(R.id.powerOffScreen);        // Sets up the power off screen item
+        this.powerOffScreen.setText(this.systemInformation.getDateTime("h:mm a"));      // Sets some text on the screen
 
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Get instance of Vibrator from current Context
@@ -178,6 +186,25 @@ public class MainActivity extends WearableActivity
                 startMinuteUpdater();       // Calls the method
             }
         };
+
+        this.powerOffScreen.setOnClickListener(new View.OnClickListener()       // Listener for the screen off look
+        {
+            /**
+             * This is run when the button is clicked
+             * @param v is the view of the button
+             */
+            @Override
+            public void onClick(View v)
+            {
+                powerOffScreen.setVisibility(View.INVISIBLE);       // Sets the button look
+                start.setVisibility(View.VISIBLE);       // Sets the button look
+                sleep.setVisibility(View.VISIBLE);       // Sets the button look
+                dailyEMA.setVisibility(View.VISIBLE);       // Sets the button look
+                time.setVisibility(View.VISIBLE);       // Sets the button look
+                date.setVisibility(View.VISIBLE);       // Sets the button look
+                battery.setVisibility(View.VISIBLE);       // Sets the button look
+            }
+        });
 
         registerReceiver(this.minuteUpdateReceiver, this.minuteTimeTick);     // Registers the receiver with the system to make sure it runs
     }
@@ -521,7 +548,16 @@ public class MainActivity extends WearableActivity
         checkSteps.saveData("write");       // Writes data to the file
         setUpUIElements();      // Calls the method to set up UI elements
 
-        sleepAutomatically++;
+        sleepAutomatically++;       // Increments the counter
+
+        start.setVisibility(View.INVISIBLE);       // Sets the button look
+        sleep.setVisibility(View.INVISIBLE);       // Sets the button look
+        dailyEMA.setVisibility(View.INVISIBLE);       // Sets the button look
+        time.setVisibility(View.INVISIBLE);       // Sets the button look
+        date.setVisibility(View.INVISIBLE);       // Sets the button look
+        battery.setVisibility(View.INVISIBLE);       // Sets the button look
+        powerOffScreen.setVisibility(View.VISIBLE);      // Sets the visibility of the item to be true
+        powerOffScreen.setText(systemInformation.getDateTime("h:mm a"));      // Sets some text on the screen
     }
 
     /**
@@ -563,7 +599,7 @@ public class MainActivity extends WearableActivity
     {
         super.onResume();       // Calls the super class method
         this.setUpUIElements();     // Calls the method
-        this.startMinuteUpdater();       // Calls the method
+        this.registerReceiver(this.minuteUpdateReceiver, this.minuteTimeTick);     // Registers the receiver with the system to make sure it runs
         this.minuteUpdateReceiver = new BroadcastReceiver()     // Makes a broadcast receiver from the system
         {
             /**
