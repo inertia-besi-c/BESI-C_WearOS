@@ -52,7 +52,7 @@ public class Accelerometer extends SensorTimer implements SensorEventListener
 
         this.sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);      // Sets up the sensor service
         this.accelerometer = this.sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);        // Sets up the type of sensor
-        this.sensorManager.registerListener(this, this.accelerometer, SensorManager.SENSOR_DELAY_UI);       // Sets up the listener rate
+        this.sensorManager.registerListener(this, this.accelerometer, SensorManager.SENSOR_DELAY_GAME);       // Sets up the listener rate
 
         this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Accelerometer Service" + (",") + "Starting Accelerometer Service";       // Data to be logged by the system
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable

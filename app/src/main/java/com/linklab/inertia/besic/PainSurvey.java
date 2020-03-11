@@ -133,7 +133,6 @@ public class PainSurvey extends WearableActivity
         this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
         this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
         this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
-//        this.followupTimer = new Timer();       // Sets up the HRTimer
         this.heartRate = new Intent(getApplicationContext(), HeartRate.class);     // Makes an intent to the heartrate class
         this.estimote = new Intent(getApplicationContext(), Estimote.class);       // Makes an intent to the estimote class
         this.followUpEMA = new Intent(getApplicationContext(), FollowupSurvey.class);       // Makes an intent to the estimote class

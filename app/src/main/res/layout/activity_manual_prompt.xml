@@ -43,7 +43,7 @@
             android:background="#45EE08"
             android:text="@string/start_string"
             android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textSize="30sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
