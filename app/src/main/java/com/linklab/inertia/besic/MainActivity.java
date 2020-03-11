@@ -15,8 +15,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.wearable.activity.WearableActivity;
@@ -51,15 +49,13 @@ public class MainActivity extends WearableActivity
     private Intent startSettings, startEMA, startLowBattery, startSensors, estimoteSensor, startAWSUpload;      // Initializes intents for the class
     private IntentFilter minuteTimeTick;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
-    private PowerManager powerManger;        // Initializes a power manager for the system
-    private WakeLock wakeLock;     // Initializes the wakelock item
     private DataLogger dataLogger, checkSteps, checkDate;      // initializes the datalogger of the class
     private StringBuilder stringBuilder;        // Initializes string builder of the system
-    private Button start, sleep, dailyEMA;        // Makes all button on the system
+    private Button start, sleep, dailyEMA, powerOffScreen;        // Makes all button on the system
     private TextView date, time, battery;        // Makes all text views on the system
     private String batteryInformation, data;      // Sets up the string in the class
-    private int hapticLevel, sleepAutomatically, lowBatteryThreshHold, lowBatteryTime, followupTime, startHour, startMinute, startSecond, endHour, endMinute, endSecond;        // Initializes the integers of the class
-    private boolean sleepMode, runLowBattery, runEODEMAButton, ranIsCharging;      // Initializes the boolean variables of the class
+    private int hapticLevel, sleepAutomatically, lowBatteryThreshHold, lowBatteryTime, startHour, startMinute, startSecond, endHour, endMinute, endSecond;        // Initializes the integers of the class
+    private boolean sleepMode, runLowBattery, runEODEMAButton, uploadToAWS;      // Initializes the boolean variables of the class
     private long startAutomaticEMA;     // Initializes the long variables of the class
 
     /**
@@ -82,7 +78,6 @@ public class MainActivity extends WearableActivity
         this.minuteTimeTick = new IntentFilter();     // Initializes the intent filter
 
         this.CheckPermissions();        // Calls the method to check for the required permissions for the device.
-
         this.setContentView(R.layout.activity_main);        // Sets the view of the system
 
         this.start = findViewById(R.id.start);      // Sets up the start button in the view
@@ -91,6 +86,7 @@ public class MainActivity extends WearableActivity
         this.date = findViewById(R.id.date);        // Sets up the date view
         this.time = findViewById(R.id.time);        // Sets up the time view
         this.battery = findViewById(R.id.battery);      // Sets up the battery view
+        this.powerOffScreen = findViewById(R.id.powerOffScreen);        // Sets up the power off screen item
 
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Get instance of Vibrator from current Context
@@ -101,21 +97,16 @@ public class MainActivity extends WearableActivity
         this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "45")));     // Gets the sleep level max number
         this.lowBatteryThreshHold = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_alert", "15")));     // Gets the low battery thresh hold
         this.lowBatteryTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10")));        // Sets up a timer
-        this.followupTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_trigger", ""))) * 1000;       // Followup ema timer extension
         this.directory = new File(Environment.getExternalStorageDirectory() + "/" + this.sharedPreferences.getString("directory_key", getResources().getString(R.string.app_name_abbreviated)));     // Makes a reference to a directory
         this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
         this.checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
         this.sleepMode = false;     // Initializes the sleepmode variable
-        this.ranIsCharging = false;     // Initializes the variable
+        this.uploadToAWS = false;     // Initializes the variable
 
         this.setUpUIElements();     // Calls the specified method to run
         this.setUpLowBattery();     // Calls the method
         this.setUpEODEMAButton();       // Calls the method
         this.logHeaders();      // Calls the method
-
-        this.powerManger = (PowerManager) getSystemService(POWER_SERVICE);      // Gets the power manager
-        this.wakeLock = powerManger.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BESI-C: WakeLock");        // Acquires the wakelock for the device
-        this.wakeLock.acquire(this.followupTime);       // Sets the time limit for the wakelock
 
         this.start.setOnClickListener(new View.OnClickListener()        // Sets up the start button
         {
@@ -172,6 +163,21 @@ public class MainActivity extends WearableActivity
                 sleepSettings(true);        // Calls the method accordingly
             }
         });
+
+        this.minuteUpdateReceiver = new BroadcastReceiver()     // Makes a broadcast receiver from the system
+        {
+            /**
+             * This method receives information from the system when the time changes
+             *
+             * @param context is the application context around the system
+             * @param intent  is the intent to be used
+             */
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                startMinuteUpdater();       // Calls the method
+            }
+        };
 
         registerReceiver(this.minuteUpdateReceiver, this.minuteTimeTick);     // Registers the receiver with the system to make sure it runs
     }
@@ -425,7 +431,7 @@ public class MainActivity extends WearableActivity
             this.sleep.bringToFront();      // Brings the button to the front
         }
 
-        if (System.currentTimeMillis() >= this.startAutomaticEMA && System.currentTimeMillis() <= this.startAutomaticEMA + (2*60*1000))     // Checks the time for the automatic ema
+        if (System.currentTimeMillis() >= this.startAutomaticEMA && System.currentTimeMillis() <= this.startAutomaticEMA + (60*1000))     // Checks the time for the automatic ema
         {
             if (!this.systemInformation.isCharging(getApplicationContext()) && !sleepMode && !this.checkDate.readData().contains(this.systemInformation.getDateTime("yyyy/MM/dd")))      // Makes sure the system is not charging or in sleepmode
             {
@@ -461,66 +467,61 @@ public class MainActivity extends WearableActivity
      */
     private void startMinuteUpdater()
     {
-        this.minuteUpdateReceiver = new BroadcastReceiver()     // Makes a broadcast receiver from the system
+        setUpLowBattery();      // Calls the method
+        setUpEODEMAButton();        // Calls the method
+
+        if(systemInformation.isCharging(getApplicationContext()) && !uploadToAWS)       // Checks if the system is charging
         {
-            /**
-             * This method receives information from the system when the time changes
-             * @param context is the application context around the system
-             * @param intent is the intent to be used
-             */
-            @Override
-            public void onReceive(Context context, Intent intent)
+            sleepMode = false;      // Forces the sleep mode to be false;
+            sleepSettings(false);        // Calls the sleep setting
+
+            if (isRunning(SensorTimer.class))
+                stopService(startSensors);      // Stops the sensor class
+            if(!isRunning(Estimote.class))       // Checks if the class is not running
+                startService(estimoteSensor);        // Starts the estimote service
+
+            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Uploading Data to Amazon Web Services!!!";       // Data to be logged by the system
+            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
+            dataLogger.saveData("log");      // Saves the data in the mode specified
+
+            if(!uploadToAWS)      // If the update has not been run
             {
-                checkSteps.saveData("write");       // Writes data to the file
-                setUpLowBattery();      // Calls the method
-                setUpEODEMAButton();        // Calls the method
-
-                if(systemInformation.isCharging(getApplicationContext()) && !ranIsCharging)       // Checks if the system is charging
-                {
-                    ranIsCharging = true;       // Sets the variable to be true
-
-                    sleepMode = false;      // Forces the sleep mode to be false;
-                    sleepSettings(false);        // Calls the sleep setting
-
-                    if (isRunning(SensorTimer.class))
-                        stopService(startSensors);      // Stops the sensor class
-                    if(!isRunning(Estimote.class))       // Checks if the class is not running
-                        startService(estimoteSensor);        // Starts the estimote service
-
-                    data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Uploading Data to Amazon Web Services!!!";       // Data to be logged by the system
-                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
-                    dataLogger.saveData("log");      // Saves the data in the mode specified
-
-                    startActivity(startAWSUpload);       // Starts an upload intent to aws
-                }
-
-                if(sleepAutomatically <= 0)     // Checks if the variable is below the limit
-                {
-                    sleepMode = false;      // Forces the sleepmode to be false
-                    sleepSettings(false);        // Calls the sleep setting
-                    if(isRunning(SensorTimer.class))       // If the sensor timer class is not running
-                        stopService(startSensors);     // Calls to stop the service class
-                }
-                else        // If the variable is within parameters
-                {
-                    if(!isRunning(SensorTimer.class))       // If the sensor timer class is not running
-                        startService(startSensors);     // Calls to start the service class
-                }
-
-                if (checkSteps.readData().contains("no"))       // Checks if the file is a no
-                    sleepAutomatically--;       // Decrements the boolean value
-
-                if (checkSteps.readData().contains("yes"))        // If it contains anything else
-                {
-                    sleepAutomatically = Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "")));       // Resets the variable
-                    sleepMode = true;       // Sets the value to be true
-                    sleepSettings(false);        // Calls the sleep setting
-                }
-
-                checkSteps.saveData("write");       // Writes data to the file
-                setUpUIElements();      // Calls the method to set up UI elements
+                startActivity(startAWSUpload);       // Starts an upload intent to aws
+                uploadToAWS = true;       // Sets the variable to be true
             }
-        };
+        }
+        else        // if the system is not charging
+        {
+            uploadToAWS = false;      // Resets the variable
+
+            if (sleepAutomatically <= 0)     // Checks if the variable is below the limit
+            {
+                sleepMode = false;      // Forces the sleepmode to be false
+                sleepSettings(false);        // Calls the sleep setting
+                if (isRunning(SensorTimer.class))       // If the sensor timer class is not running
+                    stopService(startSensors);     // Calls to stop the service class
+            }
+            else        // If the variable is within parameters
+            {
+                if (!isRunning(SensorTimer.class))       // If the sensor timer class is not running
+                    startService(startSensors);     // Calls to start the service class
+            }
+
+            if (checkSteps.readData().contains("no"))       // Checks if the file is a no
+                sleepAutomatically--;       // Decrements the boolean value
+
+            if (checkSteps.readData().contains("yes"))        // If it contains anything else
+            {
+                sleepAutomatically = Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "45")));       // Resets the variable
+                sleepMode = true;       // Sets the value to be true
+                sleepSettings(false);        // Calls the sleep setting
+            }
+        }
+
+        checkSteps.saveData("write");       // Writes data to the file
+        setUpUIElements();      // Calls the method to set up UI elements
+
+        sleepAutomatically++;
     }
 
     /**
@@ -548,9 +549,10 @@ public class MainActivity extends WearableActivity
     private void unlockScreen()
     {
         this.window = this.getWindow();     // Gets access to the screen of the device
-        this.window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
         this.window.addFlags(WindowManager.LayoutParams.FLAG_TOUCHABLE_WHEN_WAKING);        // Makes the screen touchable while in the waking process
         this.window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);        // Makes sure the screen is on if off
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);      // Makes sure the device can wake up if locked
+        this.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);       // Keeps the screen on constantly.
     }
 
     /**
@@ -561,7 +563,21 @@ public class MainActivity extends WearableActivity
     {
         super.onResume();       // Calls the super class method
         this.setUpUIElements();     // Calls the method
-        this.startMinuteUpdater();       // Does not unregisters the receiver
+        this.startMinuteUpdater();       // Calls the method
+        this.minuteUpdateReceiver = new BroadcastReceiver()     // Makes a broadcast receiver from the system
+        {
+            /**
+             * This method receives information from the system when the time changes
+             *
+             * @param context is the application context around the system
+             * @param intent  is the intent to be used
+             */
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                startMinuteUpdater();       // Calls the method
+            }
+        };
     }
 
     /**
@@ -573,8 +589,8 @@ public class MainActivity extends WearableActivity
         super.onPause();        // Calls the super class method
         try     // Tries to perform the action
         {
-            this.wakeLock.release();        // Releases the claim to the wakelock
             unregisterReceiver(this.minuteUpdateReceiver);     // Unregisters the receiver with the system to make sure it stops running
+            finish();       // Clears the main activity
         }
         catch (Exception e)     // If an error occurs
         {
@@ -591,8 +607,8 @@ public class MainActivity extends WearableActivity
         super.onStop();     // Calls the super class method
         try     // Tries to perform the action
         {
-            this.wakeLock.release();        // Releases the claim to the wakelock
             unregisterReceiver(this.minuteUpdateReceiver);     // Unregisters the receiver with the system to make sure it stops running
+            finish();       // Clears the main activity
         }
         catch (Exception e)     // If an error occurs
         {
