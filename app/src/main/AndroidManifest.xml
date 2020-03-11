@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.BODY_SENSORS" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -67,31 +68,40 @@
             </intent-filter>
         </service>
         <service
+            android:name= "com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
+            android:exported="true"
+            android:permission="true">
+        </service>
+        <service
             android:name=".Accelerometer"
             android:enabled="true"
             android:exported="true"
             android:permission="true"
             android:launchMode="singleInstance">
         </service>
-        <service android:name=".Pedometer"
+        <service
+            android:name=".Pedometer"
             android:enabled="true"
             android:exported="true"
             android:permission="true"
             android:launchMode="singleInstance">
         </service>
-        <service android:name=".HeartRate"
+        <service
+            android:name=".HeartRate"
             android:enabled="true"
             android:exported="true"
             android:permission="true"
             android:launchMode="singleInstance">
         </service>
-        <service android:name=".SensorTimer"
+        <service
+            android:name=".SensorTimer"
             android:enabled="true"
             android:exported="true"
             android:permission="true"
             android:launchMode="singleInstance">
         </service>
-        <service android:name=".Estimote"
+        <service
+            android:name=".Estimote"
             android:enabled="true"
             android:exported="true"
             android:permission="true"
@@ -173,7 +183,7 @@
         </intent-filter>
         </activity>
         <activity
-            android:name=".EndOfDayPrompt1"
+            android:name=".EndOfDayPromptA1"
             android:icon="@mipmap/besic_logo_round"
             android:label="@string/endofdaypromptone_name"
             android:launchMode="singleInstance">
@@ -184,7 +194,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EndOfDayPrompt2"
+            android:name=".EndOfDayPromptA2"
             android:icon="@mipmap/besic_logo_round"
             android:label="@string/endofdayprompttwo_name"
             android:launchMode="singleInstance">
@@ -194,6 +204,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".Amazon"
+            android:enabled="true"
+            android:label="@string/amazon_name"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".EndOfDayPromptM1"
+            android:enabled="true"
+            android:label="@string/endofdaypromptmanual_name"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
-
 </manifest>

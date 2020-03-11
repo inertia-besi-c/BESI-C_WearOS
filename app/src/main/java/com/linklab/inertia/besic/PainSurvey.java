@@ -133,7 +133,6 @@ public class PainSurvey extends WearableActivity
         this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
         this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
         this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
-        this.followupTimer = new Timer();       // Sets up the HRTimer
         this.heartRate = new Intent(getApplicationContext(), HeartRate.class);     // Makes an intent to the heartrate class
         this.estimote = new Intent(getApplicationContext(), Estimote.class);       // Makes an intent to the estimote class
         this.followUpEMA = new Intent(getApplicationContext(), FollowupSurvey.class);       // Makes an intent to the estimote class
@@ -187,6 +186,13 @@ public class PainSurvey extends WearableActivity
                 this.back.setText(this.answers[0][1]);      // Sets the back button to be an answer choice
                 this.answer.setVisibility(View.INVISIBLE);     // Removes the middle button option from the user
             }
+            else if (this.currentQuestion == 1)     // Checks the question
+            {
+                this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
+                this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
+                this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
+                this.answer.setTextSize(50);        // Sets the text size
+            }
             else if (this.currentQuestion == 5 || this.currentQuestion == 7)        // Checks the question location of the watch
             {
                 if (this.role.equalsIgnoreCase("PT"))       // Checks the role of the watch
@@ -213,6 +219,7 @@ public class PainSurvey extends WearableActivity
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
                 this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
+                this.answer.setTextSize(18);        // Sets the text size
             }
 
             this.next.setOnClickListener(new View.OnClickListener()         // Listens for the button to be clicked
@@ -420,25 +427,38 @@ public class PainSurvey extends WearableActivity
      */
     private void scheduleFollowupSurvey()
     {
-        if(this.userResponses[this.questions.length-3] != null && this.userResponses[this.questions.length-3].equalsIgnoreCase(this.answers[this.questions.length-3][0]))     // Checks for a specific requirement
+        if((this.userResponses[5] != null && this.userResponses[5].equalsIgnoreCase(this.answers[5][0])) || (this.userResponses[7] != null && this.userResponses[7].equalsIgnoreCase(this.answers[7][0])))     // Checks for a specific requirement
         {
-            this.followupTimer.schedule(new TimerTask()         // Schedules the HRTimer at a fixed rate
+            try     // Tries the following
             {
-                /**
-                 * The following is called to run
-                 */
-                @Override
-                public void run()
+                this.followupTimer.cancel();        // Cancels the timer if already running
+                this.followupTimer.purge();     // Clears the timer
+            }
+            catch (Exception e)     // If anything goes wrong
+            {
+                // Do nothing
+            }
+            finally         // After everything is taken care of
+            {
+                this.followupTimer = new Timer();       // Makes a new timer
+                this.followupTimer.schedule(new TimerTask()         // Schedules the HRTimer at a fixed rate
                 {
-                    startActivity(followUpEMA);     // Calls to start the followup EMA
+                    /**
+                     * The following is called to run
+                     */
+                    @Override
+                    public void run()
+                    {
+                        startActivity(followUpEMA);     // Calls to start the followup EMA
 
-                    data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Starting Followup EMA";       // Data to be logged by the system
-                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-                    dataLogger.saveData("log");      // Saves the data in the mode specified
-                }
-            }, this.followupTime);      // Repeats at the specified interval
+                        data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Starting Followup EMA";       // Data to be logged by the system
+                        dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                        dataLogger.saveData("log");      // Saves the data in the mode specified
+                    }
+                }, this.followupTime);      // Repeats at the specified interval
 
-            this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA Scheduled").append("\n");       // Logs to the system logs
+                this.systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Followup EMA Scheduled").append("\n");       // Logs to the system logs
+            }
         }
         else        // If the requirement was failed
         {

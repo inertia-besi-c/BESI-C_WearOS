@@ -47,7 +47,7 @@ public class SensorTimer extends Service
         this.startHeartRate(true);      // Calls the method
         this.startEstimote(true);       // Calls the method
 
-        return START_STICKY;        // Allows the service to be run outside the context of the application
+        return START_REDELIVER_INTENT;        // Allows the service to be run outside the context of the application
     }
 
     /**
@@ -192,10 +192,18 @@ public class SensorTimer extends Service
      */
     private void killProcess()
     {
-        this.heartrateTimer.cancel();       // Cancels the timer
+        try     // Tries to perform the following
+        {
+            this.heartrateTimer.cancel();       // Cancels the timer
+        }
+        catch (Exception e)     // If it fails
+        {
+            // Do nothing
+        }
 
         this.startAccelerometer(false);     // Stops the sensor from running
         this.startHeartRate(false);     // Stops the sensor from running
+        this.startEstimote(false);      // Stops the sensor from running
     }
 
     /**

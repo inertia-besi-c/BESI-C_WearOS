@@ -190,6 +190,13 @@ public class FollowupSurvey extends WearableActivity
                     this.answer.setVisibility(View.INVISIBLE);     // Removes the middle button option from the user
                 }
             }
+            else if (this.currentQuestion == 1)     // Checks the question
+            {
+                this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
+                this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
+                this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
+                this.answer.setTextSize(50);        // Sets the text size
+            }
             else if (this.currentQuestion == 5 || this.currentQuestion == 7)        // Checks the question location of the watch
             {
                 if (this.role.equalsIgnoreCase("PT"))       // Checks the role of the watch
@@ -216,6 +223,7 @@ public class FollowupSurvey extends WearableActivity
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
                 this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
+                this.answer.setTextSize(18);        // Sets the text size
             }
 
             this.next.setOnClickListener(new View.OnClickListener()         // Listens for the button to be clicked

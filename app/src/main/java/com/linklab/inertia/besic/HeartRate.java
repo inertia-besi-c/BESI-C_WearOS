@@ -66,7 +66,7 @@ public class HeartRate extends SensorTimer implements SensorEventListener
             }
         }, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("heartrate_duration", ""))) * 1000);      // Repeats at the specified interval
 
-        return START_STICKY;        // Returns an integer for the service schedule
+        return START_REDELIVER_INTENT;        // Returns an integer for the service schedule
     }
 
     /**
@@ -102,8 +102,15 @@ public class HeartRate extends SensorTimer implements SensorEventListener
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
-        this.HRTimer.cancel();        // Cancels the HRTimer from the system
-        this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
+        try     // Tries to perform the following
+        {
+            this.HRTimer.cancel();        // Cancels the HRTimer from the system
+            this.sensorManager.unregisterListener(this);        // Unregisters the sensor change listener
+        }
+        catch (Exception e)     // If it fails
+        {
+            // Do nothing
+        }
     }
 
     /**

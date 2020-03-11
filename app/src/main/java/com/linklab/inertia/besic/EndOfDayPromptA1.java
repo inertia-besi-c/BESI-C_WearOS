@@ -25,7 +25,7 @@ import java.util.TimerTask;
  * This class is run when the automatic end of day ema is called to run. This has the ability to either start the survey,
  * snooze it for a specified amount of time, or dismiss the ema completely.
  */
-public class EndOfDayPrompt1 extends WearableActivity
+public class EndOfDayPromptA1 extends WearableActivity
 {
     private SystemInformation systemInformation;        // Private link to the class
     private DataLogger dataLogger, checkDate;      // Private initialization to the data logger
@@ -141,7 +141,7 @@ public class EndOfDayPrompt1 extends WearableActivity
                             dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
                             dataLogger.saveData("log");        // Saves the data
 
-                            promptTwo = new Intent(getApplicationContext(), EndOfDayPrompt2.class);       // Makes an intent to the estimote class
+                            promptTwo = new Intent(getApplicationContext(), EndOfDayPromptA2.class);       // Makes an intent to the estimote class
                             startActivity(promptTwo);       // Calls to start the activity
                         }
                         else        // If completed
