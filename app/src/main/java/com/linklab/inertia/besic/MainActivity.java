@@ -410,15 +410,18 @@ public class MainActivity extends WearableActivity
         }
         else        // If the system is charging
         {
-            sleep.setBackgroundColor(Color.GRAY);       // Sets the background color
-            systemInformation.toast(getApplicationContext(), "Charging Device");        // Shows a toast
+            this.sleep.setBackgroundColor(Color.GRAY);       // Sets the background color
+
+            if(!this.uploadToAWS)        // If we have not uploaded to AWS
+                this.systemInformation.toast(getApplicationContext(), "Charging Device");        // Shows a toast
 
             if (isRunning(SensorTimer.class))       // Checks if the class is running
-                stopService(startSensors);     // Calls to start the service class
-            sleepMode = true;       // Explicitly sets the sleepmode to be true
+                this.stopService(startSensors);     // Calls to start the service class
+
+            this.sleepMode = true;       // Explicitly sets the sleepmode to be true
         }
 
-        checkSteps.saveData("write");       // Writes data to the storage location
+        this.checkSteps.saveData("write");       // Writes data to the storage location
     }
 
     /**
@@ -511,7 +514,7 @@ public class MainActivity extends WearableActivity
             dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
             dataLogger.saveData("log");      // Saves the data in the mode specified
 
-            if(!uploadToAWS)      // If the update has not been run
+            if(!uploadToAWS && !isRunning(Amazon.class))      // If the update has not been run
             {
                 startActivity(startAWSUpload);       // Starts an upload intent to aws
                 uploadToAWS = true;       // Sets the variable to be true
