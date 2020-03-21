@@ -497,7 +497,7 @@ public class MainActivity extends WearableActivity
         setUpLowBattery();      // Calls the method
         setUpEODEMAButton();        // Calls the method
 
-        if(systemInformation.isCharging(getApplicationContext()) && !uploadToAWS)       // Checks if the system is charging
+        if(systemInformation.isCharging(getApplicationContext()))       // Checks if the system is charging
         {
             sleepMode = false;      // Forces the sleep mode to be false;
             sleepSettings(false);        // Calls the sleep setting
