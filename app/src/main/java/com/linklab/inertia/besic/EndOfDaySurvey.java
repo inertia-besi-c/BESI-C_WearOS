@@ -322,6 +322,8 @@ public class EndOfDaySurvey extends WearableActivity
         {
             Date startTime = timeFormatter.parse(this.startTime);     // Sets the start time to the start time
             Date stopTime = timeFormatter.parse(this.endTime);     // Sets the stop time to be the immediate time
+            assert stopTime != null;        // Asserts a non null value
+            assert startTime != null;       // Asserts a non null value
             long EMADuration = stopTime.getTime() - startTime.getTime();        // Gets the difference between both times
             String EMADurationHours = String.valueOf(EMADuration / (60 * 60 * 1000) % 24);      // Sets the hour difference to the variable
             String EMADurationMinutes = String.valueOf(EMADuration / (60 * 1000) % 60);     // Sets the minutes difference to the variable
