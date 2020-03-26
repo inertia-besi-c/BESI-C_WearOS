@@ -42,7 +42,7 @@
             android:layout_height="41dp"
             android:background="#45EE08"
             android:text="@string/start_string"
-            android:textColor="@color/white"
+            android:textColor="@android:color/white"
             android:textSize="30sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
