@@ -38,7 +38,7 @@
             android:id="@+id/eodSurvey"
             android:layout_width="87dp"
             android:layout_height="60dp"
-            android:background="@color/ambient_mode_text"
+            android:background="@color/dark_red"
             android:fontFamily="serif"
             android:text="@string/eodema_string"
             android:textAlignment="center"
