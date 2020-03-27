@@ -34,6 +34,11 @@ public class DataLogger
     private Context context;        // Holds a context of the application
 
     /**
+     * Default constructor for the class
+     */
+    public DataLogger(){}      // Required by android apk build for store release
+
+    /**
      * Overloaded constructor taking arguments to set up data information
      * @param subdirectory is the subdirectory where the data should be logged
      * @param fileName is the name of the file that is to be logged

@@ -312,7 +312,7 @@ public class MainActivity extends WearableActivity
     {
         int value = 0;      // Initializes a value
 
-        for (final File fileEntry : folder.listFiles())     // For every file in the folder
+        for (final File fileEntry : Objects.requireNonNull(folder.listFiles()))     // For every file in the folder
         {
             if (fileEntry.isDirectory())        // If the file is a directory
             {

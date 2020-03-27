@@ -117,6 +117,9 @@ public class FollowupSurvey extends WearableActivity
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets a reference to the shared preferences of the activity
         this.systemInformation = new SystemInformation();       // Gets a reference to the system information of the wearable activity
 
+        if(this.systemInformation.isCharging(this.getApplicationContext()))     // Checks if the system is charging
+            this.finish();      // Finishes the screen
+
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Initializes the vibrator variable
 
         this.startTime = this.getEstablishedTime();    // Sets the start time of the survey
@@ -182,12 +185,15 @@ public class FollowupSurvey extends WearableActivity
                     this.next.setText(this.answers[0][0]);      // Sets the next button to be an answer choice
                     this.back.setText(this.answers[0][1]);      // Sets the back button to be an answer choice
                     this.answer.setText(this.answers[0][2]);       // Assigns a value to the answer button
+                    this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_orange));      // Implements the orange background
+                    this.answer.setTextSize(18);        // Sets the text size
                 }
                 else if (this.role.equalsIgnoreCase("PT"))      // Checks the role of the watch
                 {
                     this.next.setText(this.answers[questions.length-3][0]);     // Assigns a value to the next button
                     this.back.setText(this.answers[questions.length-3][1]);     // Assigns a value to the back button
                     this.answer.setVisibility(View.INVISIBLE);     // Removes the middle button option from the user
+                    this.answer.setTextSize(18);        // Sets the text size
                 }
             }
             else if (this.currentQuestion == 1)     // Checks the question
@@ -195,6 +201,7 @@ public class FollowupSurvey extends WearableActivity
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
                 this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
+                this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_blue));      // Implements the orange background
                 this.answer.setTextSize(50);        // Sets the text size
             }
             else if (this.currentQuestion == 5 || this.currentQuestion == 7)        // Checks the question location of the watch
@@ -210,6 +217,7 @@ public class FollowupSurvey extends WearableActivity
                     this.next.setText(this.answers[questions.length-3][0]);     // Assigns a value to the next button
                     this.back.setText(this.answers[questions.length-3][1]);     // Assigns a value to the back button
                     this.answer.setText(this.answers[questions.length-3][2]);       // Assigns a value to the answer button
+                    this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_orange));      // Implements the orange background
                 }
             }
             else if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
@@ -223,6 +231,7 @@ public class FollowupSurvey extends WearableActivity
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
                 this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
+                this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_blue));      // Implements the orange background
                 this.answer.setTextSize(18);        // Sets the text size
             }
 
@@ -379,7 +388,7 @@ public class FollowupSurvey extends WearableActivity
         {
             Date startTime = timeFormatter.parse(this.startTime);     // Sets the start time to the start time
             Date stopTime = timeFormatter.parse(this.endTime);     // Sets the stop time to be the immediate time
-            long EMADuration = stopTime.getTime() - startTime.getTime();        // Gets the difference between both times
+            long EMADuration = Objects.requireNonNull(stopTime).getTime() - Objects.requireNonNull(startTime).getTime();        // Gets the difference between both times
             String EMADurationHours = String.valueOf(EMADuration / (60 * 60 * 1000) % 24);      // Sets the hour difference to the variable
             String EMADurationMinutes = String.valueOf(EMADuration / (60 * 1000) % 60);     // Sets the minutes difference to the variable
             String EMADurationSeconds = String.valueOf((EMADuration / 1000) % 60);      // Sets the seconds difference to the variable
@@ -432,7 +441,6 @@ public class FollowupSurvey extends WearableActivity
     {
         this.role = this.sharedPreferences.getString("user_info", "");      // Sets the role of the device based on the preferences setting
 
-        assert this.role != null;       // Makes sure that the role variable is not a null value
         if(this.role.equalsIgnoreCase("PT"))        // Checks the role value against a patient identifier
         {
             this.systemLogs.append(this.getEstablishedTime()).append(",").append("Followup Survey").append(",").append("Device is set as Patient").append("\n");       // Logs to the system logs

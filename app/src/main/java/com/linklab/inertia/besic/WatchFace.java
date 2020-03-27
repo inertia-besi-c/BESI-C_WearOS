@@ -132,7 +132,7 @@ public class WatchFace extends CanvasWatchFaceService
 //            this.scheduleEndOfDaySurvey();      // Calls the method to run
 //            this.startSensorTimers();      // Calls the method to run
 //            this.setUpDefaultValues();      // Sets up the values on the UI.
-//            this.setUpDefaultColors();      // Sets up the colors on the UI.
+//            this.setUpDefaultColors();      // Sets up the color on the UI.
 //            this.setUpDateAndTime();       // Sets up the time on the UI.
 //            this.setUpBatteryLevel();      // Sets up the battery values on the UI.
 //            this.setUpButtons();        // Sets up the buttons on the UI.
@@ -378,7 +378,7 @@ public class WatchFace extends CanvasWatchFaceService
 //        }
 
 //        /**
-//         * This method initializes the required colors for variables needed in the onDraw method.
+//         * This method initializes the required color for variables needed in the onDraw method.
 //         */
 //        @SuppressWarnings("ALL")        // Suppresses the warnings for this method
 //        private void setUpDefaultColors()
