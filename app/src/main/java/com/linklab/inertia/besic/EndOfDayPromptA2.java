@@ -48,6 +48,10 @@ public class EndOfDayPromptA2 extends WearableActivity
     {
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
         this.systemInformation = new SystemInformation();       // Binds the variable to the calls in the class
+
+        if(this.systemInformation.isCharging(this.getApplicationContext()))     // Checks if the system is charging
+            this.finish();      // Finishes the screen
+
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Sets the vibrator service.
 
         this.activityStart = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;       // Sets up the vibration level of the system for haptic feedback

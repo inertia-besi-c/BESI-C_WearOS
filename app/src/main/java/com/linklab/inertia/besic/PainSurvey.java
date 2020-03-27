@@ -191,6 +191,7 @@ public class PainSurvey extends WearableActivity
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
                 this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
+                this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_blue));      // Implements the orange background
                 this.answer.setTextSize(50);        // Sets the text size
             }
             else if (this.currentQuestion == 5 || this.currentQuestion == 7)        // Checks the question location of the watch
@@ -206,6 +207,7 @@ public class PainSurvey extends WearableActivity
                     this.next.setText(this.answers[questions.length-3][0]);     // Assigns a value to the next button
                     this.back.setText(this.answers[questions.length-3][1]);     // Assigns a value to the back button
                     this.answer.setText(this.answers[questions.length-3][2]);       // Assigns a value to the answer button
+                    this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_orange));      // Implements the orange background
                 }
             }
             else if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
@@ -219,6 +221,7 @@ public class PainSurvey extends WearableActivity
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
                 this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
+                this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_blue));      // Implements the orange background
                 this.answer.setTextSize(18);        // Sets the text size
             }
 
