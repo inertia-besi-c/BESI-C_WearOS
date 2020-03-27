@@ -138,6 +138,9 @@ public class EndOfDaySurvey extends WearableActivity
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets a reference to the shared preferences of the activity
         this.systemInformation = new SystemInformation();       // Gets a reference to the system information of the wearable activity
 
+        if(this.systemInformation.isCharging(this.getApplicationContext()))     // Checks if the system is charging
+            this.finish();      // Finishes the screen
+
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Initializes the vibrator variable
 
         this.startTime = this.getEstablishedTime();    // Sets the start time of the survey
@@ -377,7 +380,6 @@ public class EndOfDaySurvey extends WearableActivity
     {
         this.role = this.sharedPreferences.getString("user_info", "");      // Sets the role of the device based on the preferences setting
 
-        assert this.role != null;       // Makes sure that the role variable is not a null value
         if(this.role.equalsIgnoreCase("PT"))        // Checks the role value against a patient identifier
         {
             this.systemLogs.append(this.getEstablishedTime()).append(",").append("End of Day Survey").append(",").append("Device is set as Patient").append("\n");       // Logs to the system logs
