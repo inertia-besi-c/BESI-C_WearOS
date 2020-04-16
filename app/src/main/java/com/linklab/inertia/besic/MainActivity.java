@@ -53,7 +53,7 @@ public class MainActivity extends WearableActivity
     private Intent startSettings, startEMA, startLowBattery, startSensors, estimoteSensor, startAWSUpload;      // Initializes intents for the class
     private IntentFilter minuteTimeTick;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
-    private DataLogger dataLogger, checkSteps, checkDate;      // initializes the datalogger of the class
+    private DataLogger dataLogger, checkSteps, checkDate, checkSleep;      // initializes the datalogger of the class
     private StringBuilder stringBuilder;        // Initializes string builder of the system
     private Button start, sleep, dailyEMA, powerOffScreen;        // Makes all button on the system
     private TextView date, time, battery;        // Makes all text views on the system
@@ -113,6 +113,7 @@ public class MainActivity extends WearableActivity
         this.lowBatteryTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10")));        // Sets up a timer
         this.directory = new File(Environment.getExternalStorageDirectory() + "/" + this.sharedPreferences.getString("directory_key", getResources().getString(R.string.app_name_abbreviated)));     // Makes a reference to a directory
         this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
+        this.checkSleep = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), "false");      // Sets a new datalogger variable
         this.checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
         this.sleepMode = false;     // Initializes the sleepmode variable
         this.uploadToAWS = false;     // Initializes the variable
@@ -390,6 +391,9 @@ public class MainActivity extends WearableActivity
                 this.dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), this.getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
+                this.checkSleep = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), "false");      // Sets a new datalogger variable
+                this.checkSleep.saveData("write");      // Saves the data in specified format
+
                 this.sleep.setBackgroundColor(getResources().getColor(R.color.dark_gray));       // Changes the background
 
                 if(toast)       // Checks if there is a need to toast
@@ -407,6 +411,9 @@ public class MainActivity extends WearableActivity
                 this.dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), this.getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
+                this.checkSleep = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), "true");      // Sets a new datalogger variable
+                this.checkSleep.saveData("write");      // Saves the data in specified format
+
                 this.sleep.setBackgroundColor(getResources().getColor(R.color.dark_blue));       // Changes the background
 
                 if(toast)       // Checks if there is a need to toast
@@ -417,6 +424,9 @@ public class MainActivity extends WearableActivity
         }
         else        // If the system is charging
         {
+            this.checkSleep = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), "true");      // Sets a new datalogger variable
+            this.checkSleep.saveData("write");      // Saves the data in specified format
+
             this.sleep.setBackgroundColor(getResources().getColor(R.color.dark_blue));       // Changes the background
 
             if(!this.uploadToAWS)        // If we have not uploaded to AWS

@@ -601,6 +601,13 @@ public class FollowupSurvey extends WearableActivity
     {
         super.onDestroy();      // Calls the super class method
 
-        this.reminderTimer.cancel();        // Cancels the timer that is running
+        try         // Tries to do the action
+        {
+            this.reminderTimer.cancel();        // Cancels the timer that is running
+        }
+        catch (Exception e)     // If an error occurs
+        {
+            // DO nothing
+        }
     }
 }

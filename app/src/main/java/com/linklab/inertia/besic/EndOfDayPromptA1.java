@@ -190,8 +190,14 @@ public class EndOfDayPromptA1 extends WearableActivity
     @Override
     public void onDestroy()     // This is called when the activity is destroyed.
     {
-        this.reminderTimer.cancel();        // Cancels the timer
-
+        try         // Tries to do the action
+        {
+            this.reminderTimer.cancel();        // Cancels the timer that is running
+        }
+        catch (Exception e)     // If an error occurs
+        {
+            // DO nothing
+        }
         this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 1" + "," + "Cleaning up the Class";        // Sets data to be logged by system
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");        // Saves the data
