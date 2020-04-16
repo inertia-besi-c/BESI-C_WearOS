@@ -378,6 +378,8 @@ public class PainSurvey extends WearableActivity
         {
             Date startTime = timeFormatter.parse(this.startTime);     // Sets the start time to the start time
             Date stopTime = timeFormatter.parse(this.endTime);     // Sets the stop time to be the immediate time
+            assert stopTime != null;        // Asserts a not null statement
+            assert startTime != null;       // Asserts a not null statement
             long EMADuration = stopTime.getTime() - startTime.getTime();        // Gets the difference between both times
             String EMADurationHours = String.valueOf(EMADuration / (60 * 60 * 1000) % 24);      // Sets the hour difference to the variable
             String EMADurationMinutes = String.valueOf(EMADuration / (60 * 1000) % 60);     // Sets the minutes difference to the variable
@@ -487,7 +489,6 @@ public class PainSurvey extends WearableActivity
     {
         this.role = this.sharedPreferences.getString("user_info", "");      // Sets the role of the device based on the preferences setting
 
-        assert this.role != null;       // Makes sure that the role variable is not a null value
         if(this.role.equalsIgnoreCase("PT"))        // Checks the role value against a patient identifier
         {
             this.systemLogs.append(this.getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Device is set as Patient").append("\n");       // Logs to the system logs
