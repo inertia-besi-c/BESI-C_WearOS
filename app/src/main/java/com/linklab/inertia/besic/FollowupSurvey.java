@@ -6,6 +6,8 @@ package com.linklab.inertia.besic;
 import android.annotation.SuppressLint;
 import android.support.wearable.activity.WearableActivity;
 import android.content.SharedPreferences;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.content.Context;
 import android.os.Vibrator;
@@ -19,6 +21,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
 
 import java.util.TimerTask;
 import java.text.ParseException;
@@ -33,18 +36,21 @@ public class FollowupSurvey extends WearableActivity
 {
 
     private SharedPreferences sharedPreferences;        // Gets a reference to the shared preferences of the wearable activity
+    private LayoutInflater layoutInflater;      // Layout inflater for the activity
     private Vibrator vibrator;      // Gets a link to the system vibrator
     private Window window;      // Gets access to the touch screen of the device
     private int currentQuestion, answersTapped, index, hapticLevel, activityStartLevel, activityRemindLevel, emaReminderInterval, emaDelayInterval, maxReminder;       // Initializes various integers to be used by the system
     private int[] userResponseIndex;        // This is the user response index that keeps track of the index response of the user.
     private Button back, next, answer;      // The buttons on the screen
+    private Toast toast;        // Makes the toast variable
+    private View view;      // Makes the view variable
     private Timer reminderTimer;        // Sets up the timers for the survey
     private TextView question;      // Links to the text shown on the survey screen
     private String role, data, startTime, endTime, duration;        // Sets up all the string variable in the system
     private String[] userResponses, questions;     // String list variables used in the method
     private String[][] answers;     // String list in list variables used in the class
     private Intent heartRate, estimote;     // Initializes an intent variable
-    private DataLogger dataLogger;      // Makes a global variable for the data logger
+    private DataLogger dataLogger, checkSleep;      // Makes a global variable for the data logger
     private StringBuilder surveyLogs, systemLogs;       // Initializes a global string builder variable
     private SimpleDateFormat timeFormatter;     // Initiates a date time variable
     private SystemInformation systemInformation;        // Gets a reference to the system information class
@@ -116,44 +122,54 @@ public class FollowupSurvey extends WearableActivity
 
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets a reference to the shared preferences of the activity
         this.systemInformation = new SystemInformation();       // Gets a reference to the system information of the wearable activity
+        this.checkSleep = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), "false");      // Sets a new datalogger variable
 
-        if(this.systemInformation.isCharging(this.getApplicationContext()))     // Checks if the system is charging
-            this.finish();      // Finishes the screen
+        if((!this.systemInformation.isCharging(this.getApplicationContext())) && this.checkSleep.readData().contains("false"))     // Checks if the system is charging
+        {
+            this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Initializes the vibrator variable
 
-        this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Initializes the vibrator variable
+            this.startTime = this.getEstablishedTime();    // Sets the start time of the survey
+            this.systemLogs = new StringBuilder(this.startTime).append(",").append("Followup Survey").append(",").append("Starting Followup Survey").append("\n");       // Logs to the string builder variable
 
-        this.startTime = this.getEstablishedTime();    // Sets the start time of the survey
-        this.systemLogs = new StringBuilder(this.startTime).append(",").append("Followup Survey").append(",").append("Starting Followup Survey").append("\n");       // Logs to the string builder variable
+            this.unlockScreen();        // Calls the method to unlock the screen in a specified manner
+            this.setContentView(R.layout.activity_ema);      // Sets the view of the watch to be the specified activity
+            this.decideRoleQuestions();      // Decides the role the device is playing
 
-        this.unlockScreen();        // Calls the method to unlock the screen in a specified manner
-        this.setContentView(R.layout.activity_ema);      // Sets the view of the watch to be the specified activity
-        this.decideRoleQuestions();      // Decides the role the device is playing
+            this.userResponses = new String[questions.length];      // Sets up the responses needed by the user to be the length of the number given
+            this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
+            this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
+            this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
+            this.toast = new Toast(getApplicationContext());      // Sets up the toast in term of this context
+            this.heartRate = new Intent(getBaseContext(), HeartRate.class);     // Makes an intent to the heartrate class
+            this.estimote = new Intent(getBaseContext(), Estimote.class);       // Makes an intent to the estimote class
+            this.currentQuestion = 0;       // Sets the number of questioned answered by the user
 
-        this.userResponses = new String[questions.length];      // Sets up the responses needed by the user to be the length of the number given
-        this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
-        this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
-        this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
-        this.heartRate = new Intent(getBaseContext(), HeartRate.class);     // Makes an intent to the heartrate class
-        this.estimote = new Intent(getBaseContext(), Estimote.class);       // Makes an intent to the estimote class
-        this.currentQuestion = 0;       // Sets the number of questioned answered by the user
+            this.back = findViewById(R.id.back);        // Gets a reference to the back button
+            this.next = findViewById(R.id.next);        // Gets a reference to the next button
+            this.answer = findViewById(R.id.responses);        // Gets a reference to the answer button
+            this.question = findViewById(R.id.request);        // Gets a reference to the question text view
 
-        this.back = findViewById(R.id.back);        // Gets a reference to the back button
-        this.next = findViewById(R.id.next);        // Gets a reference to the next button
-        this.answer = findViewById(R.id.responses);        // Gets a reference to the answer button
-        this.question = findViewById(R.id.request);        // Gets a reference to the question text view
+            this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
+            this.activityStartLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;      // Alert for starting the activity
+            this.activityRemindLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_remind", ""))) * 1000;      // Alert for starting the activity
+            this.emaReminderInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_remind_interval", ""))) * 1000;       // Alert to continue survey initialized
+            this.emaDelayInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_remind", ""))) * 1000;       // Amount to offset reminder alert by
+            this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_remind_max", "")));        // Maximum reminders allowed for the survey
 
-        this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
-        this.activityStartLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;      // Alert for starting the activity
-        this.activityRemindLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_remind", ""))) * 1000;      // Alert for starting the activity
-        this.emaReminderInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_remind_interval", ""))) * 1000;       // Alert to continue survey initialized
-        this.emaDelayInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_remind", ""))) * 1000;       // Amount to offset reminder alert by
-        this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("followup_remind_max", "")));        // Maximum reminders allowed for the survey
+            this.vibrator.vibrate(this.activityStartLevel);     // Vibrates the watch to signify the start of an activity
+            this.scheduleReminderTimer();       // Calls the method to schedule the timer for the survey
+            this.setAmbientEnabled();        // Sets ambient mode ability
+            this.setAutoResumeEnabled(true);     // Resumes the activity if not killed properly
+            this.deploySurvey();        // Calls on the method for the survey to begin
+        }
+        else        // If it fails the first condition
+        {
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "Followup Survey" + "," + "Automatically Dismissed Survey";      // Sets up the data to be logged
+            this.dataLogger = new DataLogger(getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), this.getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
+            this.dataLogger.saveData("log");        // Saves the data
 
-        this.vibrator.vibrate(this.activityStartLevel);     // Vibrates the watch to signify the start of an activity
-        this.scheduleReminderTimer();       // Calls the method to schedule the timer for the survey
-        this.setAmbientEnabled();        // Sets ambient mode ability
-        this.setAutoResumeEnabled(true);     // Resumes the activity if not killed properly
-        this.deploySurvey();        // Calls on the method for the survey to begin
+            this.finish();      // Finishes the activity
+        }
     }
 
     /**
@@ -429,7 +445,7 @@ public class FollowupSurvey extends WearableActivity
     {
         this.endTime = this.getEstablishedTime();     // Sets the end time of the survey
         this.logResponse();     // Calls the method to perform an action
-        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_you));     // Makes a special thank you toast
+        this.imageToast();       // Shows a specially made toast to the screen
         finish();       // Finishes the survey and cleans up the system
     }
 
@@ -543,6 +559,18 @@ public class FollowupSurvey extends WearableActivity
     }
 
     /**
+     * This method sets up the image toast that is to be run
+     */
+    private void imageToast()       // This is the image toast
+    {
+        this.layoutInflater = this.getLayoutInflater();      // Calls a layout
+        this.view = layoutInflater.inflate(R.layout.toast_0, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+        this.toast.setDuration(Toast.LENGTH_LONG);       // Makes the toast longer
+        this.toast.setView(this.view);        // Sets the view
+        this.toast.show();       // Shows the toast
+    }
+
+    /**
      * Sets up the information to be saved by the activity and actions happening in the activity
      */
     private void logActivity()
@@ -592,6 +620,13 @@ public class FollowupSurvey extends WearableActivity
     {
         super.onDestroy();      // Calls the super class method
 
-        this.reminderTimer.cancel();        // Cancels the timer that is running
+        try         // Tries to do the action
+        {
+            this.reminderTimer.cancel();        // Cancels the timer that is running
+        }
+        catch (Exception e)     // If an error occurs
+        {
+            // DO nothing
+        }
     }
 }

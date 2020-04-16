@@ -38,8 +38,8 @@
 
         <Button
             android:id="@+id/proceed"
-            android:layout_width="197dp"
-            android:layout_height="24dp"
+            android:layout_width="189dp"
+            android:layout_height="35dp"
             android:layout_marginTop="5dp"
             android:background="@color/dark_green"
             android:text="@string/proceed_button"
@@ -54,8 +54,8 @@
 
         <Button
             android:id="@+id/snooze"
-            android:layout_width="197dp"
-            android:layout_height="24dp"
+            android:layout_width="190dp"
+            android:layout_height="38dp"
             android:layout_marginTop="35dp"
             android:background="@color/dark_orange"
             android:text="@string/snooze_button"
@@ -63,24 +63,10 @@
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.454"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/request"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <Button
-            android:id="@+id/dismiss"
-            android:layout_width="197dp"
-            android:layout_height="24dp"
-            android:background="@color/dark_red"
-            android:text="@string/dismiss_button"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/request"
-            app:layout_constraintVertical_bias="0.985" />
+            app:layout_constraintVertical_bias="0.826" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

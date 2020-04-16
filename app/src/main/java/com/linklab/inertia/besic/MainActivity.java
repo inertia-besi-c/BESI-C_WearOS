@@ -12,7 +12,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Vibrator;
@@ -46,16 +48,19 @@ public class MainActivity extends WearableActivity
     private Window window;      // Gets access to the touch screen of the device
     private Map<String, ?> preferenceKeys;      // Creates a map to store key values
     private SystemInformation systemInformation;        // Initializes the system information
+    private ConnectivityManager connectivityManager;        // Initializes the connection manager
+    private NetworkInfo networkInformation;     // Initializes the network information
     private Intent startSettings, startEMA, startLowBattery, startSensors, estimoteSensor, startAWSUpload;      // Initializes intents for the class
     private IntentFilter minuteTimeTick;      // Makes the intent filter of the system
     private File directory;     // Initializes the files of the class
-    private DataLogger dataLogger, checkSteps, checkDate;      // initializes the datalogger of the class
+    private DataLogger dataLogger, checkSteps, checkDate, checkSleep;      // initializes the datalogger of the class
     private StringBuilder stringBuilder;        // Initializes string builder of the system
     private Button start, sleep, dailyEMA, powerOffScreen;        // Makes all button on the system
     private TextView date, time, battery;        // Makes all text views on the system
     private String batteryInformation, data;      // Sets up the string in the class
+    private WifiManager wifiAccess;     // Sets up the wifi access to the application
     private int hapticLevel, sleepAutomatically, lowBatteryThreshHold, lowBatteryTime, startHour, startMinute, startSecond, endHour, endMinute, endSecond;        // Initializes the integers of the class
-    private boolean sleepMode, runLowBattery, runEODEMAButton, uploadToAWS;      // Initializes the boolean variables of the class
+    private boolean sleepMode, runLowBattery, runEODEMAButton, uploadToAWS, wifiEnabled;      // Initializes the boolean variables of the class
     private long startAutomaticEMA;     // Initializes the long variables of the class
 
     /**
@@ -73,7 +78,7 @@ public class MainActivity extends WearableActivity
         this.startSensors = new Intent(getApplicationContext(), SensorTimer.class);     // Sets up the intent for the service
         this.estimoteSensor = new Intent(getApplicationContext(), Estimote.class);     // Sets up the intent for the service
         this.startLowBattery = new Intent(getApplicationContext(), Battery.class);     // Sets up the intent for the service
-        this.startAWSUpload = new Intent(getApplicationContext(), Amazon.class);
+        this.startAWSUpload = new Intent(getApplicationContext(), Amazon.class);        // Makes an intent to the aws service
         this.systemInformation = new SystemInformation();       // Initializes the system information
         this.minuteTimeTick = new IntentFilter();     // Initializes the intent filter
 
@@ -87,16 +92,17 @@ public class MainActivity extends WearableActivity
         this.time = findViewById(R.id.time);        // Sets up the time view
         this.battery = findViewById(R.id.battery);      // Sets up the battery view
 
-        start.setVisibility(View.INVISIBLE);       // Sets the button look
-        sleep.setVisibility(View.INVISIBLE);       // Sets the button look
-        dailyEMA.setVisibility(View.INVISIBLE);       // Sets the button look
-        time.setVisibility(View.INVISIBLE);       // Sets the button look
-        date.setVisibility(View.INVISIBLE);       // Sets the button look
-        battery.setVisibility(View.INVISIBLE);       // Sets the button look
+        this.start.setVisibility(View.INVISIBLE);       // Sets the button look
+        this.sleep.setVisibility(View.INVISIBLE);       // Sets the button look
+        this.dailyEMA.setVisibility(View.INVISIBLE);       // Sets the button look
+        this.time.setVisibility(View.INVISIBLE);       // Sets the button look
+        this.date.setVisibility(View.INVISIBLE);       // Sets the button look
+        this.battery.setVisibility(View.INVISIBLE);       // Sets the button look
         this.powerOffScreen = findViewById(R.id.powerOffScreen);        // Sets up the power off screen item
         this.powerOffScreen.setText(this.systemInformation.getDateTime("h:mm a"));      // Sets some text on the screen
 
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets the preferences from the shared preference object.
+        this.wifiAccess = (WifiManager) getSystemService(Context.WIFI_SERVICE);        // Gets the wifi system on the watch.
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Get instance of Vibrator from current Context
         this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
         this.minuteTimeTick.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
@@ -107,9 +113,11 @@ public class MainActivity extends WearableActivity
         this.lowBatteryTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10")));        // Sets up a timer
         this.directory = new File(Environment.getExternalStorageDirectory() + "/" + this.sharedPreferences.getString("directory_key", getResources().getString(R.string.app_name_abbreviated)));     // Makes a reference to a directory
         this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
+        this.checkSleep = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), "false");      // Sets a new datalogger variable
         this.checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
         this.sleepMode = false;     // Initializes the sleepmode variable
         this.uploadToAWS = false;     // Initializes the variable
+        this.wifiEnabled = wifiAccess.isWifiEnabled();      // Variable to check the status of the wifi
 
         this.setUpUIElements();     // Calls the specified method to run
         this.setUpLowBattery();     // Calls the method
@@ -383,7 +391,10 @@ public class MainActivity extends WearableActivity
                 this.dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), this.getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
-                this.sleep.setBackgroundColor(Color.BLUE);       // Changes the background
+                this.checkSleep = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), "false");      // Sets a new datalogger variable
+                this.checkSleep.saveData("write");      // Saves the data in specified format
+
+                this.sleep.setBackgroundColor(getResources().getColor(R.color.dark_gray));       // Changes the background
 
                 if(toast)       // Checks if there is a need to toast
                     this.systemInformation.toast(this.getApplicationContext(), "Do not disturb is OFF");      // Shows a toast
@@ -400,7 +411,10 @@ public class MainActivity extends WearableActivity
                 this.dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), this.getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
-                this.sleep.setBackgroundColor(Color.GRAY);       // Changes the background
+                this.checkSleep = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), "true");      // Sets a new datalogger variable
+                this.checkSleep.saveData("write");      // Saves the data in specified format
+
+                this.sleep.setBackgroundColor(getResources().getColor(R.color.dark_blue));       // Changes the background
 
                 if(toast)       // Checks if there is a need to toast
                     this.systemInformation.toast(this.getApplicationContext(), "Do not disturb is ON");       // Shows a toast
@@ -410,7 +424,10 @@ public class MainActivity extends WearableActivity
         }
         else        // If the system is charging
         {
-            this.sleep.setBackgroundColor(Color.GRAY);       // Sets the background color
+            this.checkSleep = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), "true");      // Sets a new datalogger variable
+            this.checkSleep.saveData("write");      // Saves the data in specified format
+
+            this.sleep.setBackgroundColor(getResources().getColor(R.color.dark_blue));       // Changes the background
 
             if(!this.uploadToAWS)        // If we have not uploaded to AWS
                 this.systemInformation.toast(getApplicationContext(), "Charging Device");        // Shows a toast
@@ -514,6 +531,12 @@ public class MainActivity extends WearableActivity
             dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
             dataLogger.saveData("log");      // Saves the data in the mode specified
 
+            while((!isDeviceOnline() || !wifiEnabled) && !isRunning(Amazon.class))     // Checks if the wifi is enabled
+            {
+                wifiAccess.setWifiEnabled(true);      // Turns of access to the wifi
+                wifiEnabled = wifiAccess.isWifiEnabled();      // Variable to check the status of the wifi
+            }
+
             if(!uploadToAWS && !isRunning(Amazon.class))      // If the update has not been run
             {
                 startActivity(startAWSUpload);       // Starts an upload intent to aws
@@ -523,6 +546,12 @@ public class MainActivity extends WearableActivity
         else        // if the system is not charging
         {
             uploadToAWS = false;      // Resets the variable
+
+            while((isDeviceOnline() || wifiEnabled) && !isRunning(Amazon.class))     // Checks if the wifi is enabled
+            {
+                wifiAccess.setWifiEnabled(false);      // Turns of access to the wifi
+                wifiEnabled = wifiAccess.isWifiEnabled();      // Variable to check the status of the wifi
+            }
 
             if (sleepAutomatically <= 0)     // Checks if the variable is below the limit
             {
@@ -617,6 +646,18 @@ public class MainActivity extends WearableActivity
                 startMinuteUpdater();       // Calls the method
             }
         };
+    }
+
+    /**
+     * Private method to check the status of the internet connection and see if any activity is being performed
+     * @return true or false based on the status of the network
+     */
+    private boolean isDeviceOnline()     // This checks if the device is online and has an internet connection
+    {
+        this.connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);     // Gets the connection service manager
+        assert connectivityManager != null;     // Makes sure that the connectivity manager does not return a null value
+        this.networkInformation = connectivityManager.getActiveNetworkInfo();     // It checks if there is a connection to the system
+        return networkInformation != null && networkInformation.isConnected();        // It returns the outcome.
     }
 
     /**

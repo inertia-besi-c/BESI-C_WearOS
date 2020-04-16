@@ -138,9 +138,6 @@ public class EndOfDaySurvey extends WearableActivity
         this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());        // Gets a reference to the shared preferences of the activity
         this.systemInformation = new SystemInformation();       // Gets a reference to the system information of the wearable activity
 
-        if(this.systemInformation.isCharging(this.getApplicationContext()))     // Checks if the system is charging
-            this.finish();      // Finishes the screen
-
         this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Initializes the vibrator variable
 
         this.startTime = this.getEstablishedTime();    // Sets the start time of the survey

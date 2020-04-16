@@ -58,7 +58,7 @@
             android:id="@+id/sleep"
             android:layout_width="87dp"
             android:layout_height="60dp"
-            android:background="@color/dark_blue"
+            android:background="@color/dark_gray"
             android:fontFamily="serif"
             android:text="@string/dnd_string"
             android:textAlignment="center"
