@@ -29,6 +29,9 @@ class SystemInformation
     private Date current;       // Private date variables
     private IntentFilter battery;       // Private intent filter variables
     private Intent batteryStatus;       // Private intent variables
+    private Toast toast;        // Private toast
+    private View view;      // Private view
+    private TextView textSeen;      // Private text screen
     private boolean sleepMode, setSettings;      // Private boolean variable for the sleep level of the application
     private int level, scale, batteryPercent, batteryLevel;       // private integer variables
 
@@ -62,12 +65,12 @@ class SystemInformation
      */
     void toast(Context context, String message)
     {
-        Toast toast = Toast.makeText(context, message, Toast.LENGTH_LONG);          // A short message at the end to say thank you.
-        View view = toast.getView();        // Gets the view from the toast maker
-        TextView textSeen = view.findViewById(android.R.id.message);        // Finds the text being used
-        toast.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);        // Sets the toast to show up at the center of the screen
-        textSeen.setTextColor(Color.WHITE);     // Changes the color of the text
-        toast.show();       // Shows the toast.
+        this.toast = Toast.makeText(context, message, Toast.LENGTH_LONG);          // A short message at the end to say thank you.
+        this.view = toast.getView();        // Gets the view from the toast maker
+        this.textSeen = view.findViewById(android.R.id.message);        // Finds the text being used
+        this.toast.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL, 0, 0);        // Sets the toast to show up at the center of the screen
+        this.textSeen.setTextColor(Color.WHITE);     // Changes the color of the text
+        this.toast.show();       // Shows the toast.
     }
 
     /**
@@ -270,6 +273,7 @@ class SystemInformation
      * Creates a global access to the settings variable
      * @return the value associated with the settings
      */
+    @SuppressWarnings("ALL")        // Supresses the warnings
     boolean getSetSettings()
     {
         return this.setSettings;      // Returns the value associated with the variable
