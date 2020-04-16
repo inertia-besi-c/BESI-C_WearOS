@@ -391,7 +391,7 @@ public class MainActivity extends WearableActivity
                 this.dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), this.getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
-                this.sleep.setBackgroundColor(Color.BLUE);       // Changes the background
+                this.sleep.setBackgroundColor(Color.GRAY);       // Changes the background
 
                 if(toast)       // Checks if there is a need to toast
                     this.systemInformation.toast(this.getApplicationContext(), "Do not disturb is OFF");      // Shows a toast
@@ -408,7 +408,7 @@ public class MainActivity extends WearableActivity
                 this.dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), this.getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
                 this.dataLogger.saveData("log");      // Saves the data in the mode specified
 
-                this.sleep.setBackgroundColor(Color.GRAY);       // Changes the background
+                this.sleep.setBackgroundColor(Color.BLUE);       // Changes the background
 
                 if(toast)       // Checks if there is a need to toast
                     this.systemInformation.toast(this.getApplicationContext(), "Do not disturb is ON");       // Shows a toast
@@ -418,7 +418,7 @@ public class MainActivity extends WearableActivity
         }
         else        // If the system is charging
         {
-            this.sleep.setBackgroundColor(Color.GRAY);       // Sets the background color
+            this.sleep.setBackgroundColor(Color.BLUE);       // Sets the background color
 
             if(!this.uploadToAWS)        // If we have not uploaded to AWS
                 this.systemInformation.toast(getApplicationContext(), "Charging Device");        // Shows a toast
