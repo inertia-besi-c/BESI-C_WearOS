@@ -539,7 +539,7 @@ public class MainActivity extends WearableActivity
 
             if(!uploadToAWS && !isRunning(Amazon.class))      // If the update has not been run
             {
-//                startActivity(startAWSUpload);       // Starts an upload intent to aws
+                startActivity(startAWSUpload);       // Starts an upload intent to aws
                 uploadToAWS = true;       // Sets the variable to be true
             }
         }
