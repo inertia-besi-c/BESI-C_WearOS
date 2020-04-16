@@ -38,7 +38,7 @@
 
         <Button
             android:id="@+id/dismiss"
-            android:layout_width="199dp"
+            android:layout_width="197dp"
             android:layout_height="41dp"
             android:background="@color/dark_orange"
             android:text="@string/dismiss_button"

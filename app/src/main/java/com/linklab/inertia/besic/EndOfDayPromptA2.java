@@ -29,7 +29,7 @@ public class EndOfDayPromptA2 extends WearableActivity
 {
     private SystemInformation systemInformation;        // Private link to the class
     private DataLogger dataLogger, checkSleep;      // Private initialization to the data logger
-    private Button proceed, dismiss;     // Initializes a button
+    private Button proceed;     // Initializes a button
     private String data;        // Sets up a string for data
     private TextView textView;      // Text view for the system
     private Timer reminderTimer;       // Sets up the timer for the system
@@ -65,9 +65,6 @@ public class EndOfDayPromptA2 extends WearableActivity
             this.vibrator.vibrate(this.activityStart);      // Vibrates the system
             this.proceed = findViewById(R.id.proceed);        // Sets the proceeding button
             final Button snooze = findViewById(R.id.snooze);        // Sets the snooze button
-            this.dismiss = findViewById(R.id.dismiss);        // Sets the dismiss button
-
-            this.dismiss.setVisibility(View.INVISIBLE);     // Removes the dismiss button
             snooze.setText(getResources().getString(R.string.dismiss_button));     // Sets the string to be that of the snooze button
             snooze.setBackgroundColor(getResources().getColor(R.color.dark_red));      // Sets the color of the snooze button
 

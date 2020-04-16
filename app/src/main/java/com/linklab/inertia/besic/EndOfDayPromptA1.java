@@ -29,7 +29,7 @@ public class EndOfDayPromptA1 extends WearableActivity
 {
     private SystemInformation systemInformation;        // Private link to the class
     private DataLogger dataLogger, checkDate, checkSleep;      // Private initialization to the data logger
-    private Button proceed, snooze, dismiss;     // Initializes a button
+    private Button proceed, snooze;     // Initializes a button
     private String data;        // Sets up a string for data
     private TextView textView;      // Text view for the system
     private Timer reminderTimer, snoozeTimer;       // Sets up the timer for the system
@@ -65,7 +65,6 @@ public class EndOfDayPromptA1 extends WearableActivity
             this.vibrator.vibrate(this.activityStart);      // Vibrates the system
             this.proceed = findViewById(R.id.proceed);        // Sets the proceeding button
             this.snooze = findViewById(R.id.snooze);        // Sets the snooze button
-            this.dismiss = findViewById(R.id.dismiss);        // Sets the dismiss button
             this.textView = findViewById(R.id.request);     // Sets the text view
             this.textView.setText(getString(R.string.endofday_request));      // Message to be shown on the screen
 
@@ -155,28 +154,6 @@ public class EndOfDayPromptA1 extends WearableActivity
                             }
                         }
                     }, Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("eod_automatic_snooze_time", ""))) * 60 * 1000);      // Repeats at the specified interval
-
-                    systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_you));     // Gets the string and calls a toast on it
-
-                    finish();       // It stops the class and the buzzing
-                }
-            });
-
-            this.dismiss.setOnClickListener(new View.OnClickListener() // Waits for the button to be clicked.
-            {
-                /**
-                 * This is run when the button is clicked
-                 *
-                 * @param v is the view that is needed to see the button
-                 */
-                @Override
-                public void onClick(View v)         // When the button is clicked
-                {
-                    vibrator.vibrate(hapticLevel);       // Haptic feedback for the dismiss button
-
-                    data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 1" + "," + "Dismiss button clicked";      // Sets up the data to be logged
-                    dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
-                    dataLogger.saveData("log");        // Saves the data
 
                     systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_you));     // Gets the string and calls a toast on it
 
