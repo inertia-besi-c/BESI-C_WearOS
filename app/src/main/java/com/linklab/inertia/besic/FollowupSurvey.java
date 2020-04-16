@@ -6,6 +6,8 @@ package com.linklab.inertia.besic;
 import android.annotation.SuppressLint;
 import android.support.wearable.activity.WearableActivity;
 import android.content.SharedPreferences;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.content.Context;
 import android.os.Vibrator;
@@ -19,6 +21,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
 
 import java.util.TimerTask;
 import java.text.ParseException;
@@ -33,11 +36,14 @@ public class FollowupSurvey extends WearableActivity
 {
 
     private SharedPreferences sharedPreferences;        // Gets a reference to the shared preferences of the wearable activity
+    private LayoutInflater layoutInflater;      // Layout inflater for the activity
     private Vibrator vibrator;      // Gets a link to the system vibrator
     private Window window;      // Gets access to the touch screen of the device
     private int currentQuestion, answersTapped, index, hapticLevel, activityStartLevel, activityRemindLevel, emaReminderInterval, emaDelayInterval, maxReminder;       // Initializes various integers to be used by the system
     private int[] userResponseIndex;        // This is the user response index that keeps track of the index response of the user.
     private Button back, next, answer;      // The buttons on the screen
+    private Toast toast;        // Makes the toast variable
+    private View view;      // Makes the view variable
     private Timer reminderTimer;        // Sets up the timers for the survey
     private TextView question;      // Links to the text shown on the survey screen
     private String role, data, startTime, endTime, duration;        // Sets up all the string variable in the system
@@ -133,6 +139,7 @@ public class FollowupSurvey extends WearableActivity
             this.userResponseIndex = new int[userResponses.length];     // Sets up the index to be the integer value of the user responses length
             this.responses = new ArrayList<>();     // Initializes the array list of the responses by the user
             this.reminderTimer = new Timer();       // Sets up the variable as a new timer for the instance of this class
+            this.toast = new Toast(getApplicationContext());      // Sets up the toast in term of this context
             this.heartRate = new Intent(getBaseContext(), HeartRate.class);     // Makes an intent to the heartrate class
             this.estimote = new Intent(getBaseContext(), Estimote.class);       // Makes an intent to the estimote class
             this.currentQuestion = 0;       // Sets the number of questioned answered by the user
@@ -438,7 +445,7 @@ public class FollowupSurvey extends WearableActivity
     {
         this.endTime = this.getEstablishedTime();     // Sets the end time of the survey
         this.logResponse();     // Calls the method to perform an action
-        this.systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_you));     // Makes a special thank you toast
+        this.imageToast();       // Shows a specially made toast to the screen
         finish();       // Finishes the survey and cleans up the system
     }
 
@@ -549,6 +556,18 @@ public class FollowupSurvey extends WearableActivity
             }
         }
         return false;       // If not, it returns false.
+    }
+
+    /**
+     * This method sets up the image toast that is to be run
+     */
+    private void imageToast()       // This is the image toast
+    {
+        this.layoutInflater = this.getLayoutInflater();      // Calls a layout
+        this.view = layoutInflater.inflate(R.layout.toast_0, (ViewGroup) findViewById(R.id.relativeLayout));     // Sets the layout to the view
+        this.toast.setDuration(Toast.LENGTH_LONG);       // Makes the toast longer
+        this.toast.setView(this.view);        // Sets the view
+        this.toast.show();       // Shows the toast
     }
 
     /**
