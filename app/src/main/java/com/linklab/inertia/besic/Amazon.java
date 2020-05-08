@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 /**
  * This class is run when the device needs to upload data to a S3 bucket set up on a
@@ -73,7 +74,7 @@ public class Amazon extends WearableActivity
      */
     private void findAndLogAllFiles(final File folder)
     {
-        for (final File fileEntry : folder.listFiles())     // For every file in the folder
+        for (final File fileEntry : Objects.requireNonNull(folder.listFiles()))     // For every file in the folder
         {
             if (fileEntry.isDirectory())        // If the file is a directory
             {
