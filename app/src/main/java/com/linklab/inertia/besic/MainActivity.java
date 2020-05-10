@@ -531,15 +531,15 @@ public class MainActivity extends WearableActivity
             dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
             dataLogger.saveData("log");      // Saves the data in the mode specified
 
-//            while((!isDeviceOnline() || !wifiEnabled) && !isRunning(Amazon.class))     // Checks if the wifi is enabled
-//            {
-//                wifiAccess.setWifiEnabled(true);      // Turns of access to the wifi
-//                wifiEnabled = wifiAccess.isWifiEnabled();      // Variable to check the status of the wifi
-//            }
+            while((!isDeviceOnline() || !wifiEnabled) && !isRunning(Amazon.class))     // Checks if the wifi is enabled
+            {
+                wifiAccess.setWifiEnabled(true);      // Turns of access to the wifi
+                wifiEnabled = wifiAccess.isWifiEnabled();      // Variable to check the status of the wifi
+            }
 
             if(!uploadToAWS && !isRunning(Amazon.class))      // If the update has not been run
             {
-//                startActivity(startAWSUpload);       // Starts an upload intent to aws
+                startActivity(startAWSUpload);       // Starts an upload intent to aws
                 uploadToAWS = true;       // Sets the variable to be true
             }
         }
@@ -547,11 +547,11 @@ public class MainActivity extends WearableActivity
         {
             uploadToAWS = false;      // Resets the variable
 
-//            while((isDeviceOnline() || wifiEnabled) && !isRunning(Amazon.class))     // Checks if the wifi is enabled
-//            {
-//                wifiAccess.setWifiEnabled(false);      // Turns of access to the wifi
-//                wifiEnabled = wifiAccess.isWifiEnabled();      // Variable to check the status of the wifi
-//            }
+            while((isDeviceOnline() || wifiEnabled) && !isRunning(Amazon.class))     // Checks if the wifi is enabled
+            {
+                wifiAccess.setWifiEnabled(false);      // Turns of access to the wifi
+                wifiEnabled = wifiAccess.isWifiEnabled();      // Variable to check the status of the wifi
+            }
 
             if (sleepAutomatically <= 0)     // Checks if the variable is below the limit
             {
