@@ -187,48 +187,18 @@ public class PainSurvey extends WearableActivity
 
         if (this.currentQuestion < questions.length)        // Checks to make sure there is still questions to be asked
         {
-//            if (this.currentQuestion == 0)       // Checks if the is the first question
-//            {
-//                this.next.setText(this.answers[0][0]);      // Sets the next button to be an answer choice
-//                this.back.setText(this.answers[0][1]);      // Sets the back button to be an answer choice
-//                this.answer.setVisibility(View.INVISIBLE);     // Removes the middle button option from the user
-//            }
             if (this.currentQuestion == 1)     // Checks the question
             {
-//                this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
-//                this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
-//                this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
-//                this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_blue));      // Implements the orange background
-                this.answer.setTextSize(50);        // Sets the text size
+                this.answer.setTextSize(40);        // Sets the text size
             }
-//            else if (this.currentQuestion == 5 || this.currentQuestion == 7)        // Checks the question location of the watch
-//            {
-//                if (this.role.equalsIgnoreCase("PT"))       // Checks the role of the watch
-//                {
-//                    this.next.setText(this.answers[questions.length-3][0]);     // Assigns a value for the next button
-//                    this.back.setText(this.answers[questions.length-3][1]);     // Assigns a value for the back button
-//                    this.answer.setVisibility(View.INVISIBLE);      // Removes the answer button
-//                }
-//                else if (this.role.equalsIgnoreCase("CG"))      // Checks the role of the watch
-//                {
-//                    this.next.setText(this.answers[questions.length-3][0]);     // Assigns a value to the next button
-//                    this.back.setText(this.answers[questions.length-3][1]);     // Assigns a value to the back button
-//                    this.answer.setText(this.answers[questions.length-3][2]);       // Assigns a value to the answer button
-//                    this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_orange));      // Implements the orange background
-//                }
-//            }
             else if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
             {
                 this.next.setText(this.getResources().getString(R.string.done_button));     // Sets the next button accordingly
-//                this.back.setText(this.answers[questions.length-1][1]);     // Sets the back button accordingly
-//                this.answer.setVisibility(View.INVISIBLE);      // Removes the middle answer button from view
             }
             else        // If this is just any other question
             {
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
-//                this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
-//                this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_blue));      // Implements the orange background
                 this.answer.setTextSize(18);        // Sets the text size
             }
 
@@ -239,27 +209,6 @@ public class PainSurvey extends WearableActivity
                 {
                     systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append(next.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
-
-//                    if (currentQuestion == 5)       // Checks for the question wanted
-//                    {
-//                        userResponses[currentQuestion] = next.getText().toString();     // Adds the data to be saved to an array list
-//                        logActivity();      // Calls the method to log the data
-//
-//                        userResponses[currentQuestion+1] = "**Skipped**";     // Adds the data to be saved to an array list
-//                        logActivity();      // Calls the method to log the data
-//
-//                        currentQuestion += 2;       // Skips a question not pertaining to the survey
-//                        deploySurvey();       // Calls the question system method
-//                    }
-//                    else if (currentQuestion == questions.length-1)      // Checks if this is the last question in the survey
-//                    {
-//                        userResponses[currentQuestion] = next.getText().toString();     // Adds the data to be saved to an array list
-//                        logActivity();      // Calls the method to log the data
-//
-//                        submitSurvey();     // Calls the method to run
-//                    }
-//                    else        // If none of the requirements are fulfilled
-//                    {
 
                     if (currentQuestion == 0)       // Checks if this is the first question
                     {
@@ -377,7 +326,7 @@ public class PainSurvey extends WearableActivity
                             deploySurvey();     // Calls the method on itself to move the question forward
                         }
                     }
-                    else        // If anything else
+                    else        // If it fails all the other checks
                     {
                         userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
                         userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
@@ -386,7 +335,6 @@ public class PainSurvey extends WearableActivity
                         currentQuestion++;      // Increments the current question position
                         deploySurvey();     // Calls the method on itself to move the question forward
                     }
-//                    }
                 }
             });
 
@@ -451,35 +399,10 @@ public class PainSurvey extends WearableActivity
                 public void onClick(View v)     // When the button is clicked
                 {
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
+                    systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Answer Choice Toggled Forward").append("\n");       // Logs to the system logs
 
-//                    if (currentQuestion == 5 || currentQuestion == 7)      // Checks if this is the third question
-//                    {
-//                        if (role.equalsIgnoreCase("CG"))        // Checks for the role of the device
-//                        {
-//                            systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append(answer.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
-//
-//                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
-//                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
-//                            logActivity();      // Calls the method to log the data
-//
-//                            currentQuestion += 2;       // Increments the questions two steps forward
-//                            deploySurvey();     // Calls the method on itself
-//                        }
-//                        else if (role.equalsIgnoreCase("PT"))       // Checks for the role of the device
-//                        {
-//                            systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Answer Choice Toggled Forward").append("\n");       // Logs to the system logs
-//
-//                            answersTapped += 1;         // Increments the tap on the answer by the specified amount
-//                            nextAnswer();        // Calls on the method to update the answer view
-//                        }
-//                    }
-//                    else        // If any other question
-//                    {
-                        systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Answer Choice Toggled Forward").append("\n");       // Logs to the system logs
-
-                        answersTapped += 1;         // Increments the tap on the answer by the specified amount
-                        nextAnswer();        // Calls on the method to update the answer view
-//                    }
+                    answersTapped += 1;         // Increments the tap on the answer by the specified amount
+                    nextAnswer();        // Calls on the method to update the answer view
                 }
             });
         }
