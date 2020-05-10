@@ -22,18 +22,18 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * This class is run when the automatic end of day ema is called to run. This has the ability to either start the survey,
- * snooze it for a specified amount of time, or dismiss the ema completely.
+ * This class is run when the second automatic end of day ema is called to run.
+ * This has the ability to either start the survey, or dismiss the ema completely.
  */
-public class EndOfDayPromptA2 extends WearableActivity
+public class EndOfDayPromptA3 extends WearableActivity
 {
     private SystemInformation systemInformation;        // Private link to the class
-    private DataLogger dataLogger, checkDate, checkSleep;      // Private initialization to the data logger
-    private Button proceed, snooze;     // Initializes a button
+    private DataLogger dataLogger, checkSleep;      // Private initialization to the data logger
+    private Button proceed;     // Initializes a button
     private String data;        // Sets up a string for data
     private TextView textView;      // Text view for the system
-    private Timer reminderTimer, snoozeTimer;       // Sets up the timer for the system
-    private Intent promptTwo;      // Sets up the intents for this class
+    private Timer reminderTimer;       // Sets up the timer for the system
+    private Intent endOfDay;      // Sets up the intents for this class
     private SharedPreferences sharedPreferences;        // Gets the shared preferences
     private Vibrator vibrator;      // Sets up the vibrator
     private Window window;      // Gets access to the window
@@ -64,11 +64,14 @@ public class EndOfDayPromptA2 extends WearableActivity
 
             this.vibrator.vibrate(this.activityStart);      // Vibrates the system
             this.proceed = findViewById(R.id.proceed);        // Sets the proceeding button
-            this.snooze = findViewById(R.id.snooze);        // Sets the snooze button
+            final Button snooze = findViewById(R.id.snooze);        // Sets the snooze button
+            snooze.setText(getResources().getString(R.string.dismiss_button));     // Sets the string to be that of the snooze button
+            snooze.setBackgroundColor(getResources().getColor(R.color.dark_red));      // Sets the color of the snooze button
+
             this.textView = findViewById(R.id.request);     // Sets the text view
             this.textView.setText(getString(R.string.endofday_request));      // Message to be shown on the screen
 
-            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 2" + "," + "Starting End of Day EMA prompt 2 Class";      // Sets up the data to be logged
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 3" + "," + "Starting End of Day EMA prompt 3 Class";      // Sets up the data to be logged
             this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
             this.dataLogger.saveData("log");        // Saves the data
 
@@ -82,7 +85,7 @@ public class EndOfDayPromptA2 extends WearableActivity
                 public void run() {
                     vibrator.vibrate(hapticLevel);       // Haptic feedback for the dismiss button
 
-                    data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 2" + "," + "Automatically snoozing EMA prompt";      // Sets up the data to be logged
+                    data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 3" + "," + "Automatically dismissing EMA prompt";      // Sets up the data to be logged
                     dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
                     dataLogger.saveData("log");        // Saves the data
 
@@ -102,18 +105,18 @@ public class EndOfDayPromptA2 extends WearableActivity
                 {
                     vibrator.vibrate(hapticLevel);       // Haptic feedback for the dismiss button
 
-                    data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 2" + "," + "Proceed button clicked";      // Sets up the data to be logged
+                    data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 3" + "," + "Proceed button clicked";      // Sets up the data to be logged
                     dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
                     dataLogger.saveData("log");        // Saves the data
 
-                    promptTwo = new Intent(getApplicationContext(), EndOfDaySurvey.class);       // Makes an intent to the estimote class
-                    startActivity(promptTwo);       // Calls to start the activity
+                    endOfDay = new Intent(getApplicationContext(), EndOfDaySurvey.class);       // Makes an intent to the estimote class
+                    startActivity(endOfDay);       // Calls to start the activity
 
                     finish();       // It stops the class and the buzzing
                 }
             });
 
-            this.snooze.setOnClickListener(new View.OnClickListener() // Waits for the button to be clicked.
+            snooze.setOnClickListener(new View.OnClickListener() // Waits for the button to be clicked.
             {
                 /**
                  * This is run when the button is clicked
@@ -125,35 +128,9 @@ public class EndOfDayPromptA2 extends WearableActivity
                 {
                     vibrator.vibrate(hapticLevel);       // Haptic feedback for the dismiss button
 
-                    data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 2" + "," + "Snooze button clicked";      // Sets up the data to be logged
+                    data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 3" + "," + "Snooze button clicked";      // Sets up the data to be logged
                     dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
                     dataLogger.saveData("log");        // Saves the data
-
-                    snoozeTimer = new Timer();       // Sets up the reminderTimer
-                    snoozeTimer.schedule(new TimerTask()         // Schedules the reminderTimer at a fixed rate
-                    {
-                        /**
-                         * The following is called to run
-                         */
-                        @Override
-                        public void run() {
-                            checkDate = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.eodmode), "Date");      // Sets a new datalogger variable
-                            if (!checkDate.readData().contains(systemInformation.getDateTime("yyyy/mm/dd")))        // Checks if there it was not completed
-                            {
-                                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 2" + "," + "Starting End of Day Prompt 3";      // Sets up the data to be logged
-                                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
-                                dataLogger.saveData("log");        // Saves the data
-
-                                promptTwo = new Intent(getApplicationContext(), EndOfDayPromptA3.class);       // Makes an intent to the estimote class
-                                startActivity(promptTwo);       // Calls to start the activity
-                            } else        // If completed
-                            {
-                                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 2" + "," + "Dismissed End of Day Prompt 2";      // Sets up the data to be logged
-                                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
-                                dataLogger.saveData("log");        // Saves the data
-                            }
-                        }
-                    }, Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("eod_automatic_snooze_time", ""))) * 60 * 1000);      // Repeats at the specified interval
 
                     systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_you));     // Gets the string and calls a toast on it
 
@@ -165,7 +142,7 @@ public class EndOfDayPromptA2 extends WearableActivity
         }
         else       // If it fails the first condition
         {
-            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 2" + "," + "Automatically Dismissed Survey";      // Sets up the data to be logged
+            this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 3" + "," + "Automatically Dismissed Survey";      // Sets up the data to be logged
             this.dataLogger = new DataLogger(getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), this.getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
             this.dataLogger.saveData("log");        // Saves the data
 
@@ -198,7 +175,8 @@ public class EndOfDayPromptA2 extends WearableActivity
         {
             // DO nothing
         }
-        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 2" + "," + "Cleaning up the Class";        // Sets data to be logged by system
+
+        this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + "," + "End of Day Prompt 3" + "," + "Cleaning up the Class";        // Sets data to be logged by system
         this.dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), this.data);      // Sets a new datalogger variable
         this.dataLogger.saveData("log");        // Saves the data
 
