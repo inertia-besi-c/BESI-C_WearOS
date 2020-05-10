@@ -354,33 +354,48 @@ public class PainSurvey extends WearableActivity
 
                         submitSurvey();     // Calls the method to run
                     }
-//                    else if (currentQuestion == 5)     // If the question position is fulfilled
-//                    {
-//                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
-//                        logActivity();      // Calls the method to log the data
-//
-//                        currentQuestion++;      // Increment the question
-//                        deploySurvey();     // Call the method on itself
-//                    }
-//                    else if (currentQuestion == 7)      // Checks the question
-//                    {
-//                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
-//                        logActivity();      // Calls the method to log the data
-//
-//                        userResponses[currentQuestion+1] = "**Skipped**";     // Adds the data to be saved to an array list
-//                        logActivity();      // Calls the method to log the data
-//
-//                        currentQuestion += 2;       // Skips a question not pertaining to the survey
-//                        deploySurvey();       // Calls the question system method
-//                    }
-//                    else if (currentQuestion == questions.length-1)     // If this is the last question
-//                    {
-//                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
-//                        logActivity();      // Calls the method to log the data
-//
-//                        currentQuestion = 0;        // Reset to the start of the survey
-//                        deploySurvey();     // Call the method on itself
-//                    }
+                    else if(currentQuestion == 7)       // Checks the question number
+                    {
+                        if(userResponses[currentQuestion-1].contentEquals("**Skipped**"))       // Checks if the question was skipped
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion -= 2;      // Decrements the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
+                        else        // If the previous question was not skipped
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion--;      // Decrements the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
+                    }
+                    else if (currentQuestion == questions.length-1)      // Checks if this is the last question in the survey
+                    {
+                        if(userResponses[currentQuestion-1].contentEquals("**Skipped**"))       // Checks if the question was skipped
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion -= 2;      // Decrements the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
+                        else        // If the previous question was not skipped
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion--;      // Decrements the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
+                    }
                     else        // If none of the requirements are fulfilled
                     {
                         userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
