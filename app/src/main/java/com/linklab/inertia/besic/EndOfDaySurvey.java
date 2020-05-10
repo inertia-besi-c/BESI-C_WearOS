@@ -206,9 +206,7 @@ public class EndOfDaySurvey extends WearableActivity
             }
             else if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
             {
-                this.next.setText(this.answers[questions.length-1][0]);     // Sets the next button accordingly
-                this.back.setText(this.answers[questions.length-1][1]);     // Sets the back button accordingly
-                this.answer.setVisibility(View.INVISIBLE);      // Removes the middle answer button from view
+                this.next.setText(this.getResources().getString(R.string.done_button));     // Sets the next button accordingly
             }
             else        // If this is just any other question
             {
@@ -228,10 +226,22 @@ public class EndOfDaySurvey extends WearableActivity
 
                     if (currentQuestion == questions.length-1)      // Checks if this is the last question in the survey
                     {
-                        userResponses[currentQuestion] = next.getText().toString();     // Adds the data to be saved to an array list
-                        logActivity();      // Calls the method to log the data
+                        if (answer.getText().toString().contentEquals(answers[currentQuestion][0]))         // Checks the answer choice
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            logActivity();      // Calls the method to log the data
 
-                        submitSurvey();     // Calls the method to run
+                            submitSurvey();     // Calls the method to run
+                        }
+                        else if (answer.getText().toString().contentEquals(answers[currentQuestion][1]))         // Checks the answer choice
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion = 0;      // Resets the current question location
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
                     }
                     else        // If none of the requirements are fulfilled
                     {
@@ -266,14 +276,6 @@ public class EndOfDaySurvey extends WearableActivity
                     {
                         userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
                         logActivity();      // Calls the method to log the data
-                    }
-                    else if (currentQuestion == questions.length-1)     // If this is the last question
-                    {
-                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
-                        logActivity();      // Calls the method to log the data
-
-                        currentQuestion = 0;        // Reset to the start of the survey
-                        deploySurvey();     // Call the method on itself
                     }
                     else        // If none of the requirements are fulfilled
                     {
