@@ -200,7 +200,7 @@ public class EndOfDaySurvey extends WearableActivity
             if (this.currentQuestion == 0)      // Checks if this is the first question
             {
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
-                this.back.setBackgroundColor(Color.GRAY);       // Grays out the color
+                this.back.setBackgroundColor(getResources().getColor(R.color.dark_gray));       // Grays out the color
                 this.back.setText(" ");      // Removes the back button text
                 this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
             }

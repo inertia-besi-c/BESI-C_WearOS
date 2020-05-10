@@ -4,33 +4,33 @@ package com.linklab.inertia.besic;
  * Imports needed by the system to function appropriately
  */
 import android.annotation.SuppressLint;
-import android.support.wearable.activity.WearableActivity;
-import android.content.SharedPreferences;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.content.Context;
-import android.os.Vibrator;
-import android.view.Window;
-import android.preference.PreferenceManager;
 import android.app.ActivityManager;
-import android.widget.TextView;
+import android.content.Context;
 import android.content.Intent;
-import android.widget.Button;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Vibrator;
+import android.preference.PreferenceManager;
+import android.support.wearable.activity.WearableActivity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.TimerTask;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Timer;
-import java.util.Date;
+import java.util.TimerTask;
 
 public class FollowupSurvey extends WearableActivity
 {
@@ -194,8 +194,16 @@ public class FollowupSurvey extends WearableActivity
 
         if (this.currentQuestion < questions.length)        // Checks to make sure there is still questions to be asked
         {
-            if (this.currentQuestion == 1)     // Checks the question
+            if (this.currentQuestion == 0)      // Checks if this is the first question
             {
+                this.back.setBackgroundColor(getResources().getColor(R.color.dark_gray));       // Grays out the color
+                this.back.setText(" ");      // Removes the back button text
+                this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
+            }
+            else if (this.currentQuestion == 1)     // Checks the question
+            {
+                this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
+                this.back.setBackgroundColor(getResources().getColor(R.color.dark_red));       // Grays out the color
                 this.answer.setTextSize(40);        // Sets the text size
             }
             else if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
@@ -206,64 +214,9 @@ public class FollowupSurvey extends WearableActivity
             {
                 this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
                 this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
+                this.back.setBackgroundColor(getResources().getColor(R.color.dark_red));       // Grays out the color
                 this.answer.setTextSize(18);        // Sets the text size
             }
-//            if (this.currentQuestion == 0)       // Checks if the is the first question
-//            {
-//                if (this.role.equalsIgnoreCase("CG"))       // Checks the role of the watch
-//                {
-//                    this.next.setText(this.answers[0][0]);      // Sets the next button to be an answer choice
-//                    this.back.setText(this.answers[0][1]);      // Sets the back button to be an answer choice
-//                    this.answer.setText(this.answers[0][2]);       // Assigns a value to the answer button
-//                    this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_orange));      // Implements the orange background
-//                    this.answer.setTextSize(18);        // Sets the text size
-//                }
-//                else if (this.role.equalsIgnoreCase("PT"))      // Checks the role of the watch
-//                {
-//                    this.next.setText(this.answers[questions.length-3][0]);     // Assigns a value to the next button
-//                    this.back.setText(this.answers[questions.length-3][1]);     // Assigns a value to the back button
-//                    this.answer.setVisibility(View.INVISIBLE);     // Removes the middle button option from the user
-//                    this.answer.setTextSize(18);        // Sets the text size
-//                }
-//            }
-//            else if (this.currentQuestion == 1)     // Checks the question
-//            {
-//                this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
-//                this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
-//                this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
-//                this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_blue));      // Implements the orange background
-//                this.answer.setTextSize(50);        // Sets the text size
-//            }
-//            else if (this.currentQuestion == 5 || this.currentQuestion == 7)        // Checks the question location of the watch
-//            {
-//                if (this.role.equalsIgnoreCase("PT"))       // Checks the role of the watch
-//                {
-//                    this.next.setText(this.answers[questions.length-3][0]);     // Assigns a value for the next button
-//                    this.back.setText(this.answers[questions.length-3][1]);     // Assigns a value for the back button
-//                    this.answer.setVisibility(View.INVISIBLE);      // Removes the answer button
-//                }
-//                else if (this.role.equalsIgnoreCase("CG"))      // Checks the role of the watch
-//                {
-//                    this.next.setText(this.answers[questions.length-3][0]);     // Assigns a value to the next button
-//                    this.back.setText(this.answers[questions.length-3][1]);     // Assigns a value to the back button
-//                    this.answer.setText(this.answers[questions.length-3][2]);       // Assigns a value to the answer button
-//                    this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_orange));      // Implements the orange background
-//                }
-//            }
-//            else if (this.currentQuestion == questions.length-1)        //  Checks to see if the question is the last question
-//            {
-//                this.next.setText(this.answers[questions.length-1][0]);     // Sets the next button accordingly
-//                this.back.setText(this.answers[questions.length-1][1]);     // Sets the back button accordingly
-//                this.answer.setVisibility(View.INVISIBLE);      // Removes the middle answer button from view
-//            }
-//            else        // If this is just any other question
-//            {
-//                this.next.setText(getResources().getString(R.string.next_button));      // Sets the next text back to the original value
-//                this.back.setText(getResources().getString(R.string.back_button));      // Sets the back text to the original value
-//                this.answer.setVisibility(View.VISIBLE);        // Makes the answer button visible
-//                this.answer.setBackgroundColor(this.getResources().getColor(R.color.dark_blue));      // Implements the orange background
-//                this.answer.setTextSize(18);        // Sets the text size
-//            }
 
             this.next.setOnClickListener(new View.OnClickListener()         // Listens for the button to be clicked
             {
@@ -421,39 +374,65 @@ public class FollowupSurvey extends WearableActivity
                     systemLogs.append(getEstablishedTime()).append(",").append("Followup Survey").append(",").append(back.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
-                    if (currentQuestion == 0)      // Checks if this is the last question in the survey
+                    if (currentQuestion == 0)       // If this is the first question in the survey
                     {
                         userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
+                        userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
                         logActivity();      // Calls the method to log the data
-
-                        submitSurvey();     // Calls the method to run
                     }
-                    else if (currentQuestion == 5)     // If the question position is fulfilled
+                    else if (currentQuestion == 2)      // Checks for the question level
                     {
-                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
-                        logActivity();      // Calls the method to log the data
+                        if(userResponses[currentQuestion-1].contentEquals("**Skipped**"))       // Checks if the question was skipped
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
 
-                        currentQuestion++;      // Increment the question
-                        deploySurvey();     // Call the method on itself
+                            currentQuestion -= 2;      // Decrements the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
                     }
-                    else if (currentQuestion == 7)      // Checks the question
+                    else if(currentQuestion == 7)       // Checks the question number
                     {
-                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
-                        logActivity();      // Calls the method to log the data
+                        if(userResponses[currentQuestion-1].contentEquals("**Skipped**"))       // Checks if the question was skipped
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
 
-                        userResponses[currentQuestion+1] = "**Skipped**";     // Adds the data to be saved to an array list
-                        logActivity();      // Calls the method to log the data
+                            currentQuestion -= 2;      // Decrements the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
+                        else        // If the previous question was not skipped
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
 
-                        currentQuestion += 2;       // Skips a question not pertaining to the survey
-                        deploySurvey();       // Calls the question system method
+                            currentQuestion--;      // Decrements the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
                     }
-                    else if (currentQuestion == questions.length-1)     // If this is the last question
+                    else if (currentQuestion == questions.length-1)      // Checks if this is the last question in the survey
                     {
-                        userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
-                        logActivity();      // Calls the method to log the data
+                        if(userResponses[currentQuestion-1].contentEquals("**Skipped**"))       // Checks if the question was skipped
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
 
-                        currentQuestion = 0;        // Reset to the start of the survey
-                        deploySurvey();     // Call the method on itself
+                            currentQuestion -= 2;      // Decrements the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
+                        else        // If the previous question was not skipped
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion--;      // Decrements the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
                     }
                     else        // If none of the requirements are fulfilled
                     {
