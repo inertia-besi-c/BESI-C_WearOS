@@ -261,31 +261,59 @@ public class PainSurvey extends WearableActivity
 //                    else        // If none of the requirements are fulfilled
 //                    {
 
-                        if (currentQuestion == 0)       // Checks if this is the first question
+                    if (currentQuestion == 0)       // Checks if this is the first question
+                    {
+                        if (answer.getText().toString().contentEquals(answers[currentQuestion][0]))         // Checks the answer choice
                         {
-                            if (answer.getText().toString().contentEquals(answers[currentQuestion][0]))         // Checks the answer choice
-                            {
-                                runServices();      // Calls the method to run some services
+                            runServices();      // Calls the method to run some services
 
-                                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Started HeartRate and Estimote Class";       // Data to be logged by the system
-                                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
-                                dataLogger.saveData("log");      // Saves the data in the mode specified
-                            }
-                            else if (answer.getText().toString().contentEquals(answers[currentQuestion][1]))         // Checks the answer choice
-                            {
-                                userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
-                                logActivity();      // Calls the method to log the data
+                            data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Pain Survey" + (",") + "Started HeartRate and Estimote Class";       // Data to be logged by the system
+                            dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.sensors), data);      // Sets a new datalogger variable
+                            dataLogger.saveData("log");      // Saves the data in the mode specified
 
-                                submitSurvey();     // Calls the method to run
-                            }
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion++;      // Increments the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
                         }
+                        else if (answer.getText().toString().contentEquals(answers[currentQuestion][1]))         // Checks the answer choice
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            logActivity();      // Calls the method to log the data
 
+                            submitSurvey();     // Calls the method to run
+                        }
+                    }
+                    else if (currentQuestion == questions.length-1)      // Checks if this is the last question in the survey
+                    {
+                        if (answer.getText().toString().contentEquals(answers[currentQuestion][0]))         // Checks the answer choice
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            logActivity();      // Calls the method to log the data
+
+                            submitSurvey();     // Calls the method to run
+                        }
+                        else if (answer.getText().toString().contentEquals(answers[currentQuestion][1]))         // Checks the answer choice
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion = 0;      // Resets the current question location
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
+                    }
+                    else        // If anything else
+                    {
                         userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
                         userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
                         logActivity();      // Calls the method to log the data
 
                         currentQuestion++;      // Increments the current question position
                         deploySurvey();     // Calls the method on itself to move the question forward
+                    }
 //                    }
                 }
             });
@@ -334,12 +362,12 @@ public class PainSurvey extends WearableActivity
 //                    }
 //                    else        // If none of the requirements are fulfilled
 //                    {
-                        userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
-                        userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
-                        logActivity();      // Calls the method to log the data
+                    userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                    userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                    logActivity();      // Calls the method to log the data
 
-                        currentQuestion--;      // Decrements the current question position
-                        deploySurvey();     // Calls the method on itself to move the question forward
+                    currentQuestion--;      // Decrements the current question position
+                    deploySurvey();     // Calls the method on itself to move the question forward
 //                    }
                 }
             });
