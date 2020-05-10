@@ -286,6 +286,78 @@ public class PainSurvey extends WearableActivity
                             submitSurvey();     // Calls the method to run
                         }
                     }
+                    else if (currentQuestion == 5)      // Checks the question location
+                    {
+                        if (answer.getText().toString().contentEquals(answers[currentQuestion][0]))         // Checks the answer choice
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            userResponses[currentQuestion+1] = "**Skipped**";     // Adds the data to be saved to an array list
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion += 2;       // Skips a question not pertaining to the survey
+                            deploySurvey();       // Calls the question system method
+                        }
+                        else if (answer.getText().toString().contentEquals(answers[currentQuestion][1]))         // Checks the answer choice
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion++;      // Increments the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
+                        else if (answer.getText().toString().contentEquals(answers[currentQuestion][2]))         // Checks the answer choice
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            userResponses[currentQuestion+1] = "**Skipped**";     // Adds the data to be saved to an array list
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion += 2;       // Skips a question not pertaining to the survey
+                            deploySurvey();       // Calls the question system method
+                        }
+                    }
+                    else if (currentQuestion == 7)      // Checks the question location
+                    {
+                        if (answer.getText().toString().contentEquals(answers[currentQuestion][0]))         // Checks the answer choice
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion++;      // Increments the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
+                        else if (answer.getText().toString().contentEquals(answers[currentQuestion][1]))         // Checks the answer choice
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            userResponses[currentQuestion+1] = "**Skipped**";     // Adds the data to be saved to an array list
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion += 2;       // Skips a question not pertaining to the survey
+                            deploySurvey();       // Calls the question system method
+                        }
+                        else if (answer.getText().toString().contentEquals(answers[currentQuestion][2]))         // Checks the answer choice
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            userResponses[currentQuestion+1] = "**Skipped**";     // Adds the data to be saved to an array list
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion += 2;       // Skips a question not pertaining to the survey
+                            deploySurvey();       // Calls the question system method
+                        }
+                    }
                     else if (currentQuestion == questions.length-1)      // Checks if this is the last question in the survey
                     {
                         if (answer.getText().toString().contentEquals(answers[currentQuestion][0]))         // Checks the answer choice
@@ -329,6 +401,7 @@ public class PainSurvey extends WearableActivity
                     if (currentQuestion == 0)      // Checks if this is the last question in the survey
                     {
                         userResponses[currentQuestion] = back.getText().toString();     // Adds the data to be saved to an array list
+                        userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
                         logActivity();      // Calls the method to log the data
 
                         submitSurvey();     // Calls the method to run
@@ -360,15 +433,15 @@ public class PainSurvey extends WearableActivity
 //                        currentQuestion = 0;        // Reset to the start of the survey
 //                        deploySurvey();     // Call the method on itself
 //                    }
-//                    else        // If none of the requirements are fulfilled
-//                    {
-                    userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
-                    userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
-                    logActivity();      // Calls the method to log the data
+                    else        // If none of the requirements are fulfilled
+                    {
+                        userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                        userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                        logActivity();      // Calls the method to log the data
 
-                    currentQuestion--;      // Decrements the current question position
-                    deploySurvey();     // Calls the method on itself to move the question forward
-//                    }
+                        currentQuestion--;      // Decrements the current question position
+                        deploySurvey();     // Calls the method on itself to move the question forward
+                    }
                 }
             });
 
@@ -379,34 +452,34 @@ public class PainSurvey extends WearableActivity
                 {
                     vibrator.vibrate(hapticLevel);      // Vibrates the system for the desired time
 
-                    if (currentQuestion == 5 || currentQuestion == 7)      // Checks if this is the third question
-                    {
-                        if (role.equalsIgnoreCase("CG"))        // Checks for the role of the device
-                        {
-                            systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append(answer.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
-
-                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
-                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
-                            logActivity();      // Calls the method to log the data
-
-                            currentQuestion += 2;       // Increments the questions two steps forward
-                            deploySurvey();     // Calls the method on itself
-                        }
-                        else if (role.equalsIgnoreCase("PT"))       // Checks for the role of the device
-                        {
-                            systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Answer Choice Toggled Forward").append("\n");       // Logs to the system logs
-
-                            answersTapped += 1;         // Increments the tap on the answer by the specified amount
-                            nextAnswer();        // Calls on the method to update the answer view
-                        }
-                    }
-                    else        // If any other question
-                    {
+//                    if (currentQuestion == 5 || currentQuestion == 7)      // Checks if this is the third question
+//                    {
+//                        if (role.equalsIgnoreCase("CG"))        // Checks for the role of the device
+//                        {
+//                            systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append(answer.getText().toString()).append(" is clicked").append("\n");       // Logs to the system logs
+//
+//                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+//                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+//                            logActivity();      // Calls the method to log the data
+//
+//                            currentQuestion += 2;       // Increments the questions two steps forward
+//                            deploySurvey();     // Calls the method on itself
+//                        }
+//                        else if (role.equalsIgnoreCase("PT"))       // Checks for the role of the device
+//                        {
+//                            systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Answer Choice Toggled Forward").append("\n");       // Logs to the system logs
+//
+//                            answersTapped += 1;         // Increments the tap on the answer by the specified amount
+//                            nextAnswer();        // Calls on the method to update the answer view
+//                        }
+//                    }
+//                    else        // If any other question
+//                    {
                         systemLogs.append(getEstablishedTime()).append(",").append("Pain Survey").append(",").append("Answer Choice Toggled Forward").append("\n");       // Logs to the system logs
 
                         answersTapped += 1;         // Increments the tap on the answer by the specified amount
                         nextAnswer();        // Calls on the method to update the answer view
-                    }
+//                    }
                 }
             });
         }
