@@ -54,8 +54,8 @@ public class EndOfDayPromptA1 extends WearableActivity
         {
             this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Sets the vibrator service.
 
-            this.activityStart = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;       // Sets up the vibration level of the system for haptic feedback
-            this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
+            this.activityStart = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;       // Sets up the vibration level of the system for haptic feedback
+            this.hapticLevel = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
 
             this.unlockScreen();     // Unlocks the screen
 
@@ -88,7 +88,7 @@ public class EndOfDayPromptA1 extends WearableActivity
 
                     snooze.performClick();     // Automatically snoozes the question
                 }
-            }, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_remind_interval", ""))) * 1000);      // Repeats at the specified interval
+            }, Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_remind_interval", ""))) * 1000);      // Repeats at the specified interval
 
             this.proceed.setOnClickListener(new View.OnClickListener()      // Waits for the button to be clicked.
             {
@@ -153,7 +153,7 @@ public class EndOfDayPromptA1 extends WearableActivity
                                 dataLogger.saveData("log");        // Saves the data
                             }
                         }
-                    }, Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("eod_automatic_snooze_time", ""))) * 60 * 1000);      // Repeats at the specified interval
+                    }, Integer.parseInt(Objects.requireNonNull(sharedPreferences.getString("eod_automatic_snooze_time", ""))) * 60 * 1000);      // Repeats at the specified interval
 
                     systemInformation.toast(getApplicationContext(), getResources().getString(R.string.thank_you));     // Gets the string and calls a toast on it
 
