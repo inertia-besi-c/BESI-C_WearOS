@@ -48,8 +48,8 @@ public class Battery extends WearableActivity
         {
             this.vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);      // Sets the vibrator service.
 
-            this.activityStart = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_buzz", ""))) * 1000;       // Sets up the vibration level of the system for haptic feedback
-            this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
+            this.activityStart = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_buzz", ""))) * 1000;       // Sets up the vibration level of the system for haptic feedback
+            this.hapticLevel = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
 
             this.unlockScreen();     // Unlocks the screen
 

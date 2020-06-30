@@ -107,10 +107,10 @@ public class MainActivity extends WearableActivity
         this.preferenceKeys = this.sharedPreferences.getAll();      // Saves all the key values into a map
         this.minuteTimeTick.addAction(Intent.ACTION_TIME_TICK);       // Initializes the filter to be tied to the time tick
 
-        this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "20")));       // Gets the haptic  level preference
-        this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "45")));     // Gets the sleep level max number
-        this.lowBatteryThreshHold = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_alert", "15")));     // Gets the low battery thresh hold
-        this.lowBatteryTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10")));        // Sets up a timer
+        this.hapticLevel = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "20")));       // Gets the haptic  level preference
+        this.sleepAutomatically = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "45")));     // Gets the sleep level max number
+        this.lowBatteryThreshHold = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("low_battery_alert", "15")));     // Gets the low battery thresh hold
+        this.lowBatteryTime = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10")));        // Sets up a timer
         this.directory = new File(Environment.getExternalStorageDirectory() + "/" + this.sharedPreferences.getString("directory_key", getResources().getString(R.string.app_name_abbreviated)));     // Makes a reference to a directory
         this.checkSteps = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.steps), "no");      // Sets a new datalogger variable
         this.checkSleep = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_information), getResources().getString(R.string.sleepmode), "false");      // Sets a new datalogger variable
@@ -354,19 +354,19 @@ public class MainActivity extends WearableActivity
      */
     private void setUpLowBattery()
     {
-        this.startHour = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "00")));     // Gets the start hour from preferences
-        this.startMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "00")));     // Gets the start minute from preferences
-        this.startSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "00")));     // Gets the start second from preferences
+        this.startHour = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "00")));     // Gets the start hour from preferences
+        this.startMinute = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "00")));     // Gets the start minute from preferences
+        this.startSecond = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_start", "00")));     // Gets the start second from preferences
         this.endHour = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "07")));         // Gets the end hour from preferences
-        this.endMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "59")));     // Gets the end minute from preferences
-        this.endSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "59")));     // Gets the end second from preferences
+        this.endMinute = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "59")));     // Gets the end minute from preferences
+        this.endSecond = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("battery_hour_alert_end", "59")));     // Gets the end second from preferences
 
         this.runLowBattery = this.systemInformation.isTimeBetweenTimes(this.systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
         this.lowBatteryTime--;      // Decrements the time
 
         if(this.systemInformation.getBatteryLevel(this.getApplicationContext()) <= this.lowBatteryThreshHold && !this.runLowBattery  && this.lowBatteryTime < 0 && !this.isRunning(Battery.class) && !this.systemInformation.isCharging(this.getApplicationContext()))        // Checks if the battery level is lower than expected
         {
-            this.lowBatteryTime = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10")));        // Sets up a timer
+            this.lowBatteryTime = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("battery_remind", "10")));        // Sets up a timer
             this.data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Main Activity" + (",") + "Starting Low Battery Notification";       // Data to be logged by the system
             this.dataLogger = new DataLogger(this.getApplicationContext(), getResources().getString(R.string.subdirectory_logs), getResources().getString(R.string.system), data);      // Sets a new datalogger variable
             this.dataLogger.saveData("log");      // Saves the data in the mode specified
@@ -401,7 +401,7 @@ public class MainActivity extends WearableActivity
 
                 if(!this.isRunning(SensorTimer.class))       // Checks if the class is not running
                     this.startService(this.startSensors);     // Calls to start the service class
-                this.sleepAutomatically = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));     // Resets the value
+                this.sleepAutomatically = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("sleepmode_setup", "")));     // Resets the value
 
                 this.sleepMode = false;       // Explicitly sets the sleepmode to be false
             }
@@ -447,16 +447,16 @@ public class MainActivity extends WearableActivity
     private void setUpEODEMAButton()
     {
         this.calendar = Calendar.getInstance();     // Makes an instance of the calendar
-        this.calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_hour", "20"))));     // Assigns the hour
-        this.calendar.set(Calendar.MINUTE, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_minute", "00"))));        // Assigns the minute
-        this.calendar.set(Calendar.SECOND, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_second", "00"))));        // Assigns the seconds
+        this.calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_hour", "20"))));     // Assigns the hour
+        this.calendar.set(Calendar.MINUTE, Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_minute", "00"))));        // Assigns the minute
+        this.calendar.set(Calendar.SECOND, Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_automatic_start_second", "00"))));        // Assigns the seconds
 
-        this.startHour = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_hour", "17")));     // Gets the start hour from preferences
-        this.startMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_minute", "00")));     // Gets the start minute from preferences
-        this.startSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_second", "00")));     // Gets the start second from preferences
+        this.startHour = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_hour", "17")));     // Gets the start hour from preferences
+        this.startMinute = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_minute", "00")));     // Gets the start minute from preferences
+        this.startSecond = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_start_second", "00")));     // Gets the start second from preferences
         this.endHour = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_hour", "23")));         // Gets the end hour from preferences
-        this.endMinute = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_minute", "59")));     // Gets the end minute from preferences
-        this.endSecond = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_second", "59")));     // Gets the end second from preferences
+        this.endMinute = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_minute", "59")));     // Gets the end minute from preferences
+        this.endSecond = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_manual_end_second", "59")));     // Gets the end second from preferences
 
         this.runEODEMAButton = this.systemInformation.isTimeBetweenTimes(this.systemInformation.getDateTime("HH:mm:ss"), startHour, endHour, startMinute, endMinute, startSecond, endSecond);     // Calls the deciding method
         this.startAutomaticEMA = this.calendar.getTimeInMillis();       // Gets the time in milliseconds for the calendar time
@@ -571,7 +571,7 @@ public class MainActivity extends WearableActivity
 
             if (checkSteps.readData().contains("yes"))        // If it contains anything else
             {
-                sleepAutomatically = Integer.valueOf(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "45")));       // Resets the variable
+                sleepAutomatically = Integer.parseInt(Objects.requireNonNull(sharedPreferences.getString("sleepmode_setup", "45")));       // Resets the variable
                 sleepMode = true;       // Sets the value to be true
                 sleepSettings(false);        // Calls the sleep setting
             }

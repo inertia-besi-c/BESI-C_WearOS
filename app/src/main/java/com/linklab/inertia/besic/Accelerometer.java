@@ -90,7 +90,7 @@ public class Accelerometer extends SensorTimer implements SensorEventListener
         stringBuilder1.append(accelerometerValues);      // Appends the values to the string builder
         stringBuilder1.append("\n");     // Makes a new line
 
-        if ((this.stringBuilder1 != null) && (this.currentCount >= Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("accelerometer_data_limit", "")))))      // Checks if the conditions are met
+        if ((this.stringBuilder1 != null) && (this.currentCount >= Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("accelerometer_data_limit", "")))))      // Checks if the conditions are met
         {
             this.stringBuilder2.append(this.stringBuilder1);        // Appends all the values of the string builder to another
             this.stringBuilder1.setLength(0);       // Resets the string builder

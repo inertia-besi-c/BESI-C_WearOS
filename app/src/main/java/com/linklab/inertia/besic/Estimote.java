@@ -58,7 +58,7 @@ public class Estimote extends SensorTimer
             {
                 stopSelf();     // Kills the service
             }
-        }, Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("estimote_duration", ""))) * 1000);      // Repeats at the specified interval
+        }, Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("estimote_duration", ""))) * 1000);      // Repeats at the specified interval
 
         startRanging();     // Calls the method to start running
 

@@ -72,9 +72,13 @@ public class EndOfDaySurvey extends WearableActivity
                     "Where did you spend most time?",
                     "Time spent with the patient?",
                     "Time spent with other people?",
-                    "How was your sleep?",
-                    "How much did patient's pain bother you?",
+                    "How was your sleep quality?",
+                    "How much did you sleep?",
                     "How was your mood?",
+                    "How was your appetite?",
+                    "How tired were you?",
+                    "How much did patient's pain bother you?",
+                    "How much did pain bother the patient?",
                     "How distressed were you overall?",
                     "How distressed was the patient overall?",
                     "Ready to submit your answers?",
@@ -87,9 +91,13 @@ public class EndOfDaySurvey extends WearableActivity
                     {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
                     {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
                     {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
-                    {"Poor", "Fair", "Good", "Very Good"},
+                    {"Less than 2 Hours", "3-6 Hours", "7-10 Hours", "More than 10 Hours"},
                     {"Not at all", "A little", "Medium", "A lot"},
                     {"Poor", "Fair", "Good", "Very Good"},
+                    {"Poor", "Fair", "Good", "Very Good"},
+                    {"Not at all", "A little", "Medium", "A lot"},
+                    {"Not at all", "A little", "Medium", "A lot"},
+                    {"Not at all", "A little", "Medium", "A lot", "Unsure"},
                     {"Not at all", "A little", "Fairly", "Very"},
                     {"Not at all", "A little", "Fairly", "Very", "Unsure"},
                     {"Yes", "No"},
@@ -103,9 +111,13 @@ public class EndOfDaySurvey extends WearableActivity
                     "Where did you spend most time?",
                     "Time spent with the caregiver?",
                     "Time spent with other people?",
-                    "How was your sleep?",
-                    "How much did pain bother you?",
+                    "How was your sleep quality?",
+                    "How much did you sleep?",
                     "How was your mood?",
+                    "How was your appetite?",
+                    "How tired were you?",
+                    "How much did pain bother you overall?",
+                    "How much did pain bother the caregiver overall?",
                     "How distressed were you overall?",
                     "How distressed was the caregiver overall?",
                     "Ready to submit your answers?",
@@ -121,6 +133,10 @@ public class EndOfDaySurvey extends WearableActivity
                     {"Poor", "Fair", "Good", "Very Good"},
                     {"Not at all", "A little", "Medium", "A lot"},
                     {"Poor", "Fair", "Good", "Very Good"},
+                    {"Poor", "Fair", "Good", "Very Good"},
+                    {"Not at all", "A little", "Medium", "A lot"},
+                    {"Not at all", "A little", "Medium", "A lot"},
+                    {"Not at all", "A little", "Fairly", "Very", "Unsure"},
                     {"Not at all", "A little", "Fairly", "Very"},
                     {"Not at all", "A little", "Fairly", "Very", "Unsure"},
                     {"Yes", "No"},
@@ -161,12 +177,12 @@ public class EndOfDaySurvey extends WearableActivity
         this.answer = findViewById(R.id.responses);        // Gets a reference to the answer button
         this.question = findViewById(R.id.request);        // Gets a reference to the question text view
 
-        this.hapticLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
-        this.activityStartLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;      // Alert for starting the activity
-        this.activityRemindLevel = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("activity_remind", ""))) * 1000;      // Alert for starting the activity
-        this.emaReminderInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_remind_interval", ""))) * 1000;       // Alert to continue survey initialized
-        this.emaDelayInterval = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_remind", ""))) * 1000;       // Amount to offset reminder alert by
-        this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_remind_max", "")));        // Maximum reminders allowed for the survey
+        this.hapticLevel = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("haptic_level", "")));       // Sets up the vibration level of the system for haptic feedback
+        this.activityStartLevel = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("activity_start", ""))) * 1000;      // Alert for starting the activity
+        this.activityRemindLevel = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("activity_remind", ""))) * 1000;      // Alert for starting the activity
+        this.emaReminderInterval = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_remind_interval", ""))) * 1000;       // Alert to continue survey initialized
+        this.emaDelayInterval = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_remind", ""))) * 1000;       // Amount to offset reminder alert by
+        this.maxReminder = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_remind_max", "")));        // Maximum reminders allowed for the survey
 
         this.vibrator.vibrate(this.activityStartLevel);     // Vibrates the watch to signify the start of an activity
         this.scheduleReminderTimer();       // Calls the method to schedule the timer for the survey
@@ -190,7 +206,7 @@ public class EndOfDaySurvey extends WearableActivity
         this.question.setText(this.questions[this.currentQuestion]);     // Sets the question to be asked to be the current question position
         this.answersTapped = this.userResponseIndex[this.currentQuestion];      // Sets up the index of the answer tapped to be the response index of the current question
         this.responses.clear();     // Cleats the array list of any values in it
-        this.maxReminder = Integer.valueOf(Objects.requireNonNull(this.sharedPreferences.getString("eod_remind_max", "")));        // Maximum reminders allowed for the survey
+        this.maxReminder = Integer.parseInt(Objects.requireNonNull(this.sharedPreferences.getString("eod_remind_max", "")));        // Maximum reminders allowed for the survey
 
         Collections.addAll(this.responses, this.answers[this.currentQuestion]);     // Calls on the collections object to add all the values in the array list so it can remember them
         this.nextAnswer();      // Calls on the method to update the answer view
@@ -379,6 +395,7 @@ public class EndOfDaySurvey extends WearableActivity
     {
         this.role = this.sharedPreferences.getString("user_info", "");      // Sets the role of the device based on the preferences setting
 
+        assert this.role != null;       // Makes sure that the role is not null
         if(this.role.equalsIgnoreCase("PT"))        // Checks the role value against a patient identifier
         {
             this.systemLogs.append(this.getEstablishedTime()).append(",").append("End of Day Survey").append(",").append("Device is set as Patient").append("\n");       // Logs to the system logs
