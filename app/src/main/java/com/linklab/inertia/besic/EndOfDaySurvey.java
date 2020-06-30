@@ -91,7 +91,7 @@ public class EndOfDaySurvey extends WearableActivity
                     {"Living Room", "Bedroom", "Kitchen", "Outside the home", "Other"},
                     {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
                     {"None", "Minutes to 1 Hr", "1-4 Hrs", "More than 4 Hrs"},
-                    {"Poor", "Fair", "Good", "Very Good"},
+                    {"Less than 2 Hours", "3-6 Hours", "7-10 Hours", "More than 10 Hours"},
                     {"Not at all", "A little", "Medium", "A lot"},
                     {"Poor", "Fair", "Good", "Very Good"},
                     {"Poor", "Fair", "Good", "Very Good"},

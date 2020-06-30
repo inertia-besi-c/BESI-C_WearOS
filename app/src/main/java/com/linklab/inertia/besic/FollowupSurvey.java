@@ -391,6 +391,15 @@ public class FollowupSurvey extends WearableActivity
                             currentQuestion -= 2;      // Decrements the current question position
                             deploySurvey();     // Calls the method on itself to move the question forward
                         }
+                        else        // If the previous question was not skipped
+                        {
+                            userResponses[currentQuestion] = answer.getText().toString();     // Adds the data to be saved to an array list
+                            userResponseIndex[currentQuestion] = nextAnswer();      // Sets up the index so that it can always remember the answer
+                            logActivity();      // Calls the method to log the data
+
+                            currentQuestion--;      // Decrements the current question position
+                            deploySurvey();     // Calls the method on itself to move the question forward
+                        }
                     }
                     else if(currentQuestion == 7)       // Checks the question number
                     {
