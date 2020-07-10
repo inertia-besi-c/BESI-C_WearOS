@@ -6,8 +6,8 @@ android {
         applicationId "com.linklab.inertia.besic"
         minSdkVersion 25
         targetSdkVersion 29
-        versionCode 3
-        versionName "2.0.0"
+        versionCode 4
+        versionName "2.0.1"
     }
     buildTypes {
         release {
