@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.linklab.inertia.besic"
         minSdkVersion 25
-        targetSdkVersion 29
-        versionCode 4
-        versionName "2.0.1"
+        targetSdkVersion 30
+        versionCode 5
+        versionName "2.0.2"
     }
     buildTypes {
         release {
@@ -20,8 +20,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //noinspection GradleCompatible
-    implementation 'com.google.android.support:wearable:2.5.0'
-    compileOnly 'com.google.android.wearable:wearable:2.5.0'
+    implementation 'com.google.android.support:wearable:2.7.0'
+    compileOnly 'com.google.android.wearable:wearable:2.7.0'
     implementation 'com.google.android.gms:play-services-wearable:17.0.0'
     implementation 'androidx.percentlayout:percentlayout:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
@@ -36,3 +36,4 @@ dependencies {
     implementation 'com.amazonaws:aws-android-sdk-ddb:2.15.2'
     implementation 'com.amazonaws:aws-android-sdk-mobile-client:2.16.8'
 }
+
