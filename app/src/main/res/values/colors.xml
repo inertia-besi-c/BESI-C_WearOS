@@ -1,9 +1,9 @@
 <!--This file holds all the non android resource color references used in this application -->
 <resources>
-    <color name="dark_red">#FFFF0000</color>      <!--This is the dark red color in terms of this application-->
-    <color name="dark_blue">#FF0000FF</color>      <!--This is the dark blue color in terms of this application-->
-    <color name="dark_orange">#FF9800</color>            <!--This is the dark orange color in terms of this application-->
-    <color name="dark_gray">#FF888888</color>           <!--This is the dark gray button in terms of this application-->
-    <color name="dark_green">#FF00FF00</color>          <!--This is the dark green button in terms of this application-->
+    <color name="dark_red">#A00000</color>      <!--This is the dark red color in terms of this application-->
+    <color name="dark_blue">#0000BA</color>      <!--This is the dark blue color in terms of this application-->
+    <color name="dark_orange">#B56C00</color>            <!--This is the dark orange color in terms of this application-->
+    <color name="dark_gray">#626262</color>           <!--This is the dark gray button in terms of this application-->
+    <color name="dark_green">#007100</color>          <!--This is the dark green button in terms of this application-->
     <color name="ambient_mode_text">#ffffffff</color>      <!--This is the ambient mode color in terms of this application-->
 </resources>
