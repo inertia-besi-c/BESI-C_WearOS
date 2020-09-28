@@ -6,8 +6,8 @@ android {
         applicationId "com.linklab.inertia.besic"
         minSdkVersion 25
         targetSdkVersion 30
-        versionCode 7
-        versionName "2.0.4"
+        versionCode 8
+        versionName "2.0.6"
     }
     buildTypes {
         release {
@@ -20,8 +20,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //noinspection GradleCompatible
-    implementation 'com.google.android.support:wearable:2.7.0'
-    compileOnly 'com.google.android.wearable:wearable:2.7.0'
+    implementation 'com.google.android.support:wearable:2.8.0'
+    compileOnly 'com.google.android.wearable:wearable:2.8.0'
     implementation 'com.google.android.gms:play-services-wearable:17.0.0'
     implementation 'androidx.percentlayout:percentlayout:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'

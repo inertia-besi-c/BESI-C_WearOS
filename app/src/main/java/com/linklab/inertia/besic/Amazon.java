@@ -20,12 +20,10 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 
@@ -43,8 +41,9 @@ public class Amazon extends WearableActivity
     private SystemInformation systemInformation;        // Sets up system information
     private TransferUtility transferUtility;        // Sets up the transfer utility
     private TransferObserver observer;      // Sets up the observer
+    private DataLogger dataLogger;  // Sets up the datalogger utility
     private JSONObject jObjectI, jObjectII;     // Sets up json objects
-    private String bucketName, keyValue, identityID;        // Sets up strings
+    private String bucketName, keyValue, identityID, data;        // Sets up strings
     private File fileToUpload;      // The files to upload
     private int fileLength;     // File length
 
@@ -111,10 +110,16 @@ public class Amazon extends WearableActivity
             this.jObjectII = this.jObjectI.getJSONObject("AmazonInformation").getJSONObject("BESICloudInformation");        // Read the data
             this.bucketName = this.jObjectII.getString("Bucket");       // Read the data
             this.identityID = this.jObjectII.getString("PoolId");       // Read the data
+
+            data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Amazon Service" + (",") + "Retrieve S3 Information" + (",") + "Successful";       // Data to be logged by the system
+            dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), "Error.csv", data);      // Sets a new datalogger variable
+            dataLogger.saveData("log");      // Saves the data in the mode specified
         }
-        catch (IOException | JSONException e)       // If an error occurs
+        catch (Exception e)       // If an error occurs
         {
-            e.printStackTrace();        // Print it out.
+            data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Amazon Service" + (",") + "Retrieve S3 Information failed with error" + (",") + e;       // Data to be logged by the system
+            dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), "Error.csv", data);      // Sets a new datalogger variable
+            dataLogger.saveData("log");      // Saves the data in the mode specified
         }
     }
 
@@ -126,10 +131,24 @@ public class Amazon extends WearableActivity
      */
     private void uploadFileToAWS(String bucket, String key, File file)
     {
-        this.credentialsProvider = new CognitoCachingCredentialsProvider(this.getApplicationContext(), this.identityID, Regions.US_EAST_1);     // Sets the credentials
-        this.s3 = new AmazonS3Client(this.credentialsProvider);     // Sends that to the bucket for verification
-        this.transferUtility = new TransferUtility(this.s3, this.getApplicationContext());      // Initializes a transfer utility
-        this.observer = transferUtility.upload(bucket, key, file);       // Initialises an observer
+
+        try // Tries to connect to the S3 bucket using the secret information
+        {
+            this.credentialsProvider = new CognitoCachingCredentialsProvider(this.getApplicationContext(), this.identityID, Regions.US_EAST_1);     // Sets the credentials
+            this.s3 = new AmazonS3Client(this.credentialsProvider);     // Sends that to the bucket for verification
+            this.transferUtility = new TransferUtility(this.s3, this.getApplicationContext());      // Initializes a transfer utility
+            this.observer = transferUtility.upload(bucket, key, file);       // Initialises an observer
+
+            data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Amazon Service" + (",") + "Connecting to S3 Bucket" + (",") + "Successful";       // Data to be logged by the system
+            dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), "Error.csv", data);      // Sets a new datalogger variable
+            dataLogger.saveData("log");      // Saves the data in the mode specified
+        }
+        catch (Exception e) // If an error happens along the way
+        {
+            data = this.systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Amazon Service" + (",") + "Connecting to S3 Bucket failed with exception" + (",") + e;       // Data to be logged by the system
+            dataLogger = new DataLogger(this.getApplicationContext(), this.getResources().getString(R.string.subdirectory_logs), "Error.csv", data);      // Sets a new datalogger variable
+            dataLogger.saveData("log");      // Saves the data in the mode specified
+        }
 
         this.observer.setTransferListener(new TransferListener()
         {
@@ -141,6 +160,10 @@ public class Amazon extends WearableActivity
             @Override
             public void onStateChanged(int id, TransferState state)
             {
+                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Amazon Service" + (",") + "Transfer State Changed to" + (",") + state;       // Data to be logged by the system
+                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), "Error.csv", data);      // Sets a new datalogger variable
+                dataLogger.saveData("log");      // Saves the data in the mode specified
+
                 if (state.equals(TransferState.COMPLETED))      // Checks for success
                 {
                     systemInformation.toast(getApplicationContext(), "Upload Completed!!!");        // Toasts the screen
@@ -166,7 +189,12 @@ public class Amazon extends WearableActivity
              * @param ex is the exception that happened
              */
             @Override
-            public void onError(int id, Exception ex) {}
+            public void onError(int id, Exception ex)
+            {
+                data = systemInformation.getDateTime("yyyy/MM/dd HH:mm:ss:SSS") + (",") + "Amazon Service" + (",") + "Transfer Service Error occurred with error" + (",") + ex;       // Data to be logged by the system
+                dataLogger = new DataLogger(getApplicationContext(), getResources().getString(R.string.subdirectory_logs), "Error.csv", data);      // Sets a new datalogger variable
+                dataLogger.saveData("log");      // Saves the data in the mode specified
+            }
         });
     }
 }
